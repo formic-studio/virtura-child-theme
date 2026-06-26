@@ -72,22 +72,18 @@ html:root {
   --fs-button: 1.6rem; /* Buttons: 16px */
 }
 
-/*
-  Tablet placeholder. Add overrides only for values that differ from desktop.
+/* Tablet */
 
-  @media (max-width: 991px) {
-    html:root {
-      --fs-h1: 10rem;
-    }
+@media (max-width: 991px) {
+  html:root {
+    --fs-h1: 10rem;
   }
-*/
+}
 
-/*
-  Mobile placeholder. Add overrides only for values that differ from desktop/tablet.
+/* Mobile */
 
-  @media (max-width: 767px) {
-    html:root {
-      --fs-h1: 6.4rem;
-    }
+@media (max-width: 767px) {
+  html:root {
+    --fs-h1: 6.4rem;
   }
-*/
+}
