@@ -54,24 +54,16 @@ function virtura_child_theme_asset_version( string $relative_path ): string {
 }
 
 /**
- * Keep custom frontend behavior out of the Bricks editor iframe.
+ * Detect the Bricks builder iframe.
  */
-function virtura_child_theme_should_enqueue_frontend_assets(): bool {
-	if ( is_admin() ) {
-		return false;
-	}
-
-	if ( function_exists( 'bricks_is_builder' ) && bricks_is_builder() ) {
-		return false;
-	}
-
-	return true;
+function virtura_child_theme_is_bricks_builder(): bool {
+	return function_exists( 'bricks_is_builder' ) && bricks_is_builder();
 }
 
 /**
  * Enqueue the built Vite entrypoint and associated CSS.
  */
-function virtura_child_theme_enqueue_vite_entry( string $entry, string $handle ): void {
+function virtura_child_theme_enqueue_vite_entry( string $entry, string $handle, bool $enqueue_script = true ): void {
 	$manifest = virtura_child_theme_get_manifest();
 
 	if ( ! isset( $manifest[ $entry ] ) || ! is_array( $manifest[ $entry ] ) ) {
@@ -91,6 +83,10 @@ function virtura_child_theme_enqueue_vite_entry( string $entry, string $handle )
 				virtura_child_theme_asset_version( $css_relative_path )
 			);
 		}
+	}
+
+	if ( ! $enqueue_script ) {
+		return;
 	}
 
 	if ( empty( $asset['file'] ) ) {
@@ -114,10 +110,14 @@ function virtura_child_theme_enqueue_vite_entry( string $entry, string $handle )
  * Load the child theme frontend bundle.
  */
 function virtura_child_theme_enqueue_assets(): void {
-	if ( ! virtura_child_theme_should_enqueue_frontend_assets() ) {
+	if ( is_admin() ) {
 		return;
 	}
 
-	virtura_child_theme_enqueue_vite_entry( 'src/scripts/main.js', 'virtura-child-theme' );
+	virtura_child_theme_enqueue_vite_entry(
+		'src/scripts/main.js',
+		'virtura-child-theme',
+		! virtura_child_theme_is_bricks_builder()
+	);
 }
 add_action( 'wp_enqueue_scripts', 'virtura_child_theme_enqueue_assets', 20 );

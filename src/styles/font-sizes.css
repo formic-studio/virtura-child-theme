@@ -6,6 +6,7 @@
   Important:
   - 1rem = 10px.
   - Root font-size is fluid and affects all rem-based values in the theme.
+  - Root font-size values avoid CSS calc multiplication for better browser support.
   - Line-height is intentionally ignored.
   - Italic variants are not separate variables when they share the same font-size as the standard style.
   - Hover/default variants are not separate variables when they share the same font-size.
@@ -13,46 +14,35 @@
   - Mobile overrides are included only where the mobile value differs from desktop.
 */
 
-html {
-  font-size: calc(0.625rem * var(--a11y-font-scale, 1)) !important;
+html:root {
+  --virtura-root-font-size: 62.5%;
 }
 
-@media screen and (max-width: 1920px) {
-  html {
-    font-size: calc(0.625rem * var(--a11y-font-scale, 1)) !important;
-  }
+html {
+  font-size: var(--virtura-root-font-size) !important;
 }
 
 @media screen and (max-width: 1440px) {
-  html {
-    font-size: calc(
-      (0.15625000000000006rem + 0.5208333333333333vw) *
-        var(--a11y-font-scale, 1)
-    ) !important;
+  html:root {
+    --virtura-root-font-size: calc(2.5px + 0.5208333333333333vw);
   }
 }
 
 @media screen and (max-width: 960px) {
-  html {
-    font-size: calc(
-      (0.24999999999999994rem + 0.6250000000000001vw) *
-        var(--a11y-font-scale, 1)
-    ) !important;
+  html:root {
+    --virtura-root-font-size: calc(4px + 0.6250000000000001vw);
   }
 }
 
 @media screen and (max-width: 720px) {
-  html {
-    font-size: calc(0.625rem * var(--a11y-font-scale, 1)) !important;
+  html:root {
+    --virtura-root-font-size: 62.5%;
   }
 }
 
 @media screen and (max-width: 360px) {
-  html {
-    font-size: calc(
-      (0.37430362116991645rem + 1.1142061281337046vw) *
-        var(--a11y-font-scale, 1)
-    ) !important;
+  html:root {
+    --virtura-root-font-size: calc(5.988857938718663px + 1.1142061281337046vw);
   }
 }
 

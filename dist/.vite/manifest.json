@@ -1,0 +1,27 @@
+{
+  "node_modules/gsap/ScrollTrigger.js": {
+    "file": "assets/ScrollTrigger-BrDuEirF.js",
+    "name": "ScrollTrigger",
+    "src": "node_modules/gsap/ScrollTrigger.js",
+    "isDynamicEntry": true
+  },
+  "node_modules/gsap/index.js": {
+    "file": "assets/index-D4-8ALNT.js",
+    "name": "index",
+    "src": "node_modules/gsap/index.js",
+    "isDynamicEntry": true
+  },
+  "src/scripts/main.js": {
+    "file": "assets/main-CYCYeH7l.js",
+    "name": "main",
+    "src": "src/scripts/main.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "node_modules/gsap/index.js",
+      "node_modules/gsap/ScrollTrigger.js"
+    ],
+    "css": [
+      "assets/main-D3HR8jPk.css"
+    ]
+  }
+}
