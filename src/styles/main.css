@@ -33,6 +33,11 @@
 
 .virtura-hero-img-motion-active {
   isolation: isolate;
+  position: relative;
+}
+
+.virtura-hero-img-motion-docked {
+  overflow: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -6,6 +6,7 @@ const HERO_SECTION_SELECTOR = '.section_hero';
 const HERO_CLONE_CLASS = 'virtura-hero-img-clone';
 const HERO_SOURCE_HIDDEN_CLASS = 'virtura-hero-img-source-hidden';
 const HERO_ACTIVE_CLASS = 'virtura-hero-img-motion-active';
+const HERO_DOCKED_CLASS = 'virtura-hero-img-motion-docked';
 
 let gsapApiPromise;
 let motionInitialized = false;
@@ -187,8 +188,19 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
 
   const getSourceBorderRadius = () => window.getComputedStyle(image).borderRadius;
 
+  const setCloneFixed = () => {
+    if (clone.parentElement !== document.body) {
+      document.body.appendChild(clone);
+    }
+
+    section.classList.remove(HERO_DOCKED_CLASS);
+    gsap.set(clone, { position: 'fixed' });
+  };
+
   const setCloneToSource = () => {
     const sourceRect = image.getBoundingClientRect();
+
+    setCloneFixed();
 
     gsap.set(clone, {
       autoAlpha: isCloneActive ? 1 : 0,
@@ -200,17 +212,67 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
     });
   };
 
-  const showClone = () => {
+  const setCloneToTarget = () => {
+    const targetRect = getHeroTargetRect(image, section);
+
+    setCloneFixed();
+
+    gsap.set(clone, {
+      autoAlpha: 1,
+      borderRadius: getSourceBorderRadius(),
+      height: targetRect.height,
+      left: targetRect.left,
+      top: targetRect.top,
+      width: targetRect.width,
+    });
+  };
+
+  const activateClone = () => {
     isCloneActive = true;
     section.classList.add(HERO_ACTIVE_CLASS);
     image.classList.add(HERO_SOURCE_HIDDEN_CLASS);
+  };
+
+  const showCloneFromSource = () => {
+    activateClone();
+    setCloneFixed();
     gsap.set(clone, { autoAlpha: 1 });
+  };
+
+  const showCloneFromTarget = () => {
+    activateClone();
+    setCloneToTarget();
+  };
+
+  const dockCloneInSection = () => {
+    const targetRect = getHeroTargetRect(image, section);
+    const sectionRect = section.getBoundingClientRect();
+
+    activateClone();
+
+    if (clone.parentElement !== section) {
+      section.appendChild(clone);
+    }
+
+    section.classList.add(HERO_DOCKED_CLASS);
+
+    gsap.set(clone, {
+      autoAlpha: 1,
+      borderRadius: getSourceBorderRadius(),
+      height: targetRect.height,
+      left: Math.max(0, targetRect.left - sectionRect.left),
+      position: 'absolute',
+      top: 0,
+      width: targetRect.width,
+    });
   };
 
   const hideClone = () => {
     isCloneActive = false;
     section.classList.remove(HERO_ACTIVE_CLASS);
+    section.classList.remove(HERO_DOCKED_CLASS);
     image.classList.remove(HERO_SOURCE_HIDDEN_CLASS);
+    setCloneFixed();
     gsap.set(clone, { autoAlpha: 0 });
   };
 
@@ -221,8 +283,9 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
       anticipatePin: 1,
       end: '+=120%',
       invalidateOnRefresh: true,
-      onEnter: showClone,
-      onEnterBack: showClone,
+      onEnter: showCloneFromSource,
+      onEnterBack: showCloneFromTarget,
+      onLeave: dockCloneInSection,
       onLeaveBack: hideClone,
       onRefreshInit: setCloneToSource,
       pin: true,
@@ -260,6 +323,7 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
       timeline.kill();
       clone.remove();
       section.classList.remove(HERO_ACTIVE_CLASS);
+      section.classList.remove(HERO_DOCKED_CLASS);
       image.classList.remove(HERO_SOURCE_HIDDEN_CLASS);
     },
   });
