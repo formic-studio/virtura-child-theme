@@ -13,10 +13,11 @@
 }
 
 .virtura-hero-img-clone {
+  border-radius: var(--space-16, 1.6rem);
   display: block;
   margin: 0;
   max-width: none;
-  object-fit: cover;
+  object-fit: fill;
   object-position: center center;
   opacity: 0;
   pointer-events: none;

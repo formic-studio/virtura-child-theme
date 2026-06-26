@@ -7,6 +7,7 @@ const HERO_CLONE_CLASS = 'virtura-hero-img-clone';
 const HERO_SOURCE_HIDDEN_CLASS = 'virtura-hero-img-source-hidden';
 const HERO_ACTIVE_CLASS = 'virtura-hero-img-motion-active';
 const HERO_DOCKED_CLASS = 'virtura-hero-img-motion-docked';
+const HERO_TARGET_MAX_BLOCK_PADDING = '12rem';
 
 let gsapApiPromise;
 let motionInitialized = false;
@@ -90,15 +91,31 @@ const getNearestHorizontalPadding = (element, stopElement) => {
 };
 
 const getHeroTargetRect = (image, section) => {
-  const padding = getNearestHorizontalPadding(image, section);
-  const left = Math.max(0, padding.left);
-  const right = Math.max(0, padding.right);
+  const inlinePadding = getNearestHorizontalPadding(image, section);
+  const leftPadding = Math.max(0, inlinePadding.left);
+  const rightPadding = Math.max(0, inlinePadding.right);
+  const maxBlockPadding = getCssLengthInPixels(HERO_TARGET_MAX_BLOCK_PADDING);
+  const blockPadding = Math.min(maxBlockPadding, window.innerHeight * 0.18);
+  const availableWidth = Math.max(1, window.innerWidth - leftPadding - rightPadding);
+  const availableHeight = Math.max(1, window.innerHeight - blockPadding * 2);
+  const sourceRect = image.getBoundingClientRect();
+  const sourceWidth = image.naturalWidth || sourceRect.width || availableWidth;
+  const sourceHeight = image.naturalHeight || sourceRect.height || availableHeight;
+  const aspectRatio = sourceWidth / sourceHeight;
+
+  let width = availableWidth;
+  let height = width / aspectRatio;
+
+  if (height > availableHeight) {
+    height = availableHeight;
+    width = height * aspectRatio;
+  }
 
   return {
-    left,
-    top: 0,
-    width: Math.max(1, window.innerWidth - left - right),
-    height: window.innerHeight,
+    height,
+    left: (window.innerWidth - width) / 2,
+    top: (window.innerHeight - height) / 2,
+    width,
   };
 };
 
@@ -262,7 +279,7 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
       height: targetRect.height,
       left: Math.max(0, targetRect.left - sectionRect.left),
       position: 'absolute',
-      top: 0,
+      top: Math.max(0, targetRect.top - sectionRect.top),
       width: targetRect.width,
     });
   };
