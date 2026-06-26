@@ -1,0 +1,45 @@
+/*
+  Font-size tokens for Bricks + child theme.
+  Source: desktop typography styles from Figma/design handoff.
+  Assumption: 1rem = 10px.
+  This file contains only font-size values. Line-height is intentionally ignored.
+  Add tablet/mobile overrides only when you receive those values from the design.
+
+  In Bricks use these variables directly, e.g. var(--fs-h1), var(--fs-body-small).
+*/
+
+html:root {
+  --fs-h1:          12.4rem; /* H1: 124px */
+  --fs-h2:          8rem; /* H2: 80px */
+  --fs-h3:          6.4rem; /* H3: 64px */
+  --fs-h4:          4.8rem; /* H4: 48px */
+  --fs-h5:          3.6rem; /* H5: 36px */
+  --fs-h6:          2.4rem; /* H6: 24px */
+  --fs-title-big:   2rem; /* Title Big: 20px */
+  --fs-title-small: 1.6rem; /* Title Small: 16px */
+  --fs-label-big:   1.6rem; /* Label Big: 16px */
+  --fs-label-small: 1.2rem; /* Label Small: 12px */
+  --fs-body-big:    1.8rem; /* Body Big: 18px */
+  --fs-body-small:  1.6rem; /* Body Small: 16px */
+  --fs-button:      1.6rem; /* Buttons: 16px */
+}
+
+/*
+  Tablet placeholder. Add overrides only for values that differ from desktop.
+
+  @media (max-width: 991px) {
+    html:root {
+      --fs-h1: 10rem;
+    }
+  }
+*/
+
+/*
+  Mobile placeholder. Add overrides only for values that differ from desktop/tablet.
+
+  @media (max-width: 767px) {
+    html:root {
+      --fs-h1: 6.4rem;
+    }
+  }
+*/
