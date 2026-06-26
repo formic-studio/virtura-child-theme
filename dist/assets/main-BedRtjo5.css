@@ -1,0 +1,1 @@
+:root{--virtura-motion-ease: cubic-bezier(.22, 1, .36, 1)}.virtura-motion-ready [data-motion]{will-change:opacity,transform}.virtura-reduced-motion [data-motion]{will-change:auto}@media(prefers-reduced-motion:reduce){[data-motion]{opacity:1!important;transform:none!important}}
