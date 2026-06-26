@@ -121,3 +121,27 @@ function virtura_child_theme_enqueue_assets(): void {
 	);
 }
 add_action( 'wp_enqueue_scripts', 'virtura_child_theme_enqueue_assets', 20 );
+
+/**
+ * Force Vite bundles to load as ES modules.
+ *
+ * Some WordPress/optimization stacks ignore wp_script_add_data( 'type', 'module' ),
+ * but Vite output uses import.meta and dynamic imports, so the script tag must
+ * be rendered with type="module".
+ */
+function virtura_child_theme_add_module_type_to_script( string $tag, string $handle, string $src ): string {
+	if ( 'virtura-child-theme' !== $handle || empty( $src ) ) {
+		return $tag;
+	}
+
+	if ( false !== strpos( $tag, ' type=' ) ) {
+		return $tag;
+	}
+
+	return sprintf(
+		'<script type="module" src="%s" id="%s-js"></script>' . "\n",
+		esc_url( $src ),
+		esc_attr( $handle )
+	);
+}
+add_filter( 'script_loader_tag', 'virtura_child_theme_add_module_type_to_script', 10, 3 );
