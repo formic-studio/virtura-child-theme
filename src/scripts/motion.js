@@ -223,7 +223,6 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
       invalidateOnRefresh: true,
       onEnter: showClone,
       onEnterBack: showClone,
-      onLeave: hideClone,
       onLeaveBack: hideClone,
       onRefreshInit: setCloneToSource,
       pin: true,
@@ -243,7 +242,7 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
       width: () => image.getBoundingClientRect().width,
     },
     {
-      borderRadius: '0px',
+      borderRadius: () => getSourceBorderRadius(),
       ease: 'none',
       height: () => getHeroTargetRect(image, section).height,
       left: () => getHeroTargetRect(image, section).left,
