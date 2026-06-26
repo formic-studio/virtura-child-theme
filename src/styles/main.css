@@ -12,8 +12,36 @@
   will-change: auto;
 }
 
+.virtura-hero-img-clone {
+  display: block;
+  margin: 0;
+  max-width: none;
+  object-fit: cover;
+  object-position: center center;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  transform: translateZ(0);
+  visibility: hidden;
+  will-change: left, top, width, height, border-radius;
+  z-index: 20;
+}
+
+.hero-img.virtura-hero-img-source-hidden {
+  opacity: 0 !important;
+}
+
+.virtura-hero-img-motion-active {
+  isolation: isolate;
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-motion] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .hero-img {
     opacity: 1 !important;
     transform: none !important;
   }
