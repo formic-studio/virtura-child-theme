@@ -53,6 +53,47 @@
   transform: translate3d(0, var(--virtura-category-stack-exit-y, 0px), 0);
 }
 
+.glass-block.brxe-block {
+  background-color: rgba(87, 87, 87, 0.46);
+  background-image: linear-gradient(
+    180deg,
+    rgba(87, 87, 87, 0.46) 0%,
+    rgba(54, 54, 54, 0.56) 72%,
+    rgba(44, 44, 44, 0.42) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+  isolation: isolate;
+  overflow: hidden;
+  position: relative;
+  -webkit-backdrop-filter: blur(15px) saturate(120%);
+  backdrop-filter: blur(15px) saturate(120%);
+}
+
+.glass-block.brxe-block::after {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.18) 42%,
+    rgba(255, 255, 255, 0.58) 100%
+  );
+  bottom: 0;
+  content: "";
+  height: 13rem;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  z-index: 0;
+}
+
+.glass-block.brxe-block > * {
+  position: relative;
+  z-index: 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-motion] {
     opacity: 1 !important;
