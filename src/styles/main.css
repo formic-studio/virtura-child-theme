@@ -53,6 +53,7 @@
   }
 
   .category-wrapper.brxe-block > .category-block.brxe-block {
+    margin-top: var(--category-stack-overlap, 0);
     position: sticky;
     top: var(--category-stack-top, var(--space-72, 7.2rem));
     z-index: var(--category-stack-z-index, 1);
