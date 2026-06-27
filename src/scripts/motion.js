@@ -13,6 +13,7 @@ const CATEGORY_BLOCK_SELECTOR = '.category-block';
 const CATEGORY_HEADING_SELECTOR = '.category-heading-block';
 const CATEGORY_STACK_TOP_OFFSET = 'var(--space-72, 7.2rem)';
 const CATEGORY_STACK_HEADING_GAP = 'var(--space-8, 0.8rem)';
+const CATEGORY_STACK_OVERLAP = '-1rem';
 
 let gsapApiPromise;
 let motionInitialized = false;
@@ -228,15 +229,12 @@ const refreshCategoryStacks = () => {
       return blockTopPadding + headingHeight;
     });
     const visibleStep = Math.max(...visibleHeadingHeights, 0) + headingGap;
-    const stackHold = Math.max(
-      visibleStep * blocks.length,
-      window.innerHeight - stackTopOffset,
-    );
+    const stackHold = visibleStep;
 
     wrapper.style.setProperty('--category-stack-padding-bottom', `${stackHold}px`);
 
     blocks.forEach((block, index) => {
-      block.style.setProperty('--category-stack-overlap', index ? `-${visibleStep}px` : '0px');
+      block.style.setProperty('--category-stack-overlap', index ? CATEGORY_STACK_OVERLAP : '0px');
       block.style.setProperty('--category-stack-top', `${stackTopOffset + visibleStep * index}px`);
       block.style.setProperty('--category-stack-z-index', `${10 + index}`);
     });
