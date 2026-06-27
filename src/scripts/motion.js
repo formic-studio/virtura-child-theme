@@ -8,9 +8,16 @@ const HERO_SOURCE_HIDDEN_CLASS = 'virtura-hero-img-source-hidden';
 const HERO_ACTIVE_CLASS = 'virtura-hero-img-motion-active';
 const HERO_DOCKED_CLASS = 'virtura-hero-img-motion-docked';
 const HERO_TARGET_MAX_BLOCK_PADDING = '12rem';
+const CATEGORY_WRAPPER_SELECTOR = '.category-wrapper';
+const CATEGORY_BLOCK_SELECTOR = '.category-block';
+const CATEGORY_HEADING_SELECTOR = '.category-heading-block';
+const CATEGORY_STACK_TOP_OFFSET = 'var(--space-72, 7.2rem)';
+const CATEGORY_STACK_HEADING_GAP = 'var(--space-8, 0.8rem)';
 
 let gsapApiPromise;
 let motionInitialized = false;
+let categoryStackInitialized = false;
+let categoryStackRefreshFrame;
 
 export const loadGsap = async () => {
   if (!gsapApiPromise) {
@@ -35,6 +42,14 @@ const getMotionElements = () => Array.from(document.querySelectorAll('[data-moti
 const getHeroImage = () => document.querySelector(HERO_IMAGE_SELECTOR);
 
 const getHeroSection = (image) => image?.closest(HERO_SECTION_SELECTOR);
+
+const getCategoryStackWrappers = () => Array
+  .from(document.querySelectorAll(CATEGORY_WRAPPER_SELECTOR))
+  .filter((wrapper) => getCategoryStackBlocks(wrapper).length > 1);
+
+const getCategoryStackBlocks = (wrapper) => Array
+  .from(wrapper.children)
+  .filter((child) => child.classList.contains(CATEGORY_BLOCK_SELECTOR.slice(1)));
 
 const getCssLengthInPixels = (value) => {
   if (!value) {
@@ -190,6 +205,84 @@ const resetMotionElements = () => {
     element.style.removeProperty('transform');
     element.style.removeProperty('visibility');
   });
+};
+
+const refreshCategoryStacks = () => {
+  const wrappers = getCategoryStackWrappers();
+
+  if (!wrappers.length) {
+    return;
+  }
+
+  const stackTopOffset = getCssLengthInPixels(CATEGORY_STACK_TOP_OFFSET);
+  const headingGap = getCssLengthInPixels(CATEGORY_STACK_HEADING_GAP);
+
+  wrappers.forEach((wrapper) => {
+    const blocks = getCategoryStackBlocks(wrapper);
+    const visibleHeadingHeights = blocks.map((block) => {
+      const blockStyles = window.getComputedStyle(block);
+      const heading = block.querySelector(CATEGORY_HEADING_SELECTOR);
+      const headingHeight = heading?.getBoundingClientRect().height || 0;
+      const blockTopPadding = Number.parseFloat(blockStyles.paddingTop) || 0;
+
+      return blockTopPadding + headingHeight;
+    });
+    const visibleStep = Math.max(...visibleHeadingHeights, 0) + headingGap;
+
+    wrapper.style.setProperty(
+      '--category-stack-padding-bottom',
+      `${visibleStep * (blocks.length - 1)}px`,
+    );
+
+    blocks.forEach((block, index) => {
+      block.style.setProperty('--category-stack-top', `${stackTopOffset + visibleStep * index}px`);
+      block.style.setProperty('--category-stack-z-index', `${10 + index}`);
+    });
+  });
+};
+
+const scheduleCategoryStackRefresh = () => {
+  if (categoryStackRefreshFrame) {
+    window.cancelAnimationFrame(categoryStackRefreshFrame);
+  }
+
+  categoryStackRefreshFrame = window.requestAnimationFrame(() => {
+    categoryStackRefreshFrame = null;
+    refreshCategoryStacks();
+  });
+};
+
+const initCategoryStack = () => {
+  const wrappers = getCategoryStackWrappers();
+
+  if (!wrappers.length) {
+    return false;
+  }
+
+  refreshCategoryStacks();
+
+  if (categoryStackInitialized) {
+    return true;
+  }
+
+  categoryStackInitialized = true;
+
+  window.addEventListener('resize', scheduleCategoryStackRefresh, { passive: true });
+  window.addEventListener('load', scheduleCategoryStackRefresh, { once: true });
+
+  if (document.fonts?.ready) {
+    document.fonts.ready.then(scheduleCategoryStackRefresh).catch(() => {});
+  }
+
+  wrappers.forEach((wrapper) => {
+    wrapper.querySelectorAll('img').forEach((image) => {
+      if (!image.complete) {
+        image.addEventListener('load', scheduleCategoryStackRefresh, { once: true });
+      }
+    });
+  });
+
+  return true;
 };
 
 const initHeroImageScale = (gsap, ScrollTrigger) => {
@@ -379,6 +472,11 @@ export const initMotion = async () => {
 
   const motionElements = getMotionElements();
   const heroImage = getHeroImage();
+  const hasCategoryStack = initCategoryStack();
+
+  if (!motionElements.length && !heroImage && !hasCategoryStack) {
+    return;
+  }
 
   if (!motionElements.length && !heroImage) {
     return;

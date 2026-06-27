@@ -41,6 +41,24 @@
   overflow: hidden;
 }
 
+.category-wrapper.brxe-block {
+  isolation: isolate;
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .category-wrapper.brxe-block {
+    display: block;
+    padding-bottom: var(--category-stack-padding-bottom, 0);
+  }
+
+  .category-wrapper.brxe-block > .category-block.brxe-block {
+    position: sticky;
+    top: var(--category-stack-top, var(--space-72, 7.2rem));
+    z-index: var(--category-stack-z-index, 1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-motion] {
     opacity: 1 !important;
