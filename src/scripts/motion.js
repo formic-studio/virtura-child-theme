@@ -263,7 +263,6 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
 
   const dockCloneInSection = () => {
     const targetRect = getHeroTargetRect(image, section);
-    const sectionRect = section.getBoundingClientRect();
 
     activateClone();
 
@@ -277,9 +276,9 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
       autoAlpha: 1,
       borderRadius: getSourceBorderRadius(),
       height: targetRect.height,
-      left: Math.max(0, targetRect.left - sectionRect.left),
+      left: Math.max(0, targetRect.left),
       position: 'absolute',
-      top: Math.max(0, targetRect.top - sectionRect.top),
+      top: Math.max(0, targetRect.top),
       width: targetRect.width,
     });
   };
@@ -304,6 +303,19 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
       onEnterBack: showCloneFromTarget,
       onLeave: dockCloneInSection,
       onLeaveBack: hideClone,
+      onRefresh: (self) => {
+        if (self.progress >= 1) {
+          dockCloneInSection();
+          return;
+        }
+
+        if (self.progress <= 0) {
+          hideClone();
+          return;
+        }
+
+        showCloneFromSource();
+      },
       onRefreshInit: setCloneToSource,
       pin: true,
       scrub: true,
