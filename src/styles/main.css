@@ -44,6 +44,7 @@
 .category-wrapper.brxe-block {
   --category-stack-overlap: -1rem;
   --category-stack-step: calc(var(--space-24, 2.4rem) + 7.2rem + var(--space-8, 0.8rem));
+  --category-stack-end-space: calc(var(--category-stack-step) + var(--category-stack-step) + var(--category-stack-step));
   --category-stack-top: var(--space-16, 1.6rem);
   isolation: isolate;
   position: relative;
@@ -52,6 +53,13 @@
 @media (min-width: 768px) {
   .category-wrapper.brxe-block {
     display: block;
+  }
+
+  .category-wrapper.brxe-block::after {
+    content: "";
+    display: block;
+    height: var(--category-stack-end-space);
+    pointer-events: none;
   }
 
   .category-wrapper.brxe-block > .category-block.brxe-block {
