@@ -73,6 +73,18 @@ const getCssLengthInPixels = (value) => {
   return Number.isFinite(width) ? width : 0;
 };
 
+const getRootRemInPixels = () => {
+  const rootFontSize = Number.parseFloat(
+    window.getComputedStyle(document.documentElement).fontSize,
+  );
+
+  return Number.isFinite(rootFontSize) && rootFontSize > 0 ? rootFontSize : 16;
+};
+
+const toRemValue = (pixels) => `${Number.parseFloat(
+  (pixels / getRootRemInPixels()).toFixed(4),
+)}rem`;
+
 const getGlobalPaddingFromCssVariable = () => {
   const rootStyles = window.getComputedStyle(document.documentElement);
   const globalPadding = rootStyles.getPropertyValue('--padding-global').trim();
@@ -230,11 +242,12 @@ const refreshCategoryStacks = () => {
     });
     const visibleStep = Math.max(...visibleHeadingHeights, 0) + headingGap;
 
-    wrapper.style.setProperty('--category-stack-padding-bottom', `${visibleStep}px`);
+    wrapper.style.setProperty('--category-stack-end-space', toRemValue(visibleStep));
+    wrapper.style.setProperty('--category-stack-end-offset', toRemValue(-visibleStep));
 
     blocks.forEach((block, index) => {
-      block.style.setProperty('--category-stack-overlap', index ? CATEGORY_STACK_OVERLAP : '0px');
-      block.style.setProperty('--category-stack-top', `${stackTopOffset + visibleStep * index}px`);
+      block.style.setProperty('--category-stack-overlap', index ? CATEGORY_STACK_OVERLAP : '0rem');
+      block.style.setProperty('--category-stack-top', toRemValue(stackTopOffset + visibleStep * index));
       block.style.setProperty('--category-stack-z-index', `${10 + index}`);
     });
   });
