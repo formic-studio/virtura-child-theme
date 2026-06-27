@@ -17,8 +17,6 @@ const CATEGORY_STACK_OVERLAP = '-1rem';
 
 let gsapApiPromise;
 let motionInitialized = false;
-let categoryStackInitialized = false;
-let categoryStackRefreshFrame;
 
 export const loadGsap = async () => {
   if (!gsapApiPromise) {
@@ -208,81 +206,134 @@ const resetMotionElements = () => {
   });
 };
 
-const refreshCategoryStacks = () => {
-  const wrappers = getCategoryStackWrappers();
+const getCategoryStackMetrics = (wrapper) => {
+  const stackTopOffset = getCssLengthInPixels(CATEGORY_STACK_TOP_OFFSET);
+  const headingGap = getCssLengthInPixels(CATEGORY_STACK_HEADING_GAP);
+  const blocks = getCategoryStackBlocks(wrapper);
+  const visibleHeadingHeights = blocks.map((block) => {
+    const blockStyles = window.getComputedStyle(block);
+    const heading = block.querySelector(CATEGORY_HEADING_SELECTOR);
+    const headingHeight = heading?.getBoundingClientRect().height || 0;
+    const blockTopPadding = Number.parseFloat(blockStyles.paddingTop) || 0;
 
+    return blockTopPadding + headingHeight;
+  });
+
+  return {
+    blocks,
+    stackTopOffset,
+    visibleStep: Math.max(...visibleHeadingHeights, 0) + headingGap,
+  };
+};
+
+const setCategoryStackVars = (wrapper) => {
+  const { blocks } = getCategoryStackMetrics(wrapper);
+
+  blocks.forEach((block, index) => {
+    block.style.setProperty('--category-stack-overlap', index ? CATEGORY_STACK_OVERLAP : '0px');
+    block.style.setProperty('--category-stack-z-index', `${10 + index}`);
+  });
+};
+
+const clearCategoryStackVars = (wrapper, gsap) => {
+  getCategoryStackBlocks(wrapper).forEach((block) => {
+    block.style.removeProperty('--category-stack-overlap');
+    block.style.removeProperty('--category-stack-z-index');
+    gsap.set(block, { clearProps: 'transform,willChange' });
+  });
+};
+
+const initCategoryStack = (gsap, ScrollTrigger, wrappers) => {
   if (!wrappers.length) {
     return;
   }
 
-  const stackTopOffset = getCssLengthInPixels(CATEGORY_STACK_TOP_OFFSET);
-  const headingGap = getCssLengthInPixels(CATEGORY_STACK_HEADING_GAP);
+  const media = gsap.matchMedia();
 
-  wrappers.forEach((wrapper) => {
-    const blocks = getCategoryStackBlocks(wrapper);
-    const visibleHeadingHeights = blocks.map((block) => {
-      const blockStyles = window.getComputedStyle(block);
-      const heading = block.querySelector(CATEGORY_HEADING_SELECTOR);
-      const headingHeight = heading?.getBoundingClientRect().height || 0;
-      const blockTopPadding = Number.parseFloat(blockStyles.paddingTop) || 0;
+  media.add('(min-width: 768px)', () => {
+    const timelines = wrappers.map((wrapper) => {
+      setCategoryStackVars(wrapper);
 
-      return blockTopPadding + headingHeight;
+      const timeline = gsap.timeline({
+        defaults: {
+          duration: 1,
+          ease: 'none',
+        },
+        scrollTrigger: {
+          end: () => {
+            setCategoryStackVars(wrapper);
+
+            const { blocks, visibleStep } = getCategoryStackMetrics(wrapper);
+            const lastBlock = blocks[blocks.length - 1];
+            const lastTargetTop = visibleStep * (blocks.length - 1);
+
+            return `+=${Math.max(1, lastBlock.offsetTop - lastTargetTop)}`;
+          },
+          invalidateOnRefresh: true,
+          onRefreshInit: () => {
+            gsap.set(getCategoryStackBlocks(wrapper), { clearProps: 'transform' });
+            setCategoryStackVars(wrapper);
+          },
+          pin: true,
+          pinSpacing: true,
+          scrub: true,
+          start: () => {
+            const { stackTopOffset } = getCategoryStackMetrics(wrapper);
+
+            return `top ${stackTopOffset}px`;
+          },
+          trigger: wrapper,
+        },
+      });
+
+      getCategoryStackBlocks(wrapper).forEach((block, index) => {
+        if (!index) {
+          return;
+        }
+
+        gsap.set(block, { willChange: 'transform' });
+
+        timeline.to(
+          block,
+          {
+            y: () => {
+              const { visibleStep } = getCategoryStackMetrics(wrapper);
+
+              return visibleStep * index - block.offsetTop;
+            },
+          },
+          index - 1,
+        );
+      });
+
+      return timeline;
     });
-    const visibleStep = Math.max(...visibleHeadingHeights, 0) + headingGap;
-    const stackHold = visibleStep;
 
-    wrapper.style.setProperty('--category-stack-padding-bottom', `${stackHold}px`);
+    const refreshOnFontsReady = () => ScrollTrigger.refresh();
 
-    blocks.forEach((block, index) => {
-      block.style.setProperty('--category-stack-overlap', index ? CATEGORY_STACK_OVERLAP : '0px');
-      block.style.setProperty('--category-stack-top', `${stackTopOffset + visibleStep * index}px`);
-      block.style.setProperty('--category-stack-z-index', `${10 + index}`);
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(refreshOnFontsReady).catch(() => {});
+    }
+
+    wrappers.forEach((wrapper) => {
+      wrapper.querySelectorAll('img').forEach((image) => {
+        if (!image.complete) {
+          image.addEventListener('load', refreshOnFontsReady, { once: true });
+        }
+      });
     });
-  });
-};
 
-const scheduleCategoryStackRefresh = () => {
-  if (categoryStackRefreshFrame) {
-    window.cancelAnimationFrame(categoryStackRefreshFrame);
-  }
-
-  categoryStackRefreshFrame = window.requestAnimationFrame(() => {
-    categoryStackRefreshFrame = null;
-    refreshCategoryStacks();
-  });
-};
-
-const initCategoryStack = () => {
-  const wrappers = getCategoryStackWrappers();
-
-  if (!wrappers.length) {
-    return false;
-  }
-
-  refreshCategoryStacks();
-
-  if (categoryStackInitialized) {
-    return true;
-  }
-
-  categoryStackInitialized = true;
-
-  window.addEventListener('resize', scheduleCategoryStackRefresh, { passive: true });
-  window.addEventListener('load', scheduleCategoryStackRefresh, { once: true });
-
-  if (document.fonts?.ready) {
-    document.fonts.ready.then(scheduleCategoryStackRefresh).catch(() => {});
-  }
-
-  wrappers.forEach((wrapper) => {
-    wrapper.querySelectorAll('img').forEach((image) => {
-      if (!image.complete) {
-        image.addEventListener('load', scheduleCategoryStackRefresh, { once: true });
-      }
-    });
+    return () => {
+      timelines.forEach((timeline) => timeline.kill());
+      wrappers.forEach((wrapper) => clearCategoryStackVars(wrapper, gsap));
+    };
   });
 
-  return true;
+  storeAnimation({
+    kill: () => {
+      media.revert();
+    },
+  });
 };
 
 const initHeroImageScale = (gsap, ScrollTrigger) => {
@@ -472,13 +523,9 @@ export const initMotion = async () => {
 
   const motionElements = getMotionElements();
   const heroImage = getHeroImage();
-  const hasCategoryStack = initCategoryStack();
+  const categoryWrappers = getCategoryStackWrappers();
 
-  if (!motionElements.length && !heroImage && !hasCategoryStack) {
-    return;
-  }
-
-  if (!motionElements.length && !heroImage) {
+  if (!motionElements.length && !heroImage && !categoryWrappers.length) {
     return;
   }
 
@@ -503,6 +550,7 @@ export const initMotion = async () => {
   }
 
   initScrollReveal(gsap, motionElements);
+  initCategoryStack(gsap, ScrollTrigger, categoryWrappers);
   initHeroImageScale(gsap, ScrollTrigger);
   document.documentElement.classList.add('virtura-motion-ready');
   motionInitialized = true;
