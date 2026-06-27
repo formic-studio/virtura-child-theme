@@ -41,6 +41,18 @@
   overflow: hidden;
 }
 
+.section_category .category-wrapper.virtura-category-stack-ready {
+  isolation: isolate;
+}
+
+.section_category .category-wrapper.virtura-category-stack-ready > .category-block {
+  z-index: var(--virtura-category-stack-index, 1);
+}
+
+.section_category .category-wrapper.virtura-category-stack-exiting > .category-block:not(:last-child) {
+  transform: translate3d(0, var(--virtura-category-stack-exit-y, 0px), 0);
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-motion] {
     opacity: 1 !important;
