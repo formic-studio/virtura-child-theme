@@ -13,6 +13,7 @@ const CATEGORY_BLOCK_SELECTOR = '.category-block';
 const CATEGORY_HEADING_SELECTOR = '.category-heading-block';
 const CATEGORY_STACK_TOP_OFFSET = 'var(--space-72, 7.2rem)';
 const CATEGORY_STACK_HEADING_GAP = 'var(--space-8, 0.8rem)';
+const CATEGORY_STACK_END_GAP = 'var(--space-16, 1.6rem)';
 const CATEGORY_STACK_OVERLAP = '-1rem';
 
 let gsapApiPromise;
@@ -229,6 +230,7 @@ const refreshCategoryStacks = () => {
 
   const stackTopOffset = getCssLengthInPixels(CATEGORY_STACK_TOP_OFFSET);
   const headingGap = getCssLengthInPixels(CATEGORY_STACK_HEADING_GAP);
+  const endGap = getCssLengthInPixels(CATEGORY_STACK_END_GAP);
 
   wrappers.forEach((wrapper) => {
     const blocks = getCategoryStackBlocks(wrapper);
@@ -241,9 +243,14 @@ const refreshCategoryStacks = () => {
       return blockTopPadding + headingHeight;
     });
     const visibleStep = Math.max(...visibleHeadingHeights, 0) + headingGap;
+    const lastBlock = blocks[blocks.length - 1];
+    const lastBlockHeight = lastBlock?.getBoundingClientRect().height || 0;
+    const lastBlockTop = stackTopOffset + visibleStep * (blocks.length - 1);
+    const safeEndPullUp = Math.max(0, window.innerHeight - lastBlockTop - lastBlockHeight - endGap);
+    const endPullUp = Math.min(visibleStep, safeEndPullUp);
 
     wrapper.style.setProperty('--category-stack-end-space', toRemValue(visibleStep));
-    wrapper.style.setProperty('--category-stack-end-offset', toRemValue(-visibleStep));
+    wrapper.style.setProperty('--category-stack-end-offset', toRemValue(-endPullUp));
 
     blocks.forEach((block, index) => {
       block.style.setProperty('--category-stack-overlap', index ? CATEGORY_STACK_OVERLAP : '0rem');
