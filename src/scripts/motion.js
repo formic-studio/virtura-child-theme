@@ -237,6 +237,18 @@ const getCategoryElementStartX = (element, block) => {
     + CATEGORY_BUTTON_START_BUFFER;
 };
 
+const getCategoryBlockStickyScroll = (block) => {
+  const wrapper = block.parentElement;
+  const wrapperTop = wrapper.getBoundingClientRect().top + window.scrollY;
+  const stickyTop = Number.parseFloat(window.getComputedStyle(block).top) || 0;
+
+  return wrapperTop + block.offsetTop - stickyTop;
+};
+
+const getCategoryImageRevealStart = (block) => (
+  getCategoryBlockStickyScroll(block) - window.innerHeight * 0.05
+);
+
 const initHeroImageScale = (gsap, ScrollTrigger) => {
   const image = getHeroImage();
   const section = getHeroSection(image);
@@ -479,9 +491,9 @@ const initCategoryBlockReveal = (gsap, categoryBlocks) => {
             ease: 'power3.out',
             scrollTrigger: {
               invalidateOnRefresh: true,
-              start: CATEGORY_REVEAL_START,
+              start: () => getCategoryImageRevealStart(block),
               toggleActions: 'play none none reverse',
-              trigger: image,
+              trigger: block,
             },
             x: 0,
           },
