@@ -4,10 +4,17 @@ const READY_CLASS = 'virtura-category-stack-ready';
 const EXITING_CLASS = 'virtura-category-stack-exiting';
 const DESKTOP_MEDIA_QUERY = '(min-width: 768px)';
 const EXIT_THRESHOLD = 0.5;
+const STACK_LIFT_BOTTOM_MARGIN = 24;
+const STACK_LIFT_ENTRY_MAX = 160;
+const STACK_LIFT_ENTRY_MIN = 80;
+const STACK_LIFT_ENTRY_VIEWPORT_RATIO = 0.16;
+const STACK_LIFT_MAX_VIEWPORT_RATIO = 0.24;
 
 let categoryStackInitialized = false;
 
 const desktopMedia = window.matchMedia(DESKTOP_MEDIA_QUERY);
+
+const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
 const getCards = (wrapper) => Array.from(wrapper.children)
   .filter((child) => child.classList.contains(CARD_CLASS));
@@ -20,10 +27,12 @@ const getStickyTop = (card) => {
 
 const resetStack = (stack) => {
   stack.wrapper.classList.remove(READY_CLASS, EXITING_CLASS);
+  stack.wrapper.style.removeProperty('--virtura-category-stack-lift-y');
 
   stack.cards.forEach((card) => {
     card.style.removeProperty('--virtura-category-stack-index');
     card.style.removeProperty('--virtura-category-stack-exit-y');
+    card.style.removeProperty('--virtura-category-stack-lift-y');
   });
 };
 
@@ -39,22 +48,96 @@ const createStack = (wrapper) => {
   cards.forEach((card, index) => {
     card.style.setProperty('--virtura-category-stack-index', String(index + 1));
     card.style.removeProperty('--virtura-category-stack-exit-y');
+    card.style.removeProperty('--virtura-category-stack-lift-y');
   });
+
+  const wrapperTop = wrapper.getBoundingClientRect().top + window.scrollY;
+  const stickyTops = cards.map(getStickyTop);
 
   return {
     appliedOffsets: new Array(cards.length).fill(0),
+    appliedStackLifts: new Array(cards.length).fill(0),
+    cardHeights: cards.map((card) => card.getBoundingClientRect().height),
     cards,
-    stickyTops: cards.map(getStickyTop),
+    stickyTops,
+    stickyScrolls: cards.map((card, index) => (
+      wrapperTop + card.offsetTop - stickyTops[index]
+    )),
     wrapper,
   };
+};
+
+const getStackLiftLimit = (stack) => {
+  const viewportHeight = window.innerHeight;
+  const maxLift = viewportHeight * STACK_LIFT_MAX_VIEWPORT_RATIO;
+  const requiredLift = stack.cardHeights.reduce((lift, cardHeight, index) => {
+    const visibleOverflow = stack.stickyTops[index]
+      + cardHeight
+      + STACK_LIFT_BOTTOM_MARGIN
+      - viewportHeight;
+
+    return Math.max(lift, visibleOverflow);
+  }, 0);
+
+  return clamp(requiredLift, 0, maxLift);
+};
+
+const getStackLiftProgress = (stack) => {
+  const start = stack.stickyScrolls[1] ?? stack.stickyScrolls[0];
+  const end = stack.stickyScrolls[2] ?? stack.stickyScrolls[stack.stickyScrolls.length - 1];
+  const distance = end - start;
+
+  if (!Number.isFinite(start) || !Number.isFinite(end) || distance <= 0) {
+    return 0;
+  }
+
+  return clamp((window.scrollY - start) / distance, 0, 1);
+};
+
+const getCardStackLift = (stack, cardIndex, stackLift) => {
+  const stickyScroll = stack.stickyScrolls[cardIndex];
+
+  if (!Number.isFinite(stickyScroll)) {
+    return 0;
+  }
+
+  const entryDistance = clamp(
+    window.innerHeight * STACK_LIFT_ENTRY_VIEWPORT_RATIO,
+    STACK_LIFT_ENTRY_MIN,
+    STACK_LIFT_ENTRY_MAX,
+  );
+  const entryProgress = clamp(
+    (window.scrollY - stickyScroll + entryDistance) / entryDistance,
+    0,
+    1,
+  );
+
+  return stackLift * entryProgress;
+};
+
+const applyStackLift = (stack, stackLift) => {
+  stack.cards.forEach((card, index) => {
+    const cardLift = getCardStackLift(stack, index, stackLift);
+
+    stack.appliedStackLifts[index] = cardLift;
+
+    if (Math.abs(cardLift) <= EXIT_THRESHOLD) {
+      card.style.removeProperty('--virtura-category-stack-lift-y');
+      return;
+    }
+
+    card.style.setProperty('--virtura-category-stack-lift-y', `${cardLift}px`);
+  });
 };
 
 const updateStack = (stack) => {
   const lastIndex = stack.cards.length - 1;
   const lastCard = stack.cards[lastIndex];
   const lastTop = stack.stickyTops[lastIndex];
-  const lastRect = lastCard.getBoundingClientRect();
-  const groupOffset = Math.min(0, lastRect.top - lastTop);
+  const previousStackLifts = [...stack.appliedStackLifts];
+  const stackLift = -1 * getStackLiftLimit(stack) * getStackLiftProgress(stack);
+  const nativeLastTop = lastCard.getBoundingClientRect().top - previousStackLifts[lastIndex];
+  const groupOffset = Math.min(0, nativeLastTop - lastTop);
 
   if (Math.abs(groupOffset) <= EXIT_THRESHOLD) {
     stack.wrapper.classList.remove(EXITING_CLASS);
@@ -64,19 +147,25 @@ const updateStack = (stack) => {
       card.style.removeProperty('--virtura-category-stack-exit-y');
     });
 
+    applyStackLift(stack, stackLift);
+
     return;
   }
 
   stack.wrapper.classList.add(EXITING_CLASS);
 
   stack.cards.slice(0, lastIndex).forEach((card, index) => {
-    const nativeTop = card.getBoundingClientRect().top - stack.appliedOffsets[index];
+    const nativeTop = card.getBoundingClientRect().top
+      - previousStackLifts[index]
+      - stack.appliedOffsets[index];
     const targetTop = stack.stickyTops[index] + groupOffset;
     const nextOffset = targetTop - nativeTop;
 
     stack.appliedOffsets[index] = nextOffset;
     card.style.setProperty('--virtura-category-stack-exit-y', `${nextOffset}px`);
   });
+
+  applyStackLift(stack, stackLift);
 };
 
 export const initCategoryStack = () => {
