@@ -27,7 +27,7 @@ const getStickyTop = (card) => {
 
 const resetStack = (stack) => {
   stack.wrapper.classList.remove(READY_CLASS, EXITING_CLASS);
-  stack.wrapper.style.removeProperty('--virtura-category-stack-lift-y');
+  stack.wrapper.style.removeProperty('--virtura-category-stack-layout-y');
 
   stack.cards.forEach((card) => {
     card.style.removeProperty('--virtura-category-stack-index');
@@ -92,7 +92,7 @@ const getCardTopWithoutTransforms = (stack, cardIndex, stackLifts) => (
 const getStackLiftProgress = (stack, stackLifts) => {
   const startIndex = 1;
   const start = stack.stickyScrolls[startIndex];
-  const end = stack.stickyScrolls[2] ?? stack.stickyScrolls[stack.stickyScrolls.length - 1];
+  const end = stack.stickyScrolls[stack.stickyScrolls.length - 1];
   const plannedDistance = end - start;
 
   if (!stack.cards[startIndex] || !Number.isFinite(start) || !Number.isFinite(end)) {
@@ -111,7 +111,10 @@ const getStackLiftProgress = (stack, stackLifts) => {
     stack.liftStartScroll = window.scrollY;
   }
 
-  const distance = plannedDistance > 0 ? plannedDistance : window.innerHeight * 0.5;
+  const activeDistance = end - stack.liftStartScroll;
+  const distance = activeDistance > 0
+    ? activeDistance
+    : Math.max(plannedDistance, window.innerHeight * 0.5);
 
   if (distance <= 0) {
     return 0;
@@ -162,6 +165,15 @@ const applyStackLift = (stack, stackLift) => {
 
     card.style.setProperty('--virtura-category-stack-lift-y', `${cardLift}px`);
   });
+
+  const layoutOffset = stack.appliedStackLifts[stack.appliedStackLifts.length - 1] ?? 0;
+
+  if (Math.abs(layoutOffset) <= EXIT_THRESHOLD) {
+    stack.wrapper.style.removeProperty('--virtura-category-stack-layout-y');
+    return;
+  }
+
+  stack.wrapper.style.setProperty('--virtura-category-stack-layout-y', `${layoutOffset}px`);
 };
 
 const updateStack = (stack) => {
