@@ -8,7 +8,8 @@ const STACK_LIFT_BOTTOM_MARGIN = 24;
 const STACK_LIFT_ENTRY_MAX = 160;
 const STACK_LIFT_ENTRY_MIN = 80;
 const STACK_LIFT_ENTRY_VIEWPORT_RATIO = 0.16;
-const STACK_LIFT_MAX_VIEWPORT_RATIO = 0.24;
+const STACK_LIFT_AMOUNT_RATIO = 0.9;
+const STACK_LIFT_MAX_VIEWPORT_RATIO = 0.22;
 
 let categoryStackInitialized = false;
 
@@ -80,7 +81,7 @@ const getStackLiftLimit = (stack) => {
     return Math.max(lift, visibleOverflow);
   }, 0);
 
-  return clamp(requiredLift, 0, maxLift);
+  return clamp(requiredLift * STACK_LIFT_AMOUNT_RATIO, 0, maxLift);
 };
 
 const getCardTopWithoutTransforms = (stack, cardIndex, stackLifts) => (
@@ -92,7 +93,7 @@ const getCardTopWithoutTransforms = (stack, cardIndex, stackLifts) => (
 const getStackLiftProgress = (stack, stackLifts) => {
   const startIndex = 1;
   const start = stack.stickyScrolls[startIndex];
-  const end = stack.stickyScrolls[2] ?? stack.stickyScrolls[stack.stickyScrolls.length - 1];
+  const end = stack.stickyScrolls[stack.stickyScrolls.length - 1];
   const plannedDistance = end - start;
 
   if (!stack.cards[startIndex] || !Number.isFinite(start) || !Number.isFinite(end)) {
