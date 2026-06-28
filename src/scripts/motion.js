@@ -9,8 +9,9 @@ const HERO_ACTIVE_CLASS = 'virtura-hero-img-motion-active';
 const HERO_DOCKED_CLASS = 'virtura-hero-img-motion-docked';
 const HERO_TARGET_MAX_BLOCK_PADDING = '12rem';
 const CATEGORY_BLOCK_SELECTOR = '.section_category .category-block';
-const CATEGORY_HEADING_SELECTOR = '.category-heading-block :is(h1, h2, h3, h4, h5, h6, .brxe-heading)';
-const CATEGORY_BUTTON_SELECTOR = '.category-heading-block .btn';
+const CATEGORY_HEADER_SELECTOR = '.category-heading-block';
+const CATEGORY_HEADING_SELECTOR = ':is(h1, h2, h3, h4, h5, h6, .brxe-heading)';
+const CATEGORY_BUTTON_SELECTOR = '.btn';
 const CATEGORY_REVEAL_END = 'top 65%';
 const CATEGORY_REVEAL_SCRUB = 0.65;
 const CATEGORY_REVEAL_START = 'top 90%';
@@ -202,10 +203,14 @@ const resetMotionElements = () => {
 };
 
 const getCategoryRevealElements = () => getCategoryBlocks()
-  .flatMap((block) => [
-    block.querySelector(CATEGORY_HEADING_SELECTOR),
-    block.querySelector(CATEGORY_BUTTON_SELECTOR),
-  ])
+  .flatMap((block) => {
+    const header = block.querySelector(CATEGORY_HEADER_SELECTOR);
+
+    return [
+      header?.querySelector(CATEGORY_HEADING_SELECTOR),
+      header?.querySelector(CATEGORY_BUTTON_SELECTOR),
+    ];
+  })
   .filter(Boolean);
 
 const resetCategoryRevealElements = () => {
@@ -419,10 +424,11 @@ const initScrollReveal = (gsap, motionElements) => {
 
 const initCategoryBlockReveal = (gsap, categoryBlocks) => {
   categoryBlocks.forEach((block) => {
-    const heading = block.querySelector(CATEGORY_HEADING_SELECTOR);
-    const button = block.querySelector(CATEGORY_BUTTON_SELECTOR);
+    const header = block.querySelector(CATEGORY_HEADER_SELECTOR);
+    const heading = header?.querySelector(CATEGORY_HEADING_SELECTOR);
+    const button = header?.querySelector(CATEGORY_BUTTON_SELECTOR);
 
-    if (!heading && !button) {
+    if (!header || (!heading && !button)) {
       return;
     }
 
@@ -436,7 +442,7 @@ const initCategoryBlockReveal = (gsap, categoryBlocks) => {
         scrub: CATEGORY_REVEAL_SCRUB,
         start: CATEGORY_REVEAL_START,
         end: CATEGORY_REVEAL_END,
-        trigger: block,
+        trigger: header,
       },
     });
 
@@ -507,9 +513,11 @@ export const initMotion = async () => {
     return;
   }
 
+  initHeroImageScale(gsap, ScrollTrigger);
   initScrollReveal(gsap, motionElements);
   initCategoryBlockReveal(gsap, categoryBlocks);
-  initHeroImageScale(gsap, ScrollTrigger);
+  ScrollTrigger.sort();
+  ScrollTrigger.refresh();
   document.documentElement.classList.add('virtura-motion-ready');
   motionInitialized = true;
 };
