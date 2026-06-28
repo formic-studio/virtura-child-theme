@@ -1,4 +1,4 @@
-@import './font-sizes.css';
+@import "./font-sizes.css";
 
 :root {
   --virtura-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -50,12 +50,14 @@
   overflow: hidden;
 }
 
-.section_category .category-wrapper.virtura-category-stack-ready > .category-block {
+.section_category
+  .category-wrapper.virtura-category-stack-ready
+  > .category-block {
   transform: translate3d(
     0,
     calc(
-      var(--virtura-category-stack-lift-y, 0px)
-      + var(--virtura-category-stack-exit-y, 0px)
+      var(--virtura-category-stack-lift-y, 0px) +
+        var(--virtura-category-stack-exit-y, 0px)
     ),
     0
   );
@@ -118,14 +120,16 @@
 
 .tab-options.brxe-block::before {
   background: var(--color-white, #fff);
-  border-radius: var(--space-20, 2rem);
+  border-radius: 6px;
   bottom: var(--space-6, 0.6rem);
   content: "";
   left: 0;
   position: absolute;
   top: var(--space-6, 0.6rem);
   transform: translate3d(var(--virtura-tabs-indicator-x), 0, 0);
-  transition: transform 0.45s var(--virtura-motion-ease), width 0.45s var(--virtura-motion-ease);
+  transition:
+    transform 0.45s var(--virtura-motion-ease),
+    width 0.45s var(--virtura-motion-ease);
   width: var(--virtura-tabs-indicator-width);
   z-index: 0;
 }
