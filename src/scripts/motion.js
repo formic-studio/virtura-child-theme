@@ -11,6 +11,9 @@ const HERO_TARGET_MAX_BLOCK_PADDING = '12rem';
 const CATEGORY_BLOCK_SELECTOR = '.section_category .category-block';
 const CATEGORY_HEADING_SELECTOR = '.category-heading-block :is(h1, h2, h3, h4, h5, h6, .brxe-heading)';
 const CATEGORY_BUTTON_SELECTOR = '.category-heading-block .btn';
+const CATEGORY_REVEAL_END = 'top 65%';
+const CATEGORY_REVEAL_SCRUB = 0.65;
+const CATEGORY_REVEAL_START = 'top 90%';
 
 let gsapApiPromise;
 let motionInitialized = false;
@@ -430,8 +433,9 @@ const initCategoryBlockReveal = (gsap, categoryBlocks) => {
       },
       scrollTrigger: {
         invalidateOnRefresh: true,
-        once: true,
-        start: 'top 82%',
+        scrub: CATEGORY_REVEAL_SCRUB,
+        start: CATEGORY_REVEAL_START,
+        end: CATEGORY_REVEAL_END,
         trigger: block,
       },
     });
@@ -446,7 +450,6 @@ const initCategoryBlockReveal = (gsap, categoryBlocks) => {
         },
         {
           autoAlpha: 1,
-          clearProps: 'filter,opacity,transform,visibility',
           filter: 'blur(0px)',
           y: 0,
         },
@@ -460,7 +463,6 @@ const initCategoryBlockReveal = (gsap, categoryBlocks) => {
           x: () => getCategoryButtonStartX(button, block),
         },
         {
-          clearProps: 'transform',
           x: 0,
         },
         heading ? '-=0.55' : 0,
