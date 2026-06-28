@@ -59,6 +59,7 @@ const createStack = (wrapper) => {
     appliedStackLifts: new Array(cards.length).fill(0),
     cardHeights: cards.map((card) => card.getBoundingClientRect().height),
     cards,
+    liftStartScroll: null,
     stickyTops,
     stickyScrolls: cards.map((card, index) => (
       wrapperTop + card.offsetTop - stickyTops[index]
@@ -82,19 +83,52 @@ const getStackLiftLimit = (stack) => {
   return clamp(requiredLift, 0, maxLift);
 };
 
-const getStackLiftProgress = (stack) => {
-  const start = stack.stickyScrolls[1] ?? stack.stickyScrolls[0];
-  const end = stack.stickyScrolls[2] ?? stack.stickyScrolls[stack.stickyScrolls.length - 1];
-  const distance = end - start;
+const getCardTopWithoutTransforms = (stack, cardIndex, stackLifts) => (
+  stack.cards[cardIndex].getBoundingClientRect().top
+  - (stackLifts[cardIndex] ?? 0)
+  - (stack.appliedOffsets[cardIndex] ?? 0)
+);
 
-  if (!Number.isFinite(start) || !Number.isFinite(end) || distance <= 0) {
+const getStackLiftProgress = (stack, stackLifts) => {
+  const startIndex = 1;
+  const start = stack.stickyScrolls[startIndex];
+  const end = stack.stickyScrolls[2] ?? stack.stickyScrolls[stack.stickyScrolls.length - 1];
+  const plannedDistance = end - start;
+
+  if (!stack.cards[startIndex] || !Number.isFinite(start) || !Number.isFinite(end)) {
     return 0;
   }
 
-  return clamp((window.scrollY - start) / distance, 0, 1);
+  const startCardTop = getCardTopWithoutTransforms(stack, startIndex, stackLifts);
+  const isSecondCardStacked = startCardTop <= stack.stickyTops[startIndex] + EXIT_THRESHOLD;
+
+  if (!isSecondCardStacked) {
+    stack.liftStartScroll = null;
+    return 0;
+  }
+
+  if (!Number.isFinite(stack.liftStartScroll)) {
+    stack.liftStartScroll = window.scrollY;
+  }
+
+  const distance = plannedDistance > 0 ? plannedDistance : window.innerHeight * 0.5;
+
+  if (distance <= 0) {
+    return 0;
+  }
+
+  return clamp((window.scrollY - stack.liftStartScroll) / distance, 0, 1);
 };
 
 const getCardStackLift = (stack, cardIndex, stackLift) => {
+  if (Math.abs(stackLift) <= EXIT_THRESHOLD) {
+    return 0;
+  }
+
+  if (cardIndex <= 1) {
+    return stackLift;
+  }
+
   const stickyScroll = stack.stickyScrolls[cardIndex];
 
   if (!Number.isFinite(stickyScroll)) {
@@ -107,7 +141,7 @@ const getCardStackLift = (stack, cardIndex, stackLift) => {
     STACK_LIFT_ENTRY_MAX,
   );
   const entryProgress = clamp(
-    (window.scrollY - stickyScroll + entryDistance) / entryDistance,
+    (window.scrollY - stickyScroll) / entryDistance,
     0,
     1,
   );
@@ -135,8 +169,8 @@ const updateStack = (stack) => {
   const lastCard = stack.cards[lastIndex];
   const lastTop = stack.stickyTops[lastIndex];
   const previousStackLifts = [...stack.appliedStackLifts];
-  const stackLift = -1 * getStackLiftLimit(stack) * getStackLiftProgress(stack);
-  const nativeLastTop = lastCard.getBoundingClientRect().top - previousStackLifts[lastIndex];
+  const stackLift = -1 * getStackLiftLimit(stack) * getStackLiftProgress(stack, previousStackLifts);
+  const nativeLastTop = getCardTopWithoutTransforms(stack, lastIndex, previousStackLifts);
   const groupOffset = Math.min(0, nativeLastTop - lastTop);
 
   if (Math.abs(groupOffset) <= EXIT_THRESHOLD) {
@@ -155,9 +189,7 @@ const updateStack = (stack) => {
   stack.wrapper.classList.add(EXITING_CLASS);
 
   stack.cards.slice(0, lastIndex).forEach((card, index) => {
-    const nativeTop = card.getBoundingClientRect().top
-      - previousStackLifts[index]
-      - stack.appliedOffsets[index];
+    const nativeTop = getCardTopWithoutTransforms(stack, index, previousStackLifts);
     const targetTop = stack.stickyTops[index] + groupOffset;
     const nextOffset = targetTop - nativeTop;
 
