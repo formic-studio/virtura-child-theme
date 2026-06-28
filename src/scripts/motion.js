@@ -526,11 +526,13 @@ const initCategoryBlockReveal = (gsap, categoryBlocks) => {
         gsap.fromTo(
           subcategoryButton,
           {
-            clipPath: 'inset(0 100% 0 0)',
-            webkitClipPath: 'inset(0 100% 0 0)',
+            autoAlpha: 1,
+            clipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)',
+            webkitClipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)',
           },
           {
-            clipPath: 'inset(0 0 0 0%)',
+            autoAlpha: 1,
+            clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
             duration: CATEGORY_SUBCATEGORY_BUTTON_REVEAL_DURATION,
             ease: 'power3.out',
             scrollTrigger: {
@@ -539,7 +541,7 @@ const initCategoryBlockReveal = (gsap, categoryBlocks) => {
               toggleActions: 'play none none reverse',
               trigger: subcategoryButton,
             },
-            webkitClipPath: 'inset(0 0 0 0%)',
+            webkitClipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
           },
         ),
       );
