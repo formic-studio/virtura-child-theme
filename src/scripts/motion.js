@@ -20,6 +20,9 @@ const CATEGORY_IMAGE_SELECTOR = '.category-img';
 const CATEGORY_REVEAL_END = 'top 65%';
 const CATEGORY_REVEAL_SCRUB = 0.65;
 const CATEGORY_REVEAL_START = 'top 95%';
+const CATEGORY_SUBCATEGORY_BUTTON_REVEAL_DURATION = 0.85;
+const CATEGORY_SUBCATEGORY_BUTTON_REVEAL_START = 'top 92%';
+const CATEGORY_SUBCATEGORY_BUTTON_SELECTOR = '.subcategory-block .btn';
 
 let gsapApiPromise;
 let motionInitialized = false;
@@ -215,12 +218,15 @@ const getCategoryRevealElements = () => getCategoryBlocks()
       header?.querySelector(CATEGORY_HEADING_SELECTOR),
       header?.querySelector(CATEGORY_BUTTON_SELECTOR),
       block.querySelector(CATEGORY_IMAGE_SELECTOR),
+      ...block.querySelectorAll(CATEGORY_SUBCATEGORY_BUTTON_SELECTOR),
     ];
   })
   .filter(Boolean);
 
 const resetCategoryRevealElements = () => {
   getCategoryRevealElements().forEach((element) => {
+    element.style.removeProperty('-webkit-clip-path');
+    element.style.removeProperty('clip-path');
     element.style.removeProperty('opacity');
     element.style.removeProperty('filter');
     element.style.removeProperty('transform');
@@ -437,8 +443,11 @@ const initCategoryBlockReveal = (gsap, categoryBlocks) => {
     const heading = header?.querySelector(CATEGORY_HEADING_SELECTOR);
     const button = header?.querySelector(CATEGORY_BUTTON_SELECTOR);
     const image = block.querySelector(CATEGORY_IMAGE_SELECTOR);
+    const subcategoryButtons = Array.from(
+      block.querySelectorAll(CATEGORY_SUBCATEGORY_BUTTON_SELECTOR),
+    );
 
-    if (!header || (!heading && !button && !image)) {
+    if (!header || (!heading && !button && !image && !subcategoryButtons.length)) {
       return;
     }
 
@@ -511,6 +520,30 @@ const initCategoryBlockReveal = (gsap, categoryBlocks) => {
         ),
       );
     }
+
+    subcategoryButtons.forEach((subcategoryButton) => {
+      storeAnimation(
+        gsap.fromTo(
+          subcategoryButton,
+          {
+            clipPath: 'inset(0 0 0 100%)',
+            webkitClipPath: 'inset(0 0 0 100%)',
+          },
+          {
+            clipPath: 'inset(0 0 0 0%)',
+            duration: CATEGORY_SUBCATEGORY_BUTTON_REVEAL_DURATION,
+            ease: 'power3.out',
+            scrollTrigger: {
+              invalidateOnRefresh: true,
+              start: CATEGORY_SUBCATEGORY_BUTTON_REVEAL_START,
+              toggleActions: 'play none none reverse',
+              trigger: subcategoryButton,
+            },
+            webkitClipPath: 'inset(0 0 0 0%)',
+          },
+        ),
+      );
+    });
   });
 };
 
