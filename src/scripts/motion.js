@@ -14,6 +14,8 @@ const CATEGORY_HEADING_SELECTOR = ':is(h1, h2, h3, h4, h5, h6, .brxe-heading)';
 const CATEGORY_BUTTON_SELECTOR = '.btn';
 const CATEGORY_BUTTON_REVEAL_DURATION = 0.8;
 const CATEGORY_BUTTON_START_BUFFER = 48;
+const CATEGORY_IMAGE_REVEAL_DURATION = 0.95;
+const CATEGORY_IMAGE_SELECTOR = '.category-img';
 const CATEGORY_REVEAL_END = 'top 65%';
 const CATEGORY_REVEAL_SCRUB = 0.65;
 const CATEGORY_REVEAL_START = 'top 95%';
@@ -211,6 +213,7 @@ const getCategoryRevealElements = () => getCategoryBlocks()
     return [
       header?.querySelector(CATEGORY_HEADING_SELECTOR),
       header?.querySelector(CATEGORY_BUTTON_SELECTOR),
+      block.querySelector(CATEGORY_IMAGE_SELECTOR),
     ];
   })
   .filter(Boolean);
@@ -224,13 +227,13 @@ const resetCategoryRevealElements = () => {
   });
 };
 
-const getCategoryButtonStartX = (button, block) => {
-  const buttonRect = button.getBoundingClientRect();
+const getCategoryElementStartX = (element, block) => {
+  const elementRect = element.getBoundingClientRect();
   const blockRect = block.getBoundingClientRect();
-  const distanceToBlockEdge = blockRect.right - buttonRect.left;
+  const distanceToBlockEdge = blockRect.right - elementRect.left;
 
-  return Math.max(distanceToBlockEdge, buttonRect.width)
-    + buttonRect.width
+  return Math.max(distanceToBlockEdge, elementRect.width)
+    + elementRect.width
     + CATEGORY_BUTTON_START_BUFFER;
 };
 
@@ -432,8 +435,9 @@ const initCategoryBlockReveal = (gsap, categoryBlocks) => {
     const header = block.querySelector(CATEGORY_HEADER_SELECTOR);
     const heading = header?.querySelector(CATEGORY_HEADING_SELECTOR);
     const button = header?.querySelector(CATEGORY_BUTTON_SELECTOR);
+    const image = block.querySelector(CATEGORY_IMAGE_SELECTOR);
 
-    if (!header || (!heading && !button)) {
+    if (!header || (!heading && !button && !image)) {
       return;
     }
 
@@ -468,10 +472,32 @@ const initCategoryBlockReveal = (gsap, categoryBlocks) => {
         gsap.fromTo(
           button,
           {
-            x: () => getCategoryButtonStartX(button, block),
+            x: () => getCategoryElementStartX(button, block),
           },
           {
             duration: CATEGORY_BUTTON_REVEAL_DURATION,
+            ease: 'power3.out',
+            scrollTrigger: {
+              invalidateOnRefresh: true,
+              start: CATEGORY_REVEAL_START,
+              toggleActions: 'play none none reverse',
+              trigger: header,
+            },
+            x: 0,
+          },
+        ),
+      );
+    }
+
+    if (image) {
+      storeAnimation(
+        gsap.fromTo(
+          image,
+          {
+            x: () => getCategoryElementStartX(image, block),
+          },
+          {
+            duration: CATEGORY_IMAGE_REVEAL_DURATION,
             ease: 'power3.out',
             scrollTrigger: {
               invalidateOnRefresh: true,
