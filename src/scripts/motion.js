@@ -8,6 +8,9 @@ const HERO_SOURCE_HIDDEN_CLASS = 'virtura-hero-img-source-hidden';
 const HERO_ACTIVE_CLASS = 'virtura-hero-img-motion-active';
 const HERO_DOCKED_CLASS = 'virtura-hero-img-motion-docked';
 const HERO_TARGET_MAX_BLOCK_PADDING = '12rem';
+const CATEGORY_BLOCK_SELECTOR = '.section_category .category-block';
+const CATEGORY_HEADING_SELECTOR = '.category-heading-block :is(h1, h2, h3, h4, h5, h6, .brxe-heading)';
+const CATEGORY_BUTTON_SELECTOR = '.category-heading-block .btn';
 
 let gsapApiPromise;
 let motionInitialized = false;
@@ -31,6 +34,8 @@ export const loadGsap = async () => {
 };
 
 const getMotionElements = () => Array.from(document.querySelectorAll('[data-motion]'));
+
+const getCategoryBlocks = () => Array.from(document.querySelectorAll(CATEGORY_BLOCK_SELECTOR));
 
 const getHeroImage = () => document.querySelector(HERO_IMAGE_SELECTOR);
 
@@ -187,9 +192,33 @@ const clearAnimations = () => {
 const resetMotionElements = () => {
   getMotionElements().forEach((element) => {
     element.style.removeProperty('opacity');
+    element.style.removeProperty('filter');
     element.style.removeProperty('transform');
     element.style.removeProperty('visibility');
   });
+};
+
+const getCategoryRevealElements = () => getCategoryBlocks()
+  .flatMap((block) => [
+    block.querySelector(CATEGORY_HEADING_SELECTOR),
+    block.querySelector(CATEGORY_BUTTON_SELECTOR),
+  ])
+  .filter(Boolean);
+
+const resetCategoryRevealElements = () => {
+  getCategoryRevealElements().forEach((element) => {
+    element.style.removeProperty('opacity');
+    element.style.removeProperty('filter');
+    element.style.removeProperty('transform');
+    element.style.removeProperty('visibility');
+  });
+};
+
+const getCategoryButtonStartX = (button, block) => {
+  const buttonRect = button.getBoundingClientRect();
+  const blockRect = block.getBoundingClientRect();
+
+  return Math.max(buttonRect.width, blockRect.right - buttonRect.left) + 16;
 };
 
 const initHeroImageScale = (gsap, ScrollTrigger) => {
@@ -385,14 +414,72 @@ const initScrollReveal = (gsap, motionElements) => {
     });
 };
 
+const initCategoryBlockReveal = (gsap, categoryBlocks) => {
+  categoryBlocks.forEach((block) => {
+    const heading = block.querySelector(CATEGORY_HEADING_SELECTOR);
+    const button = block.querySelector(CATEGORY_BUTTON_SELECTOR);
+
+    if (!heading && !button) {
+      return;
+    }
+
+    const timeline = gsap.timeline({
+      defaults: {
+        duration: 0.9,
+        ease: 'power3.out',
+      },
+      scrollTrigger: {
+        invalidateOnRefresh: true,
+        once: true,
+        start: 'top 82%',
+        trigger: block,
+      },
+    });
+
+    if (heading) {
+      timeline.fromTo(
+        heading,
+        {
+          autoAlpha: 0,
+          filter: 'blur(5px)',
+          y: '1rem',
+        },
+        {
+          autoAlpha: 1,
+          clearProps: 'filter,opacity,transform,visibility',
+          filter: 'blur(0px)',
+          y: 0,
+        },
+      );
+    }
+
+    if (button) {
+      timeline.fromTo(
+        button,
+        {
+          x: () => getCategoryButtonStartX(button, block),
+        },
+        {
+          clearProps: 'transform',
+          x: 0,
+        },
+        heading ? '-=0.55' : 0,
+      );
+    }
+
+    storeAnimation(timeline);
+  });
+};
+
 export const initMotion = async () => {
   document.documentElement.classList.add('virtura-js');
   setReducedMotionClass();
 
   const motionElements = getMotionElements();
   const heroImage = getHeroImage();
+  const categoryBlocks = getCategoryBlocks();
 
-  if (!motionElements.length && !heroImage) {
+  if (!motionElements.length && !heroImage && !categoryBlocks.length) {
     return;
   }
 
@@ -400,6 +487,7 @@ export const initMotion = async () => {
     document.documentElement.classList.remove('virtura-motion-ready');
     clearAnimations();
     resetMotionElements();
+    resetCategoryRevealElements();
     return;
   }
 
@@ -413,10 +501,12 @@ export const initMotion = async () => {
     document.documentElement.classList.remove('virtura-motion-ready');
     clearAnimations();
     resetMotionElements();
+    resetCategoryRevealElements();
     return;
   }
 
   initScrollReveal(gsap, motionElements);
+  initCategoryBlockReveal(gsap, categoryBlocks);
   initHeroImageScale(gsap, ScrollTrigger);
   document.documentElement.classList.add('virtura-motion-ready');
   motionInitialized = true;

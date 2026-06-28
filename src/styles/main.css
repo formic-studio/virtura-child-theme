@@ -46,6 +46,10 @@
   margin-bottom: var(--virtura-category-stack-layout-y, 0px);
 }
 
+.section_category .category-block {
+  overflow: hidden;
+}
+
 .section_category .category-wrapper.virtura-category-stack-ready > .category-block {
   transform: translate3d(
     0,
