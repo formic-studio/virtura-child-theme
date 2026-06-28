@@ -13,7 +13,7 @@ const STACK_LIFT_BASE_MAX = 72;
 const STACK_LIFT_BASE_MIN = 40;
 const STACK_LIFT_BASE_VIEWPORT_RATIO = 0.045;
 const STACK_LIFT_MAX_VIEWPORT_RATIO = 0.22;
-const STACK_LIFT_SCROLL_DISTANCE_RATIO = 0.82;
+const STACK_LIFT_PROGRESS_BOOST = 0.35;
 
 let categoryStackInitialized = false;
 
@@ -125,15 +125,19 @@ const getStackLiftProgress = (stack, stackLifts) => {
     stack.liftStartScroll = window.scrollY;
   }
 
-  const distance = plannedDistance > 0
-    ? plannedDistance * STACK_LIFT_SCROLL_DISTANCE_RATIO
-    : window.innerHeight * 0.5;
+  const distance = plannedDistance > 0 ? plannedDistance : window.innerHeight * 0.5;
 
   if (distance <= 0) {
     return 0;
   }
 
-  return clamp((window.scrollY - stack.liftStartScroll) / distance, 0, 1);
+  const progress = clamp((window.scrollY - stack.liftStartScroll) / distance, 0, 1);
+
+  return clamp(
+    progress + progress * (1 - progress) * STACK_LIFT_PROGRESS_BOOST,
+    0,
+    1,
+  );
 };
 
 const getCardStackLift = (stack, cardIndex, stackLift) => {
