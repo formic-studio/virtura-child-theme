@@ -15,6 +15,7 @@ const CATEGORY_BUTTON_SELECTOR = '.btn';
 const CATEGORY_BUTTON_REVEAL_DURATION = 1;
 const CATEGORY_BUTTON_START_BUFFER = 48;
 const CATEGORY_IMAGE_REVEAL_DURATION = 1.15;
+const CATEGORY_IMAGE_REVEAL_START = 'top 94%';
 const CATEGORY_IMAGE_SELECTOR = '.category-img';
 const CATEGORY_REVEAL_END = 'top 65%';
 const CATEGORY_REVEAL_SCRUB = 0.65;
@@ -236,18 +237,6 @@ const getCategoryElementStartX = (element, block) => {
     + elementRect.width
     + CATEGORY_BUTTON_START_BUFFER;
 };
-
-const getCategoryBlockStickyScroll = (block) => {
-  const wrapper = block.parentElement;
-  const wrapperTop = wrapper.getBoundingClientRect().top + window.scrollY;
-  const stickyTop = Number.parseFloat(window.getComputedStyle(block).top) || 0;
-
-  return wrapperTop + block.offsetTop - stickyTop;
-};
-
-const getCategoryImageRevealStart = (block) => (
-  getCategoryBlockStickyScroll(block) - window.innerHeight * 0.05
-);
 
 const initHeroImageScale = (gsap, ScrollTrigger) => {
   const image = getHeroImage();
@@ -491,9 +480,9 @@ const initCategoryBlockReveal = (gsap, categoryBlocks) => {
             ease: 'power3.out',
             scrollTrigger: {
               invalidateOnRefresh: true,
-              start: () => getCategoryImageRevealStart(block),
+              start: CATEGORY_REVEAL_START,
               toggleActions: 'play none none reverse',
-              trigger: block,
+              trigger: header,
             },
             x: 0,
           },
@@ -513,9 +502,9 @@ const initCategoryBlockReveal = (gsap, categoryBlocks) => {
             ease: 'power3.out',
             scrollTrigger: {
               invalidateOnRefresh: true,
-              start: CATEGORY_REVEAL_START,
+              start: CATEGORY_IMAGE_REVEAL_START,
               toggleActions: 'play none none reverse',
-              trigger: header,
+              trigger: image,
             },
             x: 0,
           },
