@@ -9,6 +9,9 @@ const STACK_LIFT_ENTRY_MAX = 160;
 const STACK_LIFT_ENTRY_MIN = 80;
 const STACK_LIFT_ENTRY_VIEWPORT_RATIO = 0.16;
 const STACK_LIFT_AMOUNT_RATIO = 0.9;
+const STACK_LIFT_BASE_MAX = 72;
+const STACK_LIFT_BASE_MIN = 40;
+const STACK_LIFT_BASE_VIEWPORT_RATIO = 0.045;
 const STACK_LIFT_MAX_VIEWPORT_RATIO = 0.22;
 
 let categoryStackInitialized = false;
@@ -71,6 +74,11 @@ const createStack = (wrapper) => {
 
 const getStackLiftLimit = (stack) => {
   const viewportHeight = window.innerHeight;
+  const baseLift = clamp(
+    viewportHeight * STACK_LIFT_BASE_VIEWPORT_RATIO,
+    STACK_LIFT_BASE_MIN,
+    STACK_LIFT_BASE_MAX,
+  );
   const maxLift = viewportHeight * STACK_LIFT_MAX_VIEWPORT_RATIO;
   const requiredLift = stack.cardHeights.reduce((lift, cardHeight, index) => {
     const visibleOverflow = stack.stickyTops[index]
@@ -81,7 +89,11 @@ const getStackLiftLimit = (stack) => {
     return Math.max(lift, visibleOverflow);
   }, 0);
 
-  return clamp(requiredLift * STACK_LIFT_AMOUNT_RATIO, 0, maxLift);
+  return clamp(
+    Math.max(requiredLift * STACK_LIFT_AMOUNT_RATIO, baseLift),
+    0,
+    maxLift,
+  );
 };
 
 const getCardTopWithoutTransforms = (stack, cardIndex, stackLifts) => (
