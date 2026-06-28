@@ -526,8 +526,8 @@ const initCategoryBlockReveal = (gsap, categoryBlocks) => {
         gsap.fromTo(
           subcategoryButton,
           {
-            clipPath: 'inset(0 0 0 100%)',
-            webkitClipPath: 'inset(0 0 0 100%)',
+            clipPath: 'inset(0 100% 0 0)',
+            webkitClipPath: 'inset(0 100% 0 0)',
           },
           {
             clipPath: 'inset(0 0 0 0%)',
