@@ -104,7 +104,54 @@
   z-index: 1;
 }
 
+.tab-options.brxe-block {
+  --virtura-tabs-indicator-width: 50%;
+  --virtura-tabs-indicator-x: 0px;
+  background-color: var(--color-darker-grey, #8f8f8f);
+  border-radius: var(--space-24, 2.4rem);
+  cursor: pointer;
+  isolation: isolate;
+  overflow: hidden;
+  position: relative;
+  touch-action: manipulation;
+}
+
+.tab-options.brxe-block::before {
+  background: var(--color-white, #fff);
+  border-radius: var(--space-20, 2rem);
+  bottom: var(--space-6, 0.6rem);
+  content: "";
+  left: 0;
+  position: absolute;
+  top: var(--space-6, 0.6rem);
+  transform: translate3d(var(--virtura-tabs-indicator-x), 0, 0);
+  transition: transform 0.45s var(--virtura-motion-ease), width 0.45s var(--virtura-motion-ease);
+  width: var(--virtura-tabs-indicator-width);
+  z-index: 0;
+}
+
+.tab-options.brxe-block > * {
+  color: var(--color-white, #fff);
+  position: relative;
+  transition: color 0.24s ease;
+  user-select: none;
+  z-index: 1;
+}
+
+.tab-options.brxe-block > .is-active {
+  color: var(--color-black, #000);
+}
+
+.tab-options.brxe-block > *:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: calc(var(--space-4, 0.4rem) * -1);
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .tab-options.brxe-block::before {
+    transition: none;
+  }
+
   [data-motion] {
     opacity: 1 !important;
     transform: none !important;
