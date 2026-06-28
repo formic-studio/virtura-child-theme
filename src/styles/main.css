@@ -110,7 +110,6 @@
   --virtura-tabs-indicator-width: 50%;
   --virtura-tabs-indicator-x: 0px;
   background-color: var(--color-darker-grey, #8f8f8f);
-  border-radius: var(--space-24, 2.4rem);
   cursor: pointer;
   isolation: isolate;
   overflow: hidden;
