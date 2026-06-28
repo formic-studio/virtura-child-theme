@@ -12,9 +12,9 @@ const CATEGORY_BLOCK_SELECTOR = '.section_category .category-block';
 const CATEGORY_HEADER_SELECTOR = '.category-heading-block';
 const CATEGORY_HEADING_SELECTOR = ':is(h1, h2, h3, h4, h5, h6, .brxe-heading)';
 const CATEGORY_BUTTON_SELECTOR = '.btn';
-const CATEGORY_BUTTON_REVEAL_DURATION = 0.8;
+const CATEGORY_BUTTON_REVEAL_DURATION = 1;
 const CATEGORY_BUTTON_START_BUFFER = 48;
-const CATEGORY_IMAGE_REVEAL_DURATION = 0.95;
+const CATEGORY_IMAGE_REVEAL_DURATION = 1.15;
 const CATEGORY_IMAGE_SELECTOR = '.category-img';
 const CATEGORY_REVEAL_END = 'top 65%';
 const CATEGORY_REVEAL_SCRUB = 0.65;
@@ -481,7 +481,7 @@ const initCategoryBlockReveal = (gsap, categoryBlocks) => {
               invalidateOnRefresh: true,
               start: CATEGORY_REVEAL_START,
               toggleActions: 'play none none reverse',
-              trigger: header,
+              trigger: image,
             },
             x: 0,
           },
