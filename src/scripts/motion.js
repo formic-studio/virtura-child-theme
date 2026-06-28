@@ -12,9 +12,11 @@ const CATEGORY_BLOCK_SELECTOR = '.section_category .category-block';
 const CATEGORY_HEADER_SELECTOR = '.category-heading-block';
 const CATEGORY_HEADING_SELECTOR = ':is(h1, h2, h3, h4, h5, h6, .brxe-heading)';
 const CATEGORY_BUTTON_SELECTOR = '.btn';
+const CATEGORY_BUTTON_REVEAL_DURATION = 0.8;
+const CATEGORY_BUTTON_START_BUFFER = 48;
 const CATEGORY_REVEAL_END = 'top 65%';
 const CATEGORY_REVEAL_SCRUB = 0.65;
-const CATEGORY_REVEAL_START = 'top 90%';
+const CATEGORY_REVEAL_START = 'top 95%';
 
 let gsapApiPromise;
 let motionInitialized = false;
@@ -225,8 +227,11 @@ const resetCategoryRevealElements = () => {
 const getCategoryButtonStartX = (button, block) => {
   const buttonRect = button.getBoundingClientRect();
   const blockRect = block.getBoundingClientRect();
+  const distanceToBlockEdge = blockRect.right - buttonRect.left;
 
-  return Math.max(buttonRect.width, blockRect.right - buttonRect.left) + 16;
+  return Math.max(distanceToBlockEdge, buttonRect.width)
+    + buttonRect.width
+    + CATEGORY_BUTTON_START_BUFFER;
 };
 
 const initHeroImageScale = (gsap, ScrollTrigger) => {
@@ -432,50 +437,53 @@ const initCategoryBlockReveal = (gsap, categoryBlocks) => {
       return;
     }
 
-    const timeline = gsap.timeline({
-      defaults: {
-        duration: 0.9,
-        ease: 'power3.out',
-      },
-      scrollTrigger: {
-        invalidateOnRefresh: true,
-        scrub: CATEGORY_REVEAL_SCRUB,
-        start: CATEGORY_REVEAL_START,
-        end: CATEGORY_REVEAL_END,
-        trigger: header,
-      },
-    });
-
     if (heading) {
-      timeline.fromTo(
-        heading,
-        {
-          autoAlpha: 0,
-          filter: 'blur(5px)',
-          y: '1rem',
-        },
-        {
-          autoAlpha: 1,
-          filter: 'blur(0px)',
-          y: 0,
-        },
+      storeAnimation(
+        gsap.fromTo(
+          heading,
+          {
+            autoAlpha: 0,
+            filter: 'blur(5px)',
+            y: '1rem',
+          },
+          {
+            autoAlpha: 1,
+            ease: 'power3.out',
+            filter: 'blur(0px)',
+            scrollTrigger: {
+              end: CATEGORY_REVEAL_END,
+              invalidateOnRefresh: true,
+              scrub: CATEGORY_REVEAL_SCRUB,
+              start: CATEGORY_REVEAL_START,
+              trigger: header,
+            },
+            y: 0,
+          },
+        ),
       );
     }
 
     if (button) {
-      timeline.fromTo(
-        button,
-        {
-          x: () => getCategoryButtonStartX(button, block),
-        },
-        {
-          x: 0,
-        },
-        heading ? '-=0.55' : 0,
+      storeAnimation(
+        gsap.fromTo(
+          button,
+          {
+            x: () => getCategoryButtonStartX(button, block),
+          },
+          {
+            duration: CATEGORY_BUTTON_REVEAL_DURATION,
+            ease: 'power3.out',
+            scrollTrigger: {
+              invalidateOnRefresh: true,
+              start: CATEGORY_REVEAL_START,
+              toggleActions: 'play none none reverse',
+              trigger: header,
+            },
+            x: 0,
+          },
+        ),
       );
     }
-
-    storeAnimation(timeline);
   });
 };
 
