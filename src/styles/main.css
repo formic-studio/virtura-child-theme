@@ -4,6 +4,10 @@
   --virtura-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+body {
+  color: var(--color-black, #000);
+}
+
 .font-color-gray {
   color: var(--color-text-grey);
 }
