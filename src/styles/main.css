@@ -4,6 +4,10 @@
   --virtura-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.font-color-gray {
+  color: var(--color-text-grey);
+}
+
 .virtura-motion-ready [data-motion] {
   will-change: opacity, transform;
 }
