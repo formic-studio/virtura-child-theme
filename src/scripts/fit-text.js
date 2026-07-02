@@ -16,10 +16,30 @@ const getInnerWidth = (element) => {
   return Math.max(0, rect.width - paddingX);
 };
 
+const getFitTarget = (element) => {
+  const targetSelector = element.getAttribute('data-fit-text-target');
+
+  if (targetSelector) {
+    const target = element.closest(targetSelector);
+
+    if (target) {
+      return target;
+    }
+  }
+
+  if (element.classList.contains('text-overview')) {
+    return element.closest('.parent') || element.parentElement || element;
+  }
+
+  if (element.classList.contains('fit-text-to-box')) {
+    return element.parentElement || element;
+  }
+
+  return element;
+};
+
 const fitTextElement = (element) => {
-  const target = element.classList.contains('fit-text-to-box')
-    ? element.parentElement || element
-    : element;
+  const target = getFitTarget(element);
   const targetWidth = getInnerWidth(target);
 
   if (!targetWidth) {
@@ -79,10 +99,7 @@ export const initFitText = () => {
 
   elements.forEach((element) => {
     resizeObserver?.observe(element);
-
-    if (element.parentElement) {
-      resizeObserver?.observe(element.parentElement);
-    }
+    resizeObserver?.observe(getFitTarget(element));
   });
 
   window.addEventListener('resize', scheduleFit, { passive: true });

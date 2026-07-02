@@ -28,16 +28,14 @@ body {
   display: block;
   flex: 0 0 auto;
   line-height: 0.82;
-  max-width: none;
   white-space: nowrap;
+  width: 100%;
 }
 
 .text-overview {
-  margin-left: calc(50% - 50vw) !important;
-  margin-right: calc(50% - 50vw) !important;
-  max-width: none !important;
+  max-width: 100% !important;
   text-align: center;
-  width: 100vw !important;
+  width: 100% !important;
 }
 
 .virtura-motion-ready [data-motion] {
