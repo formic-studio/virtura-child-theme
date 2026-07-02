@@ -23,6 +23,23 @@ body {
   backdrop-filter: blur(15px) saturate(125%);
 }
 
+.text-overview,
+.fit-text-to-box {
+  display: block;
+  flex: 0 0 auto;
+  line-height: 0.82;
+  max-width: none;
+  white-space: nowrap;
+}
+
+.text-overview {
+  margin-left: calc(50% - 50vw) !important;
+  margin-right: calc(50% - 50vw) !important;
+  max-width: none !important;
+  text-align: center;
+  width: 100vw !important;
+}
+
 .virtura-motion-ready [data-motion] {
   will-change: opacity, transform;
 }
