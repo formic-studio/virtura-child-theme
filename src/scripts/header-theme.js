@@ -1,6 +1,7 @@
 const HEADER_SELECTOR = '#brx-header';
 const NAV_THEME_SELECTOR =
   '.nav-light, .nav-dark, [data-nav-theme], [data-header-theme]';
+const DEFAULT_SAMPLE_Y_RATIO = 0.82;
 
 const normalizeTheme = (value) => {
   const theme = value?.toLowerCase();
@@ -36,6 +37,18 @@ const getElementTheme = (element) => {
   return null;
 };
 
+const getSampleYRatio = (header) => {
+  const value = Number.parseFloat(
+    header.getAttribute('data-nav-theme-sample-y')
+  );
+
+  if (Number.isFinite(value) && value >= 0 && value <= 1) {
+    return value;
+  }
+
+  return DEFAULT_SAMPLE_Y_RATIO;
+};
+
 const getThemeZone = (element, header) => {
   if (!(element instanceof Element) || header.contains(element)) {
     return null;
@@ -48,13 +61,14 @@ const getThemeZone = (element, header) => {
 
 const getHeaderSamplePoint = (header) => {
   const rect = header.getBoundingClientRect();
+  const sampleYRatio = getSampleYRatio(header);
   const x = Math.min(
     window.innerWidth - 1,
     Math.max(0, rect.left + rect.width / 2)
   );
   const y = Math.min(
     window.innerHeight - 1,
-    Math.max(0, rect.top + rect.height / 2)
+    Math.max(0, rect.top + rect.height * sampleYRatio)
   );
 
   return { x, y };
