@@ -1,5 +1,4 @@
 import '../styles/main.css';
-import { initButtonHover } from './button-hover.js';
 import { initCategoryStack } from './category-stack.js';
 import { initFitText } from './fit-text.js';
 import { initGigaMenu } from './giga-menu.js';
@@ -15,7 +14,6 @@ const initTheme = () => {
   initHeaderTheme();
   initHeaderScroll();
   initGigaMenu();
-  initButtonHover();
   void initIntroAnimation();
   initFitText();
   initCategoryStack();

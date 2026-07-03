@@ -8,32 +8,8 @@ body {
   color: var(--color-black, #000);
 }
 
-.btn {
+:is(.btn, .nav-btn, .footer-btn) {
   --btn-hover-bg: var(--color-darker-grey, #8f8f8f);
-  --btn-wave-1: 90%;
-  --btn-wave-2: 97%;
-  --btn-wave-3: 89%;
-  --btn-wave-4: 96%;
-  --btn-wave-5: 91%;
-  --btn-wave-6: 98%;
-  --btn-wave-7: 90%;
-  --btn-wave-8: 95%;
-  --btn-wave-9: 88%;
-  --btn-wave-10: 94%;
-  --btn-wave-11: 90%;
-  --btn-wave-alt-1: 94%;
-  --btn-wave-alt-2: 88%;
-  --btn-wave-alt-3: 98%;
-  --btn-wave-alt-4: 90%;
-  --btn-wave-alt-5: 97%;
-  --btn-wave-alt-6: 89%;
-  --btn-wave-alt-7: 95%;
-  --btn-wave-alt-8: 87%;
-  --btn-wave-alt-9: 96%;
-  --btn-wave-alt-10: 90%;
-  --btn-wave-alt-11: 94%;
-  --btn-wave-delay: -0.2s;
-  --btn-wave-duration: 1.2s;
   isolation: isolate;
   overflow: hidden;
   position: relative;
@@ -42,95 +18,60 @@ body {
     color 0.24s ease;
 }
 
-.btn::before {
+:is(.btn, .nav-btn, .footer-btn)::before {
   background: var(--btn-hover-bg);
   bottom: -1px;
-  -webkit-clip-path: polygon(
-    0 0,
-    var(--btn-wave-1) 0,
-    var(--btn-wave-2) 8%,
-    var(--btn-wave-3) 18%,
-    var(--btn-wave-4) 29%,
-    var(--btn-wave-5) 41%,
-    var(--btn-wave-6) 52%,
-    var(--btn-wave-7) 63%,
-    var(--btn-wave-8) 75%,
-    var(--btn-wave-9) 86%,
-    var(--btn-wave-10) 95%,
-    var(--btn-wave-11) 100%,
-    0 100%
-  );
-  clip-path: polygon(
-    0 0,
-    var(--btn-wave-1) 0,
-    var(--btn-wave-2) 8%,
-    var(--btn-wave-3) 18%,
-    var(--btn-wave-4) 29%,
-    var(--btn-wave-5) 41%,
-    var(--btn-wave-6) 52%,
-    var(--btn-wave-7) 63%,
-    var(--btn-wave-8) 75%,
-    var(--btn-wave-9) 86%,
-    var(--btn-wave-10) 95%,
-    var(--btn-wave-11) 100%,
-    0 100%
-  );
   content: "";
-  left: -22%;
+  left: -14%;
   pointer-events: none;
   position: absolute;
   top: -1px;
   transform: translate3d(-100%, 0, 0);
   transition: transform 0.62s var(--virtura-motion-ease);
-  width: 148%;
+  width: 134%;
   z-index: 0;
+  -webkit-mask-image:
+    linear-gradient(#000 0 0),
+    radial-gradient(115% 92% at 0% 50%, #000 98%, transparent 100%),
+    radial-gradient(92% 74% at 0% 14%, #000 98%, transparent 100%),
+    radial-gradient(100% 78% at 0% 86%, #000 98%, transparent 100%);
+  mask-image:
+    linear-gradient(#000 0 0),
+    radial-gradient(115% 92% at 0% 50%, #000 98%, transparent 100%),
+    radial-gradient(92% 74% at 0% 14%, #000 98%, transparent 100%),
+    radial-gradient(100% 78% at 0% 86%, #000 98%, transparent 100%);
+  -webkit-mask-position:
+    left center,
+    right 0 center,
+    right 1.8rem top -0.6rem,
+    right 0.8rem bottom -0.8rem;
+  mask-position:
+    left center,
+    right 0 center,
+    right 1.8rem top -0.6rem,
+    right 0.8rem bottom -0.8rem;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size:
+    calc(100% - 6rem) 100%,
+    8.4rem 100%,
+    7rem 68%,
+    8rem 72%;
+  mask-size:
+    calc(100% - 6rem) 100%,
+    8.4rem 100%,
+    7rem 68%,
+    8rem 72%;
 }
 
-.btn > * {
+:is(.btn, .nav-btn, .footer-btn) > * {
   position: relative;
   z-index: 1;
 }
 
-.btn:hover::before,
-.btn:focus-visible::before {
-  animation: virtura-btn-wave var(--btn-wave-duration) ease-in-out
-    var(--btn-wave-delay) infinite alternate;
+:is(.btn, .nav-btn, .footer-btn):hover::before,
+:is(.btn, .nav-btn, .footer-btn):focus-visible::before {
   transform: translate3d(0, 0, 0);
-}
-
-@keyframes virtura-btn-wave {
-  to {
-    -webkit-clip-path: polygon(
-      0 0,
-      var(--btn-wave-alt-1) 0,
-      var(--btn-wave-alt-2) 8%,
-      var(--btn-wave-alt-3) 18%,
-      var(--btn-wave-alt-4) 29%,
-      var(--btn-wave-alt-5) 41%,
-      var(--btn-wave-alt-6) 52%,
-      var(--btn-wave-alt-7) 63%,
-      var(--btn-wave-alt-8) 75%,
-      var(--btn-wave-alt-9) 86%,
-      var(--btn-wave-alt-10) 95%,
-      var(--btn-wave-alt-11) 100%,
-      0 100%
-    );
-    clip-path: polygon(
-      0 0,
-      var(--btn-wave-alt-1) 0,
-      var(--btn-wave-alt-2) 8%,
-      var(--btn-wave-alt-3) 18%,
-      var(--btn-wave-alt-4) 29%,
-      var(--btn-wave-alt-5) 41%,
-      var(--btn-wave-alt-6) 52%,
-      var(--btn-wave-alt-7) 63%,
-      var(--btn-wave-alt-8) 75%,
-      var(--btn-wave-alt-9) 86%,
-      var(--btn-wave-alt-10) 95%,
-      var(--btn-wave-alt-11) 100%,
-      0 100%
-    );
-  }
 }
 
 .btn:is(
@@ -167,37 +108,40 @@ body {
   color: var(--color-white, #fff);
 }
 
-.btn:is(:hover, :focus-visible)
+:is(.btn, .nav-btn, .footer-btn):is(:hover, :focus-visible)
   :where(a, button, span, .brxe-text-basic, .brxe-button-text) {
   color: inherit;
 }
 
-.btn svg,
-.btn svg * {
+:is(.btn, .nav-btn, .footer-btn) svg,
+:is(.btn, .nav-btn, .footer-btn) svg * {
   transition:
     fill 0.24s ease,
     stroke 0.24s ease;
 }
 
-.btn:is(:hover, :focus-visible) svg {
+:is(.btn, .nav-btn, .footer-btn):is(:hover, :focus-visible) svg {
   color: currentColor;
 }
 
-.btn:is(:hover, :focus-visible) svg [fill]:not([fill="none"]) {
+:is(.btn, .nav-btn, .footer-btn):is(:hover, :focus-visible)
+  svg
+  [fill]:not([fill="none"]) {
   fill: currentColor;
 }
 
-.btn:is(:hover, :focus-visible) svg [stroke]:not([stroke="none"]) {
+:is(.btn, .nav-btn, .footer-btn):is(:hover, :focus-visible)
+  svg
+  [stroke]:not([stroke="none"]) {
   stroke: currentColor;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .btn {
+  :is(.btn, .nav-btn, .footer-btn) {
     transition: none;
   }
 
-  .btn::before {
-    animation: none;
+  :is(.btn, .nav-btn, .footer-btn)::before {
     transition: none;
   }
 }
