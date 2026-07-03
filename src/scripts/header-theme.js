@@ -1,4 +1,5 @@
 const HEADER_SELECTOR = '#brx-header';
+const HEADER_SURFACE_SELECTOR = '.header-overlay';
 const NAV_THEME_SELECTOR =
   '.nav-light, .nav-dark, [data-nav-theme], [data-header-theme]';
 const DEFAULT_SAMPLE_Y_RATIO = 0.82;
@@ -49,6 +50,17 @@ const getSampleYRatio = (header) => {
   return DEFAULT_SAMPLE_Y_RATIO;
 };
 
+const getHeaderSurface = (header) => {
+  const surface = header.querySelector(HEADER_SURFACE_SELECTOR);
+  const surfaceRect = surface?.getBoundingClientRect();
+
+  if (surfaceRect?.height && surfaceRect?.width) {
+    return surface;
+  }
+
+  return header;
+};
+
 const getThemeZone = (element, header) => {
   if (!(element instanceof Element) || header.contains(element)) {
     return null;
@@ -59,8 +71,8 @@ const getThemeZone = (element, header) => {
   return zone && !header.contains(zone) ? zone : null;
 };
 
-const getHeaderSamplePoint = (header) => {
-  const rect = header.getBoundingClientRect();
+const getHeaderSamplePoint = (header, surface = getHeaderSurface(header)) => {
+  const rect = surface.getBoundingClientRect();
   const sampleYRatio = getSampleYRatio(header);
   const x = Math.min(
     window.innerWidth - 1,
@@ -74,12 +86,12 @@ const getHeaderSamplePoint = (header) => {
   return { x, y };
 };
 
-const getThemeFromPoint = (header) => {
+const getThemeFromPoint = (header, surface) => {
   if (!document.elementsFromPoint) {
     return null;
   }
 
-  const { x, y } = getHeaderSamplePoint(header);
+  const { x, y } = getHeaderSamplePoint(header, surface);
   const elements = document.elementsFromPoint(x, y);
 
   for (const element of elements) {
@@ -94,8 +106,8 @@ const getThemeFromPoint = (header) => {
   return null;
 };
 
-const getThemeFromSectionBounds = (header) => {
-  const { y } = getHeaderSamplePoint(header);
+const getThemeFromSectionBounds = (header, surface) => {
+  const { y } = getHeaderSamplePoint(header, surface);
   const zones = Array.from(document.querySelectorAll(NAV_THEME_SELECTOR));
   let previousTheme = null;
 
@@ -147,10 +159,11 @@ export const initHeaderTheme = () => {
 
   const updateTheme = () => {
     frame = null;
+    const surface = getHeaderSurface(header);
 
     const theme =
-      getThemeFromPoint(header) ||
-      getThemeFromSectionBounds(header) ||
+      getThemeFromPoint(header, surface) ||
+      getThemeFromSectionBounds(header, surface) ||
       defaultTheme;
 
     applyHeaderTheme(header, theme);
