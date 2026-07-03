@@ -348,18 +348,6 @@ body {
   z-index: 2;
 }
 
-.virtura-intro-word-wrap {
-  display: inline-block;
-  overflow: hidden;
-  vertical-align: baseline;
-}
-
-.virtura-intro-word {
-  display: inline-block;
-  transform-origin: 50% 100%;
-  will-change: opacity, filter, transform;
-}
-
 .font-color-gray {
   color: var(--color-text-grey);
 }

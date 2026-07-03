@@ -116,80 +116,6 @@ const getHeroImage = () => document.querySelector(HERO_IMAGE_SELECTOR);
 
 const getHeroArrow = () => document.querySelector(HERO_ARROW_SELECTOR);
 
-const splitHeroHeading = (heading) => {
-  if (!heading) {
-    return [];
-  }
-
-  if (heading.dataset.virturaIntroSplit === 'true') {
-    return Array.from(heading.querySelectorAll('.virtura-intro-word'));
-  }
-
-  const accessibleLabel = heading.textContent.trim().replace(/\s+/g, ' ');
-
-  if (accessibleLabel && !heading.hasAttribute('aria-label')) {
-    heading.setAttribute('aria-label', accessibleLabel);
-  }
-
-  const createWord = (text) => {
-    const wrap = document.createElement('span');
-    const word = document.createElement('span');
-
-    wrap.className = 'virtura-intro-word-wrap';
-    wrap.setAttribute('aria-hidden', 'true');
-    word.className = 'virtura-intro-word';
-    word.textContent = text;
-    wrap.appendChild(word);
-
-    return wrap;
-  };
-
-  const splitNode = (node) => {
-    const fragment = document.createDocumentFragment();
-
-    if (node.nodeType === Node.TEXT_NODE) {
-      node.textContent.split(/(\s+)/).forEach((part) => {
-        if (!part) {
-          return;
-        }
-
-        fragment.appendChild(
-          /^\s+$/.test(part)
-            ? document.createTextNode(part)
-            : createWord(part),
-        );
-      });
-
-      return fragment;
-    }
-
-    if (node.nodeType !== Node.ELEMENT_NODE) {
-      fragment.appendChild(node.cloneNode(true));
-      return fragment;
-    }
-
-    const clone = node.cloneNode(false);
-
-    Array.from(node.childNodes).forEach((child) => {
-      clone.appendChild(splitNode(child));
-    });
-
-    fragment.appendChild(clone);
-
-    return fragment;
-  };
-
-  const sourceNodes = Array.from(heading.childNodes);
-
-  heading.textContent = '';
-  sourceNodes.forEach((node) => {
-    heading.appendChild(splitNode(node));
-  });
-  heading.dataset.virturaIntroSplit = 'true';
-
-  return Array.from(heading.querySelectorAll('.virtura-intro-word'));
-};
-
 const waitForImage = (image, timeout = 2200) => new Promise((resolve) => {
   if (!image || image.complete) {
     resolve();
@@ -300,7 +226,6 @@ export const initIntroAnimation = async () => {
   const mark = overlay.querySelector('[data-intro-mark]');
   const nameClip = overlay.querySelector('[data-intro-name-clip]');
   const name = overlay.querySelector('[data-intro-name]');
-  const headingWords = splitHeroHeading(heroHeading);
   const imageSweep = createImageSweep(heroImage, overlay);
   const headerRevealState = { progress: 0 };
   const imageReadyPromise = waitForImage(heroImage);
@@ -355,18 +280,8 @@ export const initIntroAnimation = async () => {
   if (heroHeading) {
     gsap.set(heroHeading, {
       autoAlpha: 1,
-      perspective: 900,
-      transformStyle: 'preserve-3d',
-    });
-  }
-
-  if (headingWords.length) {
-    gsap.set(headingWords, {
-      autoAlpha: 0,
-      filter: 'blur(12px)',
-      rotateX: -52,
-      skewY: 4,
-      yPercent: 118,
+      clipPath: 'inset(0 100% 0 0)',
+      webkitClipPath: 'inset(0 100% 0 0)',
     });
   }
 
@@ -422,13 +337,7 @@ export const initIntroAnimation = async () => {
 
       if (heroHeading) {
         gsap.set(heroHeading, {
-          clearProps: 'opacity,visibility,transform,transformStyle,perspective',
-        });
-      }
-
-      if (headingWords.length) {
-        gsap.set(headingWords, {
-          clearProps: 'filter,opacity,visibility,transform',
+          clearProps: 'clipPath,opacity,visibility,webkitClipPath',
         });
       }
 
@@ -496,6 +405,7 @@ export const initIntroAnimation = async () => {
       root.classList.add('virtura-intro-revealing');
       root.classList.remove('virtura-intro-running');
     }, 'dockStart+=0.48')
+    .add('headingReveal', 'dockStart+=0.12')
     .to(
       introBg ? [introBg] : [],
       {
@@ -506,23 +416,16 @@ export const initIntroAnimation = async () => {
       'dockStart+=0.5'
     )
     .to(
-      headingWords,
+      heroHeading ? [heroHeading] : [],
       {
-        autoAlpha: 1,
-        duration: 0.95,
-        ease: 'expo.out',
-        filter: 'blur(0px)',
-        rotateX: 0,
-        skewY: 0,
-        stagger: {
-          amount: 0.28,
-          from: 'start',
-        },
-        yPercent: 0,
+        clipPath: 'inset(0 0% 0 0)',
+        duration: 1.2,
+        ease: 'power3.inOut',
+        webkitClipPath: 'inset(0 0% 0 0)',
       },
-      'dockStart+=0.72'
+      'headingReveal'
     )
-    .add('imageReveal', 'dockStart+=0.98')
+    .add('imageReveal', 'headingReveal+=1.2')
     .to(
       heroImage ? [heroImage] : [],
       {
@@ -571,7 +474,7 @@ export const initIntroAnimation = async () => {
     .to(
       headerRevealState,
       {
-        duration: 2.15,
+        duration: 3,
         ease: 'power2.inOut',
         onUpdate: () => setHeaderRevealClip(
           headerSurface,
