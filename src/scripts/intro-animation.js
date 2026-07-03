@@ -209,44 +209,28 @@ const waitForImage = (image, timeout = 2200) => new Promise((resolve) => {
   image.addEventListener('error', cleanup, { once: true });
 });
 
-const createImagePixelGrid = (image, overlay) => {
+const createImageSweep = (image, overlay) => {
   if (!image || !overlay) {
-    return [];
+    return null;
   }
 
   const rect = image.getBoundingClientRect();
 
   if (!rect.width || !rect.height) {
-    return [];
+    return null;
   }
 
-  const grid = document.createElement('div');
-  const columns = 13;
-  const rows = 7;
-  const cells = [];
+  const sweep = document.createElement('div');
 
-  grid.className = 'virtura-intro-pixels';
-  grid.setAttribute('aria-hidden', 'true');
+  sweep.className = 'virtura-intro-image-sweep';
+  sweep.setAttribute('aria-hidden', 'true');
+  sweep.style.height = `${rect.height}px`;
+  sweep.style.left = `${rect.left}px`;
+  sweep.style.top = `${rect.top}px`;
+  sweep.style.width = `${rect.width}px`;
+  overlay.appendChild(sweep);
 
-  for (let row = 0; row < rows; row += 1) {
-    for (let column = 0; column < columns; column += 1) {
-      const cell = document.createElement('span');
-      const cellWidth = rect.width / columns;
-      const cellHeight = rect.height / rows;
-
-      cell.className = 'virtura-intro-pixel';
-      cell.style.left = `${rect.left + column * cellWidth}px`;
-      cell.style.top = `${rect.top + row * cellHeight}px`;
-      cell.style.width = `${cellWidth + 1}px`;
-      cell.style.height = `${cellHeight + 1}px`;
-      grid.appendChild(cell);
-      cells.push(cell);
-    }
-  }
-
-  overlay.appendChild(grid);
-
-  return cells;
+  return sweep;
 };
 
 const createIntroOverlay = () => {
@@ -317,7 +301,7 @@ export const initIntroAnimation = async () => {
   const nameClip = overlay.querySelector('[data-intro-name-clip]');
   const name = overlay.querySelector('[data-intro-name]');
   const headingWords = splitHeroHeading(heroHeading);
-  const imagePixels = createImagePixelGrid(heroImage, overlay);
+  const imageSweep = createImageSweep(heroImage, overlay);
   const headerRevealState = { progress: 0 };
   const imageReadyPromise = waitForImage(heroImage);
   let imageReady = !heroImage || heroImage.complete;
@@ -389,11 +373,11 @@ export const initIntroAnimation = async () => {
   if (heroImage) {
     gsap.set(heroImage, {
       autoAlpha: 0,
-      clipPath: 'polygon(0% 48%, 100% 35%, 100% 62%, 0% 74%)',
-      filter: 'blur(16px) contrast(1.35) saturate(0.7)',
-      scale: 1.06,
+      clipPath: 'polygon(0% 0%, 10% 0%, 0% 100%, 0% 100%)',
+      filter: 'blur(10px) contrast(1.12) saturate(0.82)',
+      scale: 1.035,
       transformOrigin: '50% 50%',
-      webkitClipPath: 'polygon(0% 48%, 100% 35%, 100% 62%, 0% 74%)',
+      webkitClipPath: 'polygon(0% 0%, 10% 0%, 0% 100%, 0% 100%)',
     });
   }
 
@@ -405,11 +389,10 @@ export const initIntroAnimation = async () => {
     });
   }
 
-  if (imagePixels.length) {
-    gsap.set(imagePixels, {
-      autoAlpha: 1,
-      scale: 1.08,
-      transformOrigin: '50% 50%',
+  if (imageSweep) {
+    gsap.set(imageSweep, {
+      autoAlpha: 0,
+      xPercent: -145,
     });
   }
 
@@ -472,7 +455,7 @@ export const initIntroAnimation = async () => {
         ease: 'power4.inOut',
         width: LOGO_NAME_WIDTH,
       },
-      '+=0.16'
+      '-=0.22'
     )
     .to(
       name,
@@ -553,8 +536,8 @@ export const initIntroAnimation = async () => {
       heroImage ? [heroImage] : [],
       {
         clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
-        duration: 1.12,
-        ease: 'power4.out',
+        duration: 1.05,
+        ease: 'power3.out',
         filter: 'blur(0px) contrast(1) saturate(1)',
         scale: 1,
         webkitClipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
@@ -562,18 +545,23 @@ export const initIntroAnimation = async () => {
       'imageReveal'
     )
     .to(
-      imagePixels,
+      imageSweep ? [imageSweep] : [],
+      {
+        autoAlpha: 1,
+        duration: 0.18,
+        ease: 'none',
+      },
+      'imageReveal+=0.04'
+    )
+    .to(
+      imageSweep ? [imageSweep] : [],
       {
         autoAlpha: 0,
-        duration: 0.42,
-        ease: 'power2.in',
-        scale: 0.2,
-        stagger: {
-          amount: 0.58,
-          from: 'random',
-        },
+        duration: 0.95,
+        ease: 'power2.out',
+        xPercent: 140,
       },
-      'imageReveal+=0.08'
+      'imageReveal+=0.04'
     )
     .add(() => {
       imageRevealed = true;
@@ -583,8 +571,8 @@ export const initIntroAnimation = async () => {
     .to(
       headerRevealState,
       {
-        duration: 1.15,
-        ease: 'power3.inOut',
+        duration: 2.15,
+        ease: 'power2.inOut',
         onUpdate: () => setHeaderRevealClip(
           headerSurface,
           headerRevealState.progress,
@@ -600,7 +588,7 @@ export const initIntroAnimation = async () => {
         duration: 0.32,
         ease: 'power2.out',
       },
-      'navReveal+=0.44'
+      'navReveal+=0.68'
     )
     .to(
       overlay,
@@ -609,6 +597,6 @@ export const initIntroAnimation = async () => {
         duration: 0.55,
         ease: 'power2.out',
       },
-      'navReveal+=0.72'
+      'navReveal+=1.2'
     );
 };
