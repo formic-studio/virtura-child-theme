@@ -7,7 +7,7 @@ const HERO_CLONE_CLASS = 'virtura-hero-img-clone';
 const HERO_SOURCE_HIDDEN_CLASS = 'virtura-hero-img-source-hidden';
 const HERO_ACTIVE_CLASS = 'virtura-hero-img-motion-active';
 const HERO_DOCKED_CLASS = 'virtura-hero-img-motion-docked';
-const HERO_TARGET_MAX_BLOCK_PADDING = '12rem';
+const HERO_TARGET_OVERSCAN = '6rem';
 const CATEGORY_BLOCK_SELECTOR = '.section_category .category-block';
 const CATEGORY_HEADER_SELECTOR = '.category-heading-block';
 const CATEGORY_HEADING_SELECTOR = ':is(h1, h2, h3, h4, h5, h6, .brxe-heading)';
@@ -74,57 +74,20 @@ const getCssLengthInPixels = (value) => {
   return Number.isFinite(width) ? width : 0;
 };
 
-const getGlobalPaddingFromCssVariable = () => {
-  const rootStyles = window.getComputedStyle(document.documentElement);
-  const globalPadding = rootStyles.getPropertyValue('--padding-global').trim();
-  const globalPaddingPixels = getCssLengthInPixels(globalPadding);
-
-  return {
-    left: globalPaddingPixels,
-    right: globalPaddingPixels,
-  };
-};
-
-const getNearestHorizontalPadding = (element, stopElement) => {
-  let currentElement = element?.parentElement;
-
-  while (currentElement && currentElement !== document.body) {
-    const styles = window.getComputedStyle(currentElement);
-    const left = Number.parseFloat(styles.paddingLeft) || 0;
-    const right = Number.parseFloat(styles.paddingRight) || 0;
-
-    if (left > 0 || right > 0) {
-      return { left, right };
-    }
-
-    if (currentElement === stopElement) {
-      break;
-    }
-
-    currentElement = currentElement.parentElement;
-  }
-
-  return getGlobalPaddingFromCssVariable();
-};
-
-const getHeroTargetRect = (image, section) => {
-  const inlinePadding = getNearestHorizontalPadding(image, section);
-  const leftPadding = Math.max(0, inlinePadding.left);
-  const rightPadding = Math.max(0, inlinePadding.right);
-  const maxBlockPadding = getCssLengthInPixels(HERO_TARGET_MAX_BLOCK_PADDING);
-  const blockPadding = Math.min(maxBlockPadding, window.innerHeight * 0.18);
-  const availableWidth = Math.max(1, window.innerWidth - leftPadding - rightPadding);
-  const availableHeight = Math.max(1, window.innerHeight - blockPadding * 2);
+const getHeroTargetRect = (image) => {
+  const overscan = Math.max(0, getCssLengthInPixels(HERO_TARGET_OVERSCAN));
+  const targetWidth = Math.max(1, window.innerWidth + overscan * 2);
+  const targetHeight = Math.max(1, window.innerHeight + overscan * 2);
   const sourceRect = image.getBoundingClientRect();
-  const sourceWidth = image.naturalWidth || sourceRect.width || availableWidth;
-  const sourceHeight = image.naturalHeight || sourceRect.height || availableHeight;
+  const sourceWidth = image.naturalWidth || sourceRect.width || targetWidth;
+  const sourceHeight = image.naturalHeight || sourceRect.height || targetHeight;
   const aspectRatio = sourceWidth / sourceHeight;
 
-  let width = availableWidth;
+  let width = targetWidth;
   let height = width / aspectRatio;
 
-  if (height > availableHeight) {
-    height = availableHeight;
+  if (height < targetHeight) {
+    height = targetHeight;
     width = height * aspectRatio;
   }
 
@@ -282,7 +245,7 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
   };
 
   const setCloneToTarget = () => {
-    const targetRect = getHeroTargetRect(image, section);
+    const targetRect = getHeroTargetRect(image);
 
     setCloneFixed();
 
@@ -314,7 +277,7 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
   };
 
   const dockCloneInSection = () => {
-    const targetRect = getHeroTargetRect(image, section);
+    const targetRect = getHeroTargetRect(image);
 
     activateClone();
 
@@ -328,9 +291,9 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
       autoAlpha: 1,
       borderRadius: getSourceBorderRadius(),
       height: targetRect.height,
-      left: Math.max(0, targetRect.left),
+      left: targetRect.left,
       position: 'absolute',
-      top: Math.max(0, targetRect.top),
+      top: targetRect.top,
       width: targetRect.width,
     });
   };
@@ -388,10 +351,10 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
     {
       borderRadius: () => getSourceBorderRadius(),
       ease: 'none',
-      height: () => getHeroTargetRect(image, section).height,
-      left: () => getHeroTargetRect(image, section).left,
-      top: () => getHeroTargetRect(image, section).top,
-      width: () => getHeroTargetRect(image, section).width,
+      height: () => getHeroTargetRect(image).height,
+      left: () => getHeroTargetRect(image).left,
+      top: () => getHeroTargetRect(image).top,
+      width: () => getHeroTargetRect(image).width,
     },
   );
 
