@@ -10,15 +10,20 @@ import { initSmoothScroll } from './smooth-scroll.js';
 import { initTrainingTabs } from './training-tabs.js';
 
 const initTheme = () => {
+  const introPromise = initIntroAnimation().catch((error) => {
+    console.error('Virtura intro animation failed.', error);
+  });
+
   void initSmoothScroll();
   initHeaderTheme();
   initHeaderScroll();
   initGigaMenu();
-  void initIntroAnimation();
   initFitText();
   initCategoryStack();
   initTrainingTabs();
-  void initMotion();
+  void introPromise.then(() => {
+    void initMotion();
+  });
 };
 
 if (document.readyState === 'loading') {
