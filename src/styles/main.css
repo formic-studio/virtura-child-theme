@@ -27,6 +27,16 @@ body {
   --header-cta-fg: var(--color-white, #fff);
 }
 
+#brx-header.header-nav-active {
+  --header-fg: var(--color-black, #000);
+  --header-cta-bg: var(--color-black, #000);
+  --header-cta-fg: var(--color-white, #fff);
+}
+
+#brx-header.header-nav-active .nav-wrapper {
+  background-color: var(--color-white, #fff);
+}
+
 #brx-header a,
 #brx-header button,
 #brx-header .brxe-text-basic {
@@ -72,6 +82,23 @@ body {
 
 #brx-header .nav-cta svg {
   color: var(--header-cta-fg);
+}
+
+#brx-header .bricks-nav-menu > .giga-menu-trigger > .sub-menu,
+#brx-header .bricks-nav-menu > .menu-item-454 > .sub-menu {
+  display: none !important;
+}
+
+#brx-header .giga-menu:not(.is-open),
+#brx-header .mega-menu:not(.is-open),
+#brx-header [data-giga-menu]:not(.is-open) {
+  display: none !important;
+}
+
+#brx-header.giga-menu-open .giga-menu.is-open,
+#brx-header.giga-menu-open .mega-menu.is-open,
+#brx-header.giga-menu-open [data-giga-menu].is-open {
+  display: var(--giga-menu-display, flex) !important;
 }
 
 #brx-header.header-overlay,
