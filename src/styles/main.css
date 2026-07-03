@@ -8,6 +8,107 @@ body {
   color: var(--color-black, #000);
 }
 
+.btn {
+  --btn-hover-bg: var(--color-darker-grey, #8f8f8f);
+  background-image:
+    linear-gradient(96deg, var(--btn-hover-bg) 0 78%, transparent 79%),
+    linear-gradient(86deg, var(--btn-hover-bg) 0 91%, transparent 92%),
+    linear-gradient(101deg, var(--btn-hover-bg) 0 84%, transparent 85%),
+    linear-gradient(82deg, var(--btn-hover-bg) 0 96%, transparent 97%),
+    linear-gradient(94deg, var(--btn-hover-bg) 0 88%, transparent 89%);
+  background-position:
+    left 0,
+    left 25%,
+    left 50%,
+    left 75%,
+    left 100%;
+  background-repeat: no-repeat;
+  background-size:
+    0 26%,
+    0 26%,
+    0 26%,
+    0 26%,
+    0 26%;
+  transition:
+    background-size 0.55s var(--virtura-motion-ease),
+    border-color 0.24s ease,
+    color 0.24s ease;
+}
+
+.btn:hover,
+.btn:focus-visible {
+  background-size:
+    116% 26%,
+    106% 26%,
+    122% 26%,
+    111% 26%,
+    118% 26%;
+}
+
+.btn:is(
+    .btn-white,
+    .btn--white,
+    .btn-light,
+    .is-white,
+    .is-light,
+    .bg-white,
+    .background-white,
+    [data-btn-variant="white"],
+    [data-button-variant="white"],
+    [data-theme="white"]
+  ),
+.btn[class*="white"],
+.btn[class*="White"] {
+  --btn-hover-bg: var(--color-black, #000);
+}
+
+.btn:is(
+    .btn-white,
+    .btn--white,
+    .btn-light,
+    .is-white,
+    .is-light,
+    .bg-white,
+    .background-white,
+    [data-btn-variant="white"],
+    [data-button-variant="white"],
+    [data-theme="white"]
+  ):is(:hover, :focus-visible),
+.btn[class*="white"]:is(:hover, :focus-visible),
+.btn[class*="White"]:is(:hover, :focus-visible) {
+  color: var(--color-white, #fff);
+}
+
+.btn:is(:hover, :focus-visible)
+  :where(a, button, span, .brxe-text-basic, .brxe-button-text) {
+  color: inherit;
+}
+
+.btn svg,
+.btn svg * {
+  transition:
+    fill 0.24s ease,
+    stroke 0.24s ease;
+}
+
+.btn:is(:hover, :focus-visible) svg {
+  color: currentColor;
+}
+
+.btn:is(:hover, :focus-visible) svg [fill]:not([fill="none"]) {
+  fill: currentColor;
+}
+
+.btn:is(:hover, :focus-visible) svg [stroke]:not([stroke="none"]) {
+  stroke: currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+}
+
 #brx-header {
   --giga-menu-column-gap: var(--space-64, 6.4rem);
   --giga-menu-column-min: 12rem;
