@@ -248,6 +248,15 @@ body {
   }
 }
 
+.virtura-intro-prime #brx-header.header-overlay,
+.virtura-intro-prime #brx-header .header-overlay,
+.virtura-intro-prime .section_hero .hero-heading,
+.virtura-intro-prime .section_hero .hero-img,
+.virtura-intro-prime #brxe-rigtwk {
+  opacity: 0;
+  visibility: hidden;
+}
+
 .virtura-intro-running,
 .virtura-intro-running body,
 .virtura-intro-revealing,
@@ -260,9 +269,11 @@ body {
   transition: none;
 }
 
+.virtura-intro-running #brx-header.header-overlay,
 .virtura-intro-running #brx-header .header-overlay {
   opacity: 0;
   pointer-events: none;
+  visibility: hidden;
 }
 
 .virtura-intro-running .section_hero .hero-heading,
@@ -291,9 +302,11 @@ body {
   color: var(--color-white, #fff);
   height: 38px;
   left: 50%;
+  opacity: 0;
   position: absolute;
   top: 50%;
   transform-origin: center center;
+  visibility: hidden;
   width: 147px;
   z-index: 3;
 }

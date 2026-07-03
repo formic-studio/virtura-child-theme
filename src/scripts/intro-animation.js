@@ -15,6 +15,7 @@ const LOGO_MARK_WIDTH = 42;
 const LOGO_NAME_WIDTH = 97;
 const LOGO_MARK_CENTER_OFFSET = LOGO_WIDTH / 2 - LOGO_MARK_WIDTH / 2;
 const INTRO_CENTER_SCALE = 2.2;
+const INTRO_PRIME_CLASS = 'virtura-intro-prime';
 
 const ICON_SVG = `
   <svg xmlns="http://www.w3.org/2000/svg" width="42" height="38" viewBox="0 0 42 38" fill="none" aria-hidden="true" focusable="false">
@@ -199,11 +200,13 @@ const getLogoTargetTransform = (gsap, logo, target) => {
 };
 
 export const initIntroAnimation = async () => {
+  const root = document.documentElement;
+
   if (!shouldRunIntro()) {
+    root.classList.remove(INTRO_PRIME_CLASS);
     return;
   }
 
-  const root = document.documentElement;
   const headerSurface = document.querySelector(HEADER_SURFACE_SELECTOR);
   const heroHeading = getHeroHeading();
   const heroImage = getHeroImage();
@@ -212,10 +215,12 @@ export const initIntroAnimation = async () => {
   const overlay = createIntroOverlay();
 
   root.classList.add('virtura-intro-running');
+  root.classList.remove(INTRO_PRIME_CLASS);
 
   const { gsap } = await loadGsap();
 
   if (reducedMotionMedia.matches) {
+    root.classList.remove(INTRO_PRIME_CLASS);
     root.classList.remove('virtura-intro-running');
     overlay.remove();
     return;
@@ -325,6 +330,7 @@ export const initIntroAnimation = async () => {
       ease: 'power3.out',
     },
     onComplete: () => {
+      root.classList.remove(INTRO_PRIME_CLASS);
       root.classList.remove('virtura-intro-running');
       root.classList.remove('virtura-intro-revealing');
       overlay.remove();

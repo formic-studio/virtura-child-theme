@@ -123,6 +123,62 @@ function virtura_child_theme_enqueue_assets(): void {
 add_action( 'wp_enqueue_scripts', 'virtura_child_theme_enqueue_assets', 20 );
 
 /**
+ * Hide homepage intro elements before the main ES module starts.
+ *
+ * The real animation still lives in src/scripts/intro-animation.js. This tiny
+ * bootstrap only prevents a first-paint flash of the header/hero elements.
+ */
+function virtura_child_theme_print_intro_prime(): void {
+	if ( is_admin() || virtura_child_theme_is_bricks_builder() ) {
+		return;
+	}
+
+	?>
+	<style id="virtura-intro-prime-css">
+		html.virtura-intro-prime #brx-header.header-overlay,
+		html.virtura-intro-prime #brx-header .header-overlay,
+		html.virtura-intro-prime .section_hero .hero-heading,
+		html.virtura-intro-prime .section_hero .hero-img,
+		html.virtura-intro-prime #brxe-rigtwk {
+			opacity: 0 !important;
+			visibility: hidden !important;
+		}
+	</style>
+	<script id="virtura-intro-prime-js">
+		(function () {
+			var root = document.documentElement;
+			var path = window.location.pathname || "/";
+			var normalizedPath = path.charAt(path.length - 1) === "/" ? path : path + "/";
+			var reducedMotion = "matchMedia" in window &&
+				window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+			var shouldPrime = (
+				(normalizedPath === "/" || normalizedPath === "/strona-glowna/") &&
+				!window.location.hash &&
+				window.scrollY < 24 &&
+				!reducedMotion
+			);
+
+			if (!shouldPrime) {
+				return;
+			}
+
+			root.classList.add("virtura-intro-prime");
+
+			window.setTimeout(function () {
+				if (
+					!root.classList.contains("virtura-intro-running") &&
+					!root.classList.contains("virtura-intro-revealing")
+				) {
+					root.classList.remove("virtura-intro-prime");
+				}
+			}, 8000);
+		})();
+	</script>
+	<?php
+}
+add_action( 'wp_head', 'virtura_child_theme_print_intro_prime', 0 );
+
+/**
  * Force Vite bundles to load as ES modules.
  *
  * Some WordPress/optimization stacks ignore wp_script_add_data( 'type', 'module' ),
