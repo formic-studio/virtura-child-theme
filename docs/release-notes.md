@@ -10,4 +10,6 @@
   `nav-dark` for sections where it should be black.
 - Added giga menu behavior for the header. Build the panel in Bricks inside
   `.section_nav` with the `giga-menu` class; hovering the desktop `Usługi`
-  menu item opens it and leaving `.section_nav` closes it.
+  menu item opens it and leaving `.section_nav` closes it. Add
+  `giga-menu-items` inside the panel to auto-render columns from the WordPress
+  submenu.

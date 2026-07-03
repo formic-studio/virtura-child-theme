@@ -84,8 +84,7 @@ body {
   color: var(--header-cta-fg);
 }
 
-#brx-header .bricks-nav-menu > .giga-menu-trigger > .sub-menu,
-#brx-header .bricks-nav-menu > .menu-item-454 > .sub-menu {
+#brx-header .bricks-nav-menu > .menu-item-has-children > .sub-menu {
   display: none !important;
 }
 
@@ -99,6 +98,53 @@ body {
 #brx-header.giga-menu-open .mega-menu.is-open,
 #brx-header.giga-menu-open [data-giga-menu].is-open {
   display: var(--giga-menu-display, flex) !important;
+}
+
+#brx-header .giga-menu-items {
+  display: grid;
+  gap: var(--giga-menu-items-gap, var(--space-64, 6.4rem));
+  grid-template-columns: repeat(
+    var(--giga-menu-columns, 4),
+    minmax(0, 1fr)
+  );
+}
+
+#brx-header .giga-menu-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12, 1.2rem);
+}
+
+#brx-header .giga-menu-heading {
+  color: var(--color-black, #000);
+  font-size: var(--fs-title-big, 2rem);
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+}
+
+#brx-header .giga-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8, 0.8rem);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#brx-header .giga-menu-link {
+  color: var(--color-text-grey, #727272);
+  font-size: var(--fs-title-small, 1.6rem);
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+}
+
+#brx-header .giga-menu-link:hover,
+#brx-header .giga-menu-link:focus-visible,
+#brx-header .giga-menu-heading:hover,
+#brx-header .giga-menu-heading:focus-visible {
+  color: var(--color-black, #000);
 }
 
 #brx-header.header-overlay,

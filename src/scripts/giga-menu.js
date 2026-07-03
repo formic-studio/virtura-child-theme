@@ -2,6 +2,8 @@ const HEADER_SELECTOR = '#brx-header';
 const NAV_ROOT_SELECTOR = '.section_nav';
 const NAV_WRAPPER_SELECTOR = '.nav-wrapper';
 const PANEL_SELECTOR = '.giga-menu, .mega-menu, [data-giga-menu]';
+const ITEMS_TARGET_SELECTOR =
+  '.giga-menu-items, .mega-menu-items, [data-giga-menu-items]';
 const TRIGGER_SELECTOR =
   '.bricks-nav-menu > .giga-menu-trigger, .bricks-nav-menu > [data-giga-menu-trigger], .bricks-nav-menu > .menu-item-454';
 const TRIGGER_CONTROL_SELECTOR =
@@ -45,12 +47,93 @@ const getTrigger = (root) => {
     return explicitTrigger;
   }
 
-  return Array.from(
+  const dropdownItems = Array.from(
     root.querySelectorAll('.bricks-nav-menu > .menu-item-has-children')
-  ).find((item) => {
+  );
+  const servicesItem = dropdownItems.find((item) => {
     const label = getTriggerLabel(item);
 
     return label === 'usługi' || label === 'usługi+';
+  });
+
+  return servicesItem || (dropdownItems.length === 1 ? dropdownItems[0] : null);
+};
+
+const getDirectSubmenuItems = (item) =>
+  Array.from(item.querySelectorAll(':scope > .sub-menu > .menu-item'));
+
+const getDirectLink = (item) =>
+  item.querySelector(':scope > a, :scope > .brx-submenu-toggle > a');
+
+const createLink = (sourceLink, className) => {
+  const link = document.createElement('a');
+
+  link.className = className;
+  link.href = sourceLink.href;
+  link.textContent = sourceLink.textContent.trim();
+
+  if (sourceLink.target) {
+    link.target = sourceLink.target;
+  }
+
+  if (sourceLink.rel) {
+    link.rel = sourceLink.rel;
+  }
+
+  if (sourceLink.getAttribute('aria-current')) {
+    link.setAttribute('aria-current', sourceLink.getAttribute('aria-current'));
+  }
+
+  return link;
+};
+
+const renderGigaMenuItems = (panel, trigger) => {
+  const target = panel.querySelector(ITEMS_TARGET_SELECTOR);
+
+  if (!target) {
+    return;
+  }
+
+  const topLevelItems = getDirectSubmenuItems(trigger);
+
+  target.replaceChildren();
+
+  topLevelItems.forEach((item) => {
+    const link = getDirectLink(item);
+
+    if (!link) {
+      return;
+    }
+
+    const column = document.createElement('div');
+    const childItems = getDirectSubmenuItems(item);
+
+    column.className = 'giga-menu-column';
+    column.append(createLink(link, 'giga-menu-heading'));
+
+    if (childItems.length) {
+      const list = document.createElement('ul');
+
+      list.className = 'giga-menu-list';
+
+      childItems.forEach((childItem) => {
+        const childLink = getDirectLink(childItem);
+
+        if (!childLink) {
+          return;
+        }
+
+        const listItem = document.createElement('li');
+
+        listItem.className = 'giga-menu-list-item';
+        listItem.append(createLink(childLink, 'giga-menu-link'));
+        list.append(listItem);
+      });
+
+      column.append(list);
+    }
+
+    target.append(column);
   });
 };
 
@@ -129,6 +212,7 @@ const initNavRoot = (root) => {
   trigger.setAttribute('aria-haspopup', 'true');
   panel.hidden = true;
   panel.setAttribute('aria-hidden', 'true');
+  renderGigaMenuItems(panel, trigger);
 
   trigger.addEventListener('mouseenter', openMenu);
   trigger.addEventListener('focusin', openMenu);
