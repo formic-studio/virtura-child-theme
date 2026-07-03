@@ -4,6 +4,9 @@ const NAV_WRAPPER_SELECTOR = '.nav-wrapper';
 const PANEL_SELECTOR = '.giga-menu, .mega-menu, [data-giga-menu]';
 const ITEMS_TARGET_SELECTOR =
   '.giga-menu-items, .mega-menu-items, [data-giga-menu-items]';
+const NAV_TEXT_SELECTOR = '.nav-text';
+const NAV_BUTTON_SELECTOR = '.nav-btn';
+const GIGA_COLUMN_SELECTOR = '.giga-menu-column';
 const TRIGGER_SELECTOR =
   '.bricks-nav-menu > .giga-menu-trigger, .bricks-nav-menu > [data-giga-menu-trigger], .bricks-nav-menu > .menu-item-454';
 const TRIGGER_CONTROL_SELECTOR =
@@ -14,6 +17,7 @@ const NAV_ACTIVE_CLASS = 'header-nav-active';
 const ROOT_OPEN_CLASS = 'giga-menu-open';
 const PANEL_OPEN_CLASS = 'is-open';
 const TRIGGER_OPEN_CLASS = 'is-giga-menu-open';
+const MIN_NAV_GAP = 16;
 
 const setExpanded = (trigger, isExpanded) => {
   trigger
@@ -138,6 +142,43 @@ const renderGigaMenuItems = (panel, trigger) => {
   });
 };
 
+const getNavControlGroup = (root) => {
+  const navText = root.querySelector(NAV_TEXT_SELECTOR);
+  const navButton = root.querySelector(NAV_BUTTON_SELECTOR);
+  const group = navText?.parentElement;
+
+  if (!navText || !navButton || !group?.contains(navButton)) {
+    return null;
+  }
+
+  return {
+    group,
+    navButton,
+    navText,
+  };
+};
+
+const syncNavGapToFirstColumn = (root, panel) => {
+  const navControlGroup = getNavControlGroup(root);
+  const firstColumn = panel?.querySelector(GIGA_COLUMN_SELECTOR);
+
+  if (!navControlGroup || !firstColumn) {
+    return;
+  }
+
+  const { group, navButton, navText } = navControlGroup;
+  const buttonRect = navButton.getBoundingClientRect();
+  const columnRect = firstColumn.getBoundingClientRect();
+  const navTextRect = navText.getBoundingClientRect();
+  const gap = buttonRect.left - columnRect.left - navTextRect.width;
+
+  if (!Number.isFinite(gap)) {
+    return;
+  }
+
+  group.style.columnGap = `${Math.round(Math.max(gap, MIN_NAV_GAP))}px`;
+};
+
 const initNavRoot = (root) => {
   const header =
     root.closest(HEADER_SELECTOR) || document.querySelector(HEADER_SELECTOR);
@@ -151,6 +192,7 @@ const initNavRoot = (root) => {
 
   let isOpen = false;
   let isBuilderForcedOpen = root.classList.contains(BUILDER_OPEN_CLASS);
+  let navGapFrame = 0;
 
   const activateNav = () => {
     header.classList.add(NAV_ACTIVE_CLASS);
@@ -170,11 +212,23 @@ const initNavRoot = (root) => {
     panel.hidden = false;
     panel.setAttribute('aria-hidden', 'false');
     setExpanded(trigger, true);
+    syncNavGapToFirstColumn(root, panel);
   };
 
   const releaseNav = () => {
     header.classList.remove(NAV_ACTIVE_CLASS);
     root.classList.remove(NAV_ACTIVE_CLASS);
+  };
+
+  const syncOpenNavGap = () => {
+    if (!panel || !isOpen) {
+      return;
+    }
+
+    window.cancelAnimationFrame(navGapFrame);
+    navGapFrame = window.requestAnimationFrame(() => {
+      syncNavGapToFirstColumn(root, panel);
+    });
   };
 
   const openMenu = () => {
@@ -275,6 +329,12 @@ const initNavRoot = (root) => {
       trigger.querySelector('a, button')?.focus();
     }
   });
+
+  window.addEventListener('resize', syncOpenNavGap, { passive: true });
+
+  if (document.fonts?.ready) {
+    document.fonts.ready.then(syncOpenNavGap).catch(() => {});
+  }
 };
 
 export const initGigaMenu = () => {
