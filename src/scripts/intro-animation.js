@@ -199,7 +199,7 @@ export const initIntroAnimation = async () => {
 
   timeline
     .to(mark, {
-      duration: 1.35,
+      duration: 1.85,
       ease: 'power4.inOut',
       rotation: 360,
       scale: 1,
