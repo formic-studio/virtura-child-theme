@@ -8,6 +8,72 @@ body {
   color: var(--color-black, #000);
 }
 
+#brx-header {
+  --header-fg: var(--color-black, #000);
+  --header-cta-bg: var(--color-black, #000);
+  --header-cta-fg: var(--color-white, #fff);
+  color: var(--header-fg);
+}
+
+#brx-header.header-theme-light {
+  --header-fg: var(--color-white, #fff);
+  --header-cta-bg: var(--color-white, #fff);
+  --header-cta-fg: var(--color-black, #000);
+}
+
+#brx-header.header-theme-dark {
+  --header-fg: var(--color-black, #000);
+  --header-cta-bg: var(--color-black, #000);
+  --header-cta-fg: var(--color-white, #fff);
+}
+
+#brx-header a,
+#brx-header button,
+#brx-header .brxe-text-basic {
+  color: var(--header-fg);
+  transition: color 0.2s ease;
+}
+
+#brx-header svg {
+  color: var(--header-fg);
+}
+
+#brx-header svg * {
+  transition:
+    fill 0.2s ease,
+    stroke 0.2s ease;
+}
+
+#brx-header svg [fill]:not([fill="none"]) {
+  fill: currentColor;
+}
+
+#brx-header svg [stroke]:not([stroke="none"]) {
+  stroke: currentColor;
+}
+
+#brx-header svg :where(path, rect, circle, polygon, polyline, line, ellipse):not(
+    [fill="none"]
+  ):not([fill]) {
+  fill: currentColor;
+}
+
+#brx-header .nav-cta {
+  background-color: var(--header-cta-bg);
+  color: var(--header-cta-fg);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+#brx-header .nav-cta :where(a, button, span, .brxe-text-basic) {
+  color: var(--header-cta-fg);
+}
+
+#brx-header .nav-cta svg {
+  color: var(--header-cta-fg);
+}
+
 #brx-header.header-overlay,
 .header-overlay {
   left: 0;
