@@ -87,6 +87,16 @@ body {
   color: var(--color-black, #000) !important;
 }
 
+#brx-header .nav-btn:is(:hover, :focus-visible),
+#brx-header .nav-btn:is(:hover, :focus-visible)
+  :where(a, button, span, .brxe-text-basic, .brxe-button-text),
+#brx-header
+  .nav-btn:is(:hover, :focus-visible)
+  :where(a, button, span, .brxe-text-basic, .brxe-button-text)
+  * {
+  color: var(--color-black, #000) !important;
+}
+
 .footer-btn:is(:hover, :focus-visible) {
   color: var(--color-white, #fff);
 }
