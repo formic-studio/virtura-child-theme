@@ -279,8 +279,9 @@ export const initIntroAnimation = async () => {
 
   if (heroHeading) {
     gsap.set(heroHeading, {
-      autoAlpha: 1,
+      autoAlpha: 0,
       clipPath: 'inset(0 100% 0 0)',
+      filter: 'blur(5px)',
       webkitClipPath: 'inset(0 100% 0 0)',
     });
   }
@@ -337,7 +338,7 @@ export const initIntroAnimation = async () => {
 
       if (heroHeading) {
         gsap.set(heroHeading, {
-          clearProps: 'clipPath,opacity,visibility,webkitClipPath',
+          clearProps: 'clipPath,filter,opacity,visibility,webkitClipPath',
         });
       }
 
@@ -405,7 +406,7 @@ export const initIntroAnimation = async () => {
       root.classList.add('virtura-intro-revealing');
       root.classList.remove('virtura-intro-running');
     }, 'dockStart+=0.48')
-    .add('headingReveal', 'dockStart+=0.12')
+    .add('headingReveal', 'dockStart+=0.32')
     .to(
       introBg ? [introBg] : [],
       {
@@ -418,9 +419,11 @@ export const initIntroAnimation = async () => {
     .to(
       heroHeading ? [heroHeading] : [],
       {
+        autoAlpha: 1,
         clipPath: 'inset(0 0% 0 0)',
         duration: 1.2,
         ease: 'power3.inOut',
+        filter: 'blur(0px)',
         webkitClipPath: 'inset(0 0% 0 0)',
       },
       'headingReveal'
