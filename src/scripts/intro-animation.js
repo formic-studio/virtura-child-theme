@@ -421,14 +421,14 @@ export const initIntroAnimation = async () => {
       {
         autoAlpha: 1,
         clipPath: 'inset(0 0% 0 0)',
-        duration: 1.2,
+        duration: 1.5,
         ease: 'power3.inOut',
         filter: 'blur(0px)',
         webkitClipPath: 'inset(0 0% 0 0)',
       },
       'headingReveal'
     )
-    .add('imageReveal', 'headingReveal+=1.2')
+    .add('imageReveal', 'headingReveal+=1.5')
     .to(
       heroImage ? [heroImage] : [],
       {
