@@ -13,3 +13,4 @@
   menu item opens it and leaving `.section_nav` closes it. Add
   `giga-menu-items` inside the panel to auto-render columns from the WordPress
   submenu.
+- Giga menu remains visible in Bricks Builder so the panel can be edited.

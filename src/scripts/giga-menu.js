@@ -14,6 +14,10 @@ const ROOT_OPEN_CLASS = 'giga-menu-open';
 const PANEL_OPEN_CLASS = 'is-open';
 const TRIGGER_OPEN_CLASS = 'is-giga-menu-open';
 
+const isBricksBuilder = () =>
+  document.body.classList.contains('bricks-is-builder') ||
+  document.documentElement.classList.contains('bricks-is-builder');
+
 const setExpanded = (trigger, isExpanded) => {
   trigger
     .querySelectorAll(':scope > .brx-submenu-toggle > button, :scope > button')
@@ -143,6 +147,7 @@ const initNavRoot = (root) => {
   const navWrapper = root.querySelector(NAV_WRAPPER_SELECTOR);
   const panel = root.querySelector(PANEL_SELECTOR);
   const trigger = getTrigger(root);
+  const isBuilder = isBricksBuilder();
 
   if (!header || !navWrapper) {
     return;
@@ -153,6 +158,17 @@ const initNavRoot = (root) => {
   const activateNav = () => {
     header.classList.add(NAV_ACTIVE_CLASS);
     root.classList.add(NAV_ACTIVE_CLASS);
+  };
+
+  const setOpenState = () => {
+    isOpen = true;
+    header.classList.add(ROOT_OPEN_CLASS);
+    root.classList.add(ROOT_OPEN_CLASS);
+    trigger.classList.add(TRIGGER_OPEN_CLASS);
+    panel.classList.add(PANEL_OPEN_CLASS);
+    panel.hidden = false;
+    panel.setAttribute('aria-hidden', 'false');
+    setExpanded(trigger, true);
   };
 
   const releaseNav = () => {
@@ -167,17 +183,14 @@ const initNavRoot = (root) => {
       return;
     }
 
-    isOpen = true;
-    header.classList.add(ROOT_OPEN_CLASS);
-    root.classList.add(ROOT_OPEN_CLASS);
-    trigger.classList.add(TRIGGER_OPEN_CLASS);
-    panel.classList.add(PANEL_OPEN_CLASS);
-    panel.hidden = false;
-    panel.setAttribute('aria-hidden', 'false');
-    setExpanded(trigger, true);
+    setOpenState();
   };
 
   const closeMenu = () => {
+    if (isBuilder) {
+      return;
+    }
+
     if (panel && trigger) {
       isOpen = false;
       header.classList.remove(ROOT_OPEN_CLASS);
@@ -213,6 +226,12 @@ const initNavRoot = (root) => {
   panel.hidden = true;
   panel.setAttribute('aria-hidden', 'true');
   renderGigaMenuItems(panel, trigger);
+
+  if (isBuilder) {
+    activateNav();
+    setOpenState();
+    return;
+  }
 
   trigger.addEventListener('mouseenter', openMenu);
   trigger.addEventListener('focusin', openMenu);
