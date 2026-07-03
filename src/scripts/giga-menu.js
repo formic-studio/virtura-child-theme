@@ -9,14 +9,11 @@ const TRIGGER_SELECTOR =
 const TRIGGER_CONTROL_SELECTOR =
   ':scope > a, :scope > button, :scope > .brx-submenu-toggle > a, :scope > .brx-submenu-toggle > button';
 
+const BUILDER_OPEN_CLASS = 'giga-menu-builder-open';
 const NAV_ACTIVE_CLASS = 'header-nav-active';
 const ROOT_OPEN_CLASS = 'giga-menu-open';
 const PANEL_OPEN_CLASS = 'is-open';
 const TRIGGER_OPEN_CLASS = 'is-giga-menu-open';
-
-const isBricksBuilder = () =>
-  document.body.classList.contains('bricks-is-builder') ||
-  document.documentElement.classList.contains('bricks-is-builder');
 
 const setExpanded = (trigger, isExpanded) => {
   trigger
@@ -147,13 +144,13 @@ const initNavRoot = (root) => {
   const navWrapper = root.querySelector(NAV_WRAPPER_SELECTOR);
   const panel = root.querySelector(PANEL_SELECTOR);
   const trigger = getTrigger(root);
-  const isBuilder = isBricksBuilder();
 
   if (!header || !navWrapper) {
     return;
   }
 
   let isOpen = false;
+  let isBuilderForcedOpen = root.classList.contains(BUILDER_OPEN_CLASS);
 
   const activateNav = () => {
     header.classList.add(NAV_ACTIVE_CLASS);
@@ -161,6 +158,10 @@ const initNavRoot = (root) => {
   };
 
   const setOpenState = () => {
+    if (!panel || !trigger) {
+      return;
+    }
+
     isOpen = true;
     header.classList.add(ROOT_OPEN_CLASS);
     root.classList.add(ROOT_OPEN_CLASS);
@@ -187,7 +188,7 @@ const initNavRoot = (root) => {
   };
 
   const closeMenu = () => {
-    if (isBuilder) {
+    if (root.classList.contains(BUILDER_OPEN_CLASS)) {
       return;
     }
 
@@ -227,11 +228,32 @@ const initNavRoot = (root) => {
   panel.setAttribute('aria-hidden', 'true');
   renderGigaMenuItems(panel, trigger);
 
-  if (isBuilder) {
+  const syncBuilderOpenState = ({ force = false } = {}) => {
+    const shouldForceOpen = root.classList.contains(BUILDER_OPEN_CLASS);
+
+    if (!force && shouldForceOpen === isBuilderForcedOpen) {
+      return;
+    }
+
+    isBuilderForcedOpen = shouldForceOpen;
+
+    if (!shouldForceOpen) {
+      closeMenu();
+      return;
+    }
+
     activateNav();
     setOpenState();
-    return;
-  }
+  };
+
+  const classObserver = new MutationObserver(syncBuilderOpenState);
+
+  classObserver.observe(root, {
+    attributeFilter: ['class'],
+    attributes: true,
+  });
+
+  syncBuilderOpenState({ force: true });
 
   trigger.addEventListener('mouseenter', openMenu);
   trigger.addEventListener('focusin', openMenu);

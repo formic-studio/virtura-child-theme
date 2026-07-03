@@ -112,9 +112,9 @@ body {
   display: var(--giga-menu-display, flex) !important;
 }
 
-.bricks-is-builder #brx-header .giga-menu,
-.bricks-is-builder #brx-header .mega-menu,
-.bricks-is-builder #brx-header [data-giga-menu] {
+#brx-header .section_nav.giga-menu-builder-open .giga-menu,
+#brx-header .section_nav.giga-menu-builder-open .mega-menu,
+#brx-header .section_nav.giga-menu-builder-open [data-giga-menu] {
   display: var(--giga-menu-display, flex) !important;
 }
 
