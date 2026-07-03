@@ -225,12 +225,12 @@ body {
   z-index: 999;
 }
 
-#brx-header.header-scroll-ready {
+#brx-header.header-scroll-ready .header-overlay {
   transition: transform 0.32s var(--virtura-motion-ease);
   will-change: transform;
 }
 
-#brx-header.header-scroll-hidden {
+#brx-header.header-scroll-hidden .header-overlay {
   pointer-events: none;
   transform: translate3d(
     0,
@@ -240,7 +240,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #brx-header.header-scroll-ready {
+  #brx-header.header-scroll-ready .header-overlay {
     transition: none;
   }
 }
