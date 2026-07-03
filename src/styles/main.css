@@ -225,6 +225,26 @@ body {
   z-index: 999;
 }
 
+#brx-header.header-scroll-ready {
+  transition: transform 0.32s var(--virtura-motion-ease);
+  will-change: transform;
+}
+
+#brx-header.header-scroll-hidden {
+  pointer-events: none;
+  transform: translate3d(
+    0,
+    calc(-100% - var(--wp-admin--admin-bar--height, 0px)),
+    0
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #brx-header.header-scroll-ready {
+    transition: none;
+  }
+}
+
 .font-color-gray {
   color: var(--color-text-grey);
 }
