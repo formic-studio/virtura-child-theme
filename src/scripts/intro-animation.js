@@ -5,12 +5,14 @@ const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)')
 const HEADER_SURFACE_SELECTOR = '.header-overlay';
 const HERO_SECTION_SELECTOR = '.section_hero';
 const HERO_REVEAL_SELECTOR = '.section_hero .hero-heading > *';
-const NAV_LOGO_SELECTOR = '#brx-header .svg-link';
+const NAV_LOGO_SELECTOR = '#brxe-cimskf';
+const NAV_LOGO_FALLBACK_SELECTOR = '#brx-header .svg-link';
 const INTRO_PATHS = new Set(['/', '/strona-glowna/']);
 const LOGO_WIDTH = 147;
 const LOGO_MARK_WIDTH = 42;
 const LOGO_NAME_WIDTH = 97;
 const LOGO_MARK_CENTER_OFFSET = LOGO_WIDTH / 2 - LOGO_MARK_WIDTH / 2;
+const INTRO_CENTER_SCALE = 2.2;
 
 const ICON_SVG = `
   <svg xmlns="http://www.w3.org/2000/svg" width="42" height="38" viewBox="0 0 42 38" fill="none" aria-hidden="true" focusable="false">
@@ -57,8 +59,20 @@ const shouldRunIntro = () => (
   !reducedMotionMedia.matches &&
   !isBricksBuilder() &&
   document.querySelector(HERO_SECTION_SELECTOR) &&
-  document.querySelector(NAV_LOGO_SELECTOR)
+  getNavLogoTarget()
 );
+
+const getNavLogoTarget = () => (
+  document.querySelector(NAV_LOGO_SELECTOR) ||
+  document.querySelector(NAV_LOGO_FALLBACK_SELECTOR)
+);
+
+const getIntroMarkScale = () => {
+  const scaleForWidth = window.innerWidth / 18;
+  const scaleForHeight = window.innerHeight / 12;
+
+  return Math.max(48, scaleForWidth, scaleForHeight);
+};
 
 const createIntroOverlay = () => {
   const overlay = document.createElement('div');
@@ -106,7 +120,7 @@ export const initIntroAnimation = async () => {
   const root = document.documentElement;
   const headerSurface = document.querySelector(HEADER_SURFACE_SELECTOR);
   const heroElements = Array.from(document.querySelectorAll(HERO_REVEAL_SELECTOR));
-  const navLogo = document.querySelector(NAV_LOGO_SELECTOR);
+  const navLogo = getNavLogoTarget();
   const overlay = createIntroOverlay();
 
   root.classList.add('virtura-intro-running');
@@ -127,22 +141,26 @@ export const initIntroAnimation = async () => {
 
   gsap.set(logo, {
     autoAlpha: 1,
-    scale: 2.45,
+    scale: INTRO_CENTER_SCALE,
     x: LOGO_MARK_CENTER_OFFSET,
     xPercent: -50,
     yPercent: -50,
   });
   gsap.set(mark, {
-    autoAlpha: 0,
-    scale: 0.72,
+    autoAlpha: 1,
+    rotation: 0,
+    scale: getIntroMarkScale(),
     transformOrigin: '50% 50%',
-    y: 10,
   });
   gsap.set(nameClip, { width: 0 });
   gsap.set(name, { autoAlpha: 0, x: -18 });
 
   if (headerSurface) {
-    gsap.set(headerSurface, { autoAlpha: 0, y: -36 });
+    gsap.set(headerSurface, {
+      autoAlpha: 0,
+      clipPath: 'inset(0 100% 0 0)',
+      webkitClipPath: 'inset(0 100% 0 0)',
+    });
   }
 
   if (heroElements.length) {
@@ -167,7 +185,10 @@ export const initIntroAnimation = async () => {
       overlay.remove();
 
       if (headerSurface) {
-        gsap.set(headerSurface, { clearProps: 'opacity,visibility,transform' });
+        gsap.set(headerSurface, {
+          clearProps:
+            'clipPath,webkitClipPath,opacity,visibility,transform',
+        });
       }
 
       if (heroElements.length) {
@@ -178,19 +199,11 @@ export const initIntroAnimation = async () => {
 
   timeline
     .to(mark, {
-      autoAlpha: 1,
-      duration: 0.7,
+      duration: 1.35,
+      ease: 'power4.inOut',
+      rotation: 360,
       scale: 1,
-      y: 0,
     })
-    .to(
-      logo,
-      {
-        duration: 0.8,
-        scale: 2.2,
-      },
-      '<'
-    )
     .to(
       nameClip,
       {
@@ -230,7 +243,11 @@ export const initIntroAnimation = async () => {
       root.classList.remove('virtura-intro-running');
 
       if (headerSurface) {
-        gsap.set(headerSurface, { autoAlpha: 0, y: -36 });
+        gsap.set(headerSurface, {
+          autoAlpha: 1,
+          clipPath: 'inset(0 100% 0 0)',
+          webkitClipPath: 'inset(0 100% 0 0)',
+        });
       }
 
       if (heroElements.length) {
@@ -240,10 +257,10 @@ export const initIntroAnimation = async () => {
     .to(
       headerSurface ? [headerSurface] : [],
       {
-        autoAlpha: 1,
-        duration: 0.85,
-        ease: 'power3.out',
-        y: 0,
+        clipPath: 'inset(0 0% 0 0)',
+        duration: 0.95,
+        ease: 'power3.inOut',
+        webkitClipPath: 'inset(0 0% 0 0)',
       },
       '<'
     )
