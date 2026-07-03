@@ -265,18 +265,26 @@ body {
   pointer-events: none;
 }
 
-.virtura-intro-running .section_hero .hero-heading > * {
+.virtura-intro-running .section_hero .hero-heading,
+.virtura-intro-running .section_hero .hero-img,
+.virtura-intro-running #brxe-rigtwk {
   opacity: 0;
   visibility: hidden;
 }
 
 .virtura-intro {
-  background: var(--color-black, #000);
   inset: 0;
   overflow: hidden;
   pointer-events: auto;
   position: fixed;
   z-index: 10050;
+}
+
+.virtura-intro-bg {
+  background: var(--color-black, #000);
+  inset: 0;
+  position: absolute;
+  z-index: 0;
 }
 
 .virtura-intro-logo {
@@ -287,6 +295,7 @@ body {
   top: 50%;
   transform-origin: center center;
   width: 147px;
+  z-index: 3;
 }
 
 .virtura-intro-mark,
@@ -319,6 +328,32 @@ body {
   height: 100%;
   overflow: visible;
   width: 100%;
+}
+
+.virtura-intro-pixels {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
+
+.virtura-intro-pixel {
+  background: var(--color-black, #000);
+  display: block;
+  position: absolute;
+  will-change: opacity, transform;
+}
+
+.virtura-intro-word-wrap {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: baseline;
+}
+
+.virtura-intro-word {
+  display: inline-block;
+  transform-origin: 50% 100%;
+  will-change: opacity, filter, transform;
 }
 
 .font-color-gray {

@@ -4,7 +4,9 @@ const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)')
 
 const HEADER_SURFACE_SELECTOR = '.header-overlay';
 const HERO_SECTION_SELECTOR = '.section_hero';
-const HERO_REVEAL_SELECTOR = '.section_hero .hero-heading > *';
+const HERO_HEADING_SELECTOR = '.section_hero .hero-heading:is(h1, .brxe-heading), .section_hero .hero-heading :is(h1, .brxe-heading)';
+const HERO_IMAGE_SELECTOR = '.section_hero .hero-img';
+const HERO_ARROW_SELECTOR = '#brxe-rigtwk';
 const NAV_LOGO_SELECTOR = '#brxe-cimskf';
 const NAV_LOGO_FALLBACK_SELECTOR = '#brx-header .svg-link';
 const INTRO_PATHS = new Set(['/', '/strona-glowna/']);
@@ -74,12 +76,186 @@ const getIntroMarkScale = () => {
   return Math.max(48, scaleForWidth, scaleForHeight);
 };
 
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+const getHeaderRevealClip = (progress) => {
+  if (progress <= 0.001) {
+    return 'polygon(0% 0%, 0% 0%, 0% 18%, 0% 34%, 0% 52%, 0% 70%, 0% 88%, 0% 100%, 0% 100%)';
+  }
+
+  const base = progress * 108;
+  const point = (offset) => `${clamp(base + offset, 0, 110).toFixed(2)}%`;
+
+  return [
+    'polygon(0% 0%',
+    `${point(1)} 0%`,
+    `${point(-4)} 18%`,
+    `${point(3)} 34%`,
+    `${point(-7)} 52%`,
+    `${point(5)} 70%`,
+    `${point(-2)} 88%`,
+    `${point(2)} 100%`,
+    '0% 100%)',
+  ].join(', ');
+};
+
+const setHeaderRevealClip = (surface, progress) => {
+  if (!surface) {
+    return;
+  }
+
+  const clipPath = getHeaderRevealClip(progress);
+
+  surface.style.clipPath = clipPath;
+  surface.style.webkitClipPath = clipPath;
+};
+
+const getHeroHeading = () => document.querySelector(HERO_HEADING_SELECTOR);
+
+const getHeroImage = () => document.querySelector(HERO_IMAGE_SELECTOR);
+
+const getHeroArrow = () => document.querySelector(HERO_ARROW_SELECTOR);
+
+const splitHeroHeading = (heading) => {
+  if (!heading) {
+    return [];
+  }
+
+  if (heading.dataset.virturaIntroSplit === 'true') {
+    return Array.from(heading.querySelectorAll('.virtura-intro-word'));
+  }
+
+  const accessibleLabel = heading.textContent.trim().replace(/\s+/g, ' ');
+
+  if (accessibleLabel && !heading.hasAttribute('aria-label')) {
+    heading.setAttribute('aria-label', accessibleLabel);
+  }
+
+  const createWord = (text) => {
+    const wrap = document.createElement('span');
+    const word = document.createElement('span');
+
+    wrap.className = 'virtura-intro-word-wrap';
+    wrap.setAttribute('aria-hidden', 'true');
+    word.className = 'virtura-intro-word';
+    word.textContent = text;
+    wrap.appendChild(word);
+
+    return wrap;
+  };
+
+  const splitNode = (node) => {
+    const fragment = document.createDocumentFragment();
+
+    if (node.nodeType === Node.TEXT_NODE) {
+      node.textContent.split(/(\s+)/).forEach((part) => {
+        if (!part) {
+          return;
+        }
+
+        fragment.appendChild(
+          /^\s+$/.test(part)
+            ? document.createTextNode(part)
+            : createWord(part),
+        );
+      });
+
+      return fragment;
+    }
+
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      fragment.appendChild(node.cloneNode(true));
+      return fragment;
+    }
+
+    const clone = node.cloneNode(false);
+
+    Array.from(node.childNodes).forEach((child) => {
+      clone.appendChild(splitNode(child));
+    });
+
+    fragment.appendChild(clone);
+
+    return fragment;
+  };
+
+  const sourceNodes = Array.from(heading.childNodes);
+
+  heading.textContent = '';
+  sourceNodes.forEach((node) => {
+    heading.appendChild(splitNode(node));
+  });
+  heading.dataset.virturaIntroSplit = 'true';
+
+  return Array.from(heading.querySelectorAll('.virtura-intro-word'));
+};
+
+const waitForImage = (image, timeout = 2200) => new Promise((resolve) => {
+  if (!image || image.complete) {
+    resolve();
+    return;
+  }
+
+  let timeoutId;
+  const cleanup = () => {
+    window.clearTimeout(timeoutId);
+    image.removeEventListener('load', cleanup);
+    image.removeEventListener('error', cleanup);
+    resolve();
+  };
+
+  timeoutId = window.setTimeout(cleanup, timeout);
+  image.addEventListener('load', cleanup, { once: true });
+  image.addEventListener('error', cleanup, { once: true });
+});
+
+const createImagePixelGrid = (image, overlay) => {
+  if (!image || !overlay) {
+    return [];
+  }
+
+  const rect = image.getBoundingClientRect();
+
+  if (!rect.width || !rect.height) {
+    return [];
+  }
+
+  const grid = document.createElement('div');
+  const columns = 13;
+  const rows = 7;
+  const cells = [];
+
+  grid.className = 'virtura-intro-pixels';
+  grid.setAttribute('aria-hidden', 'true');
+
+  for (let row = 0; row < rows; row += 1) {
+    for (let column = 0; column < columns; column += 1) {
+      const cell = document.createElement('span');
+      const cellWidth = rect.width / columns;
+      const cellHeight = rect.height / rows;
+
+      cell.className = 'virtura-intro-pixel';
+      cell.style.left = `${rect.left + column * cellWidth}px`;
+      cell.style.top = `${rect.top + row * cellHeight}px`;
+      cell.style.width = `${cellWidth + 1}px`;
+      cell.style.height = `${cellHeight + 1}px`;
+      grid.appendChild(cell);
+      cells.push(cell);
+    }
+  }
+
+  overlay.appendChild(grid);
+
+  return cells;
+};
+
 const createIntroOverlay = () => {
   const overlay = document.createElement('div');
 
   overlay.className = 'virtura-intro';
   overlay.setAttribute('aria-hidden', 'true');
   overlay.innerHTML = `
+    <div class="virtura-intro-bg" data-intro-bg></div>
     <div class="virtura-intro-logo" data-intro-logo>
       <span class="virtura-intro-mark" data-intro-mark>${ICON_SVG}</span>
       <span class="virtura-intro-name-clip" data-intro-name-clip>
@@ -119,7 +295,9 @@ export const initIntroAnimation = async () => {
 
   const root = document.documentElement;
   const headerSurface = document.querySelector(HEADER_SURFACE_SELECTOR);
-  const heroElements = Array.from(document.querySelectorAll(HERO_REVEAL_SELECTOR));
+  const heroHeading = getHeroHeading();
+  const heroImage = getHeroImage();
+  const heroArrow = getHeroArrow();
   const navLogo = getNavLogoTarget();
   const overlay = createIntroOverlay();
 
@@ -134,10 +312,38 @@ export const initIntroAnimation = async () => {
   }
 
   const logo = overlay.querySelector('[data-intro-logo]');
+  const introBg = overlay.querySelector('[data-intro-bg]');
   const mark = overlay.querySelector('[data-intro-mark]');
   const nameClip = overlay.querySelector('[data-intro-name-clip]');
   const name = overlay.querySelector('[data-intro-name]');
+  const headingWords = splitHeroHeading(heroHeading);
+  const imagePixels = createImagePixelGrid(heroImage, overlay);
+  const headerRevealState = { progress: 0 };
+  const imageReadyPromise = waitForImage(heroImage);
+  let imageReady = !heroImage || heroImage.complete;
+  let imageRevealed = false;
+  let arrowRevealed = false;
   let targetTransform = null;
+
+  const revealArrowWhenReady = () => {
+    if (!heroArrow || !imageReady || !imageRevealed || arrowRevealed) {
+      return;
+    }
+
+    arrowRevealed = true;
+    gsap.to(heroArrow, {
+      autoAlpha: 1,
+      clearProps: 'opacity,visibility,transform',
+      duration: 0.65,
+      ease: 'power3.out',
+      y: 0,
+    });
+  };
+
+  imageReadyPromise.then(() => {
+    imageReady = true;
+    revealArrowWhenReady();
+  });
 
   gsap.set(logo, {
     autoAlpha: 1,
@@ -158,13 +364,53 @@ export const initIntroAnimation = async () => {
   if (headerSurface) {
     gsap.set(headerSurface, {
       autoAlpha: 0,
-      clipPath: 'inset(0 100% 0 0)',
-      webkitClipPath: 'inset(0 100% 0 0)',
+    });
+    setHeaderRevealClip(headerSurface, 0);
+  }
+
+  if (heroHeading) {
+    gsap.set(heroHeading, {
+      autoAlpha: 1,
+      perspective: 900,
+      transformStyle: 'preserve-3d',
     });
   }
 
-  if (heroElements.length) {
-    gsap.set(heroElements, { autoAlpha: 0, y: 36 });
+  if (headingWords.length) {
+    gsap.set(headingWords, {
+      autoAlpha: 0,
+      filter: 'blur(12px)',
+      rotateX: -52,
+      skewY: 4,
+      yPercent: 118,
+    });
+  }
+
+  if (heroImage) {
+    gsap.set(heroImage, {
+      autoAlpha: 0,
+      clipPath: 'polygon(0% 48%, 100% 35%, 100% 62%, 0% 74%)',
+      filter: 'blur(16px) contrast(1.35) saturate(0.7)',
+      scale: 1.06,
+      transformOrigin: '50% 50%',
+      webkitClipPath: 'polygon(0% 48%, 100% 35%, 100% 62%, 0% 74%)',
+    });
+  }
+
+  if (heroArrow) {
+    gsap.set(heroArrow, {
+      autoAlpha: 0,
+      scale: 0.96,
+      y: -34,
+    });
+  }
+
+  if (imagePixels.length) {
+    gsap.set(imagePixels, {
+      autoAlpha: 1,
+      scale: 1.08,
+      transformOrigin: '50% 50%',
+    });
   }
 
   const getTargetTransform = () => {
@@ -191,8 +437,23 @@ export const initIntroAnimation = async () => {
         });
       }
 
-      if (heroElements.length) {
-        gsap.set(heroElements, { clearProps: 'opacity,visibility,transform' });
+      if (heroHeading) {
+        gsap.set(heroHeading, {
+          clearProps: 'opacity,visibility,transform,transformStyle,perspective',
+        });
+      }
+
+      if (headingWords.length) {
+        gsap.set(headingWords, {
+          clearProps: 'filter,opacity,visibility,transform',
+        });
+      }
+
+      if (heroImage) {
+        gsap.set(heroImage, {
+          clearProps:
+            'clipPath,filter,opacity,scale,transform,visibility,webkitClipPath',
+        });
       }
     },
   });
@@ -231,65 +492,123 @@ export const initIntroAnimation = async () => {
       },
       '<'
     )
-    .to(logo, {
-      duration: 1.2,
-      ease: 'power3.inOut',
-      scale: () => getTargetTransform().scale,
-      x: () => getTargetTransform().x,
-      y: () => getTargetTransform().y,
-    }, '+=0.32')
+    .add('dockStart', '+=0.32')
+    .to(
+      logo,
+      {
+        duration: 1.2,
+        ease: 'power3.inOut',
+        scale: () => getTargetTransform().scale,
+        x: () => getTargetTransform().x,
+        y: () => getTargetTransform().y,
+      },
+      'dockStart'
+    )
     .add(() => {
+      if (headerSurface) {
+        gsap.set(headerSurface, { autoAlpha: 1 });
+        setHeaderRevealClip(headerSurface, 0);
+      }
+
       root.classList.add('virtura-intro-revealing');
       root.classList.remove('virtura-intro-running');
-
-      if (headerSurface) {
-        gsap.set(headerSurface, {
-          autoAlpha: 1,
-          clipPath: 'inset(0 100% 0 0)',
-          webkitClipPath: 'inset(0 100% 0 0)',
-        });
-      }
-
-      if (heroElements.length) {
-        gsap.set(heroElements, { autoAlpha: 0, y: 36 });
-      }
-    })
+    }, 'dockStart+=0.48')
     .to(
-      headerSurface ? [headerSurface] : [],
+      introBg ? [introBg] : [],
       {
-        clipPath: 'inset(0 0% 0 0)',
-        duration: 0.95,
-        ease: 'power3.inOut',
-        webkitClipPath: 'inset(0 0% 0 0)',
+        autoAlpha: 0,
+        duration: 0.78,
+        ease: 'power2.out',
       },
-      '<'
+      'dockStart+=0.5'
+    )
+    .to(
+      headingWords,
+      {
+        autoAlpha: 1,
+        duration: 0.95,
+        ease: 'expo.out',
+        filter: 'blur(0px)',
+        rotateX: 0,
+        skewY: 0,
+        stagger: {
+          amount: 0.28,
+          from: 'start',
+        },
+        yPercent: 0,
+      },
+      'dockStart+=0.72'
+    )
+    .add('imageReveal', 'dockStart+=0.98')
+    .to(
+      heroImage ? [heroImage] : [],
+      {
+        autoAlpha: 1,
+        duration: 0.18,
+        ease: 'none',
+      },
+      'imageReveal'
+    )
+    .to(
+      heroImage ? [heroImage] : [],
+      {
+        clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
+        duration: 1.12,
+        ease: 'power4.out',
+        filter: 'blur(0px) contrast(1) saturate(1)',
+        scale: 1,
+        webkitClipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
+      },
+      'imageReveal'
+    )
+    .to(
+      imagePixels,
+      {
+        autoAlpha: 0,
+        duration: 0.42,
+        ease: 'power2.in',
+        scale: 0.2,
+        stagger: {
+          amount: 0.58,
+          from: 'random',
+        },
+      },
+      'imageReveal+=0.08'
+    )
+    .add(() => {
+      imageRevealed = true;
+      revealArrowWhenReady();
+    }, 'imageReveal+=1.05')
+    .add('navReveal', 'dockStart+=1.2')
+    .to(
+      headerRevealState,
+      {
+        duration: 1.15,
+        ease: 'power3.inOut',
+        onUpdate: () => setHeaderRevealClip(
+          headerSurface,
+          headerRevealState.progress,
+        ),
+        progress: 1,
+      },
+      'navReveal'
     )
     .to(
       logo,
       {
         autoAlpha: 0,
-        duration: 0.18,
+        duration: 0.32,
+        ease: 'power2.out',
       },
-      '>-0.14'
+      'navReveal+=0.44'
     )
     .to(
       overlay,
       {
         autoAlpha: 0,
-        duration: 0.7,
+        duration: 0.55,
         ease: 'power2.out',
       },
-      '<'
-    )
-    .to(
-      heroElements,
-      {
-        autoAlpha: 1,
-        duration: 1.05,
-        ease: 'power3.out',
-        stagger: 0.12,
-        y: 0,
-      },
-      '<0.16'
+      'navReveal+=0.72'
     );
 };
