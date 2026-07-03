@@ -470,7 +470,7 @@ export const initIntroAnimation = async () => {
       imageRevealed = true;
       revealArrowWhenReady();
     }, 'imageReveal+=1.05')
-    .add('navReveal', 'dockStart+=1.2')
+    .add('navReveal', 'dockStart+=0.75')
     .to(
       headerRevealState,
       {
