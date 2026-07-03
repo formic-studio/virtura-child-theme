@@ -30,16 +30,16 @@ body {
 }
 
 .nav-btn {
-  --btn-hover-bg: var(--color-white, #fff);
+  --btn-hover-bg: var(--color-darkest-grey, #363636);
 }
 
 .nav-btn:is(:hover, :focus-visible) {
-  color: var(--color-black, #000);
+  color: var(--color-white, #fff);
 }
 
 .nav-btn:is(:hover, :focus-visible)
   :where(a, button, span, .brxe-text-basic, .brxe-button-text) {
-  color: var(--color-black, #000) !important;
+  color: var(--color-white, #fff) !important;
 }
 
 .footer-btn:is(:hover, :focus-visible) {
@@ -220,15 +220,15 @@ body {
 }
 
 #brx-header .nav-btn:is(:hover, :focus-visible) {
-  --header-cta-fg: var(--color-black, #000);
+  --header-cta-fg: var(--color-white, #fff);
   background-color: var(--header-cta-bg) !important;
   background-size: 100% 100% !important;
-  color: var(--color-black, #000) !important;
+  color: var(--color-white, #fff) !important;
   transition: var(--btn-hover-transition) !important;
 }
 
 #brx-header .nav-btn:is(:hover, :focus-visible) * {
-  color: var(--color-black, #000) !important;
+  color: var(--color-white, #fff) !important;
 }
 
 #brx-header .bricks-nav-menu > .menu-item-has-children > .sub-menu {
