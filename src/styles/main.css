@@ -15,7 +15,7 @@ body {
   --giga-menu-padding-inline: var(--space-32, 3.2rem);
   --giga-menu-padding-top: var(--space-32, 3.2rem);
   --giga-menu-radius: var(--space-16, 1.6rem);
-  --giga-menu-row-gap: var(--space-24, 2.4rem);
+  --giga-menu-row-gap: var(--space-40, 4rem);
   --header-fg: var(--color-black, #000);
   --header-cta-bg: var(--color-black, #000);
   --header-cta-fg: var(--color-white, #fff);
