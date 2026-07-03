@@ -8,6 +8,16 @@ body {
   color: var(--color-black, #000);
 }
 
+#brx-header.header-overlay,
+.header-overlay {
+  left: 0;
+  position: fixed !important;
+  right: 0;
+  top: var(--wp-admin--admin-bar--height, 0px) !important;
+  width: 100%;
+  z-index: 999;
+}
+
 .font-color-gray {
   color: var(--color-text-grey);
 }
