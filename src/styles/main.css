@@ -19,6 +19,8 @@ body {
   --giga-menu-padding-top: var(--space-32, 3.2rem);
   --giga-menu-radius: var(--space-16, 1.6rem);
   --giga-menu-row-gap: var(--space-40, 4rem);
+  --header-scroll-motion-duration: 0.85s;
+  --header-scroll-motion-ease: cubic-bezier(0.45, 0, 0.15, 1);
   --header-fg: var(--color-black, #000);
   --header-cta-bg: var(--color-black, #000);
   --header-cta-fg: var(--color-white, #fff);
@@ -226,7 +228,8 @@ body {
 }
 
 #brx-header.header-scroll-ready .header-overlay {
-  transition: transform 0.32s var(--virtura-motion-ease);
+  transition: transform var(--header-scroll-motion-duration)
+    var(--header-scroll-motion-ease);
   will-change: transform;
 }
 
