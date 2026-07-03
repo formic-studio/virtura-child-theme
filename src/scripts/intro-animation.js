@@ -15,9 +15,6 @@ const LOGO_MARK_WIDTH = 42;
 const LOGO_NAME_WIDTH = 97;
 const LOGO_MARK_CENTER_OFFSET = LOGO_WIDTH / 2 - LOGO_MARK_WIDTH / 2;
 const INTRO_CENTER_SCALE = 2.2;
-const INTRO_PENDING_CLASS = 'virtura-intro-pending';
-const INTRO_REVEALING_CLASS = 'virtura-intro-revealing';
-const INTRO_RUNNING_CLASS = 'virtura-intro-running';
 
 const ICON_SVG = `
   <svg xmlns="http://www.w3.org/2000/svg" width="42" height="38" viewBox="0 0 42 38" fill="none" aria-hidden="true" focusable="false">
@@ -177,35 +174,6 @@ const createIntroOverlay = () => {
     </div>
   `;
 
-  const logo = overlay.querySelector('[data-intro-logo]');
-  const mark = overlay.querySelector('[data-intro-mark]');
-  const nameClip = overlay.querySelector('[data-intro-name-clip]');
-  const name = overlay.querySelector('[data-intro-name]');
-
-  if (logo) {
-    logo.style.opacity = '1';
-    logo.style.transform = `translate(-50%, -50%) scale(${INTRO_CENTER_SCALE})`;
-    logo.style.transformOrigin = 'center center';
-    logo.style.visibility = 'visible';
-  }
-
-  if (mark) {
-    mark.style.opacity = '1';
-    mark.style.transform = `scale(${getIntroMarkScale()})`;
-    mark.style.transformOrigin = '50% 50%';
-    mark.style.visibility = 'visible';
-  }
-
-  if (nameClip) {
-    nameClip.style.width = '0px';
-  }
-
-  if (name) {
-    name.style.opacity = '0';
-    name.style.transform = 'translate3d(-18px, 0, 0)';
-    name.style.visibility = 'hidden';
-  }
-
   document.body.appendChild(overlay);
 
   return overlay;
@@ -231,41 +199,25 @@ const getLogoTargetTransform = (gsap, logo, target) => {
 };
 
 export const initIntroAnimation = async () => {
-  const root = document.documentElement;
-
   if (!shouldRunIntro()) {
-    root.classList.remove(INTRO_PENDING_CLASS);
     return;
   }
 
+  const root = document.documentElement;
   const headerSurface = document.querySelector(HEADER_SURFACE_SELECTOR);
   const heroHeading = getHeroHeading();
   const heroImage = getHeroImage();
   const heroArrow = getHeroArrow();
   const navLogo = getNavLogoTarget();
   const overlay = createIntroOverlay();
-  const cleanupIntro = () => {
-    root.classList.remove(INTRO_PENDING_CLASS);
-    root.classList.remove(INTRO_RUNNING_CLASS);
-    root.classList.remove(INTRO_REVEALING_CLASS);
-    overlay.remove();
-  };
 
-  root.classList.add(INTRO_RUNNING_CLASS);
-  root.classList.remove(INTRO_PENDING_CLASS);
+  root.classList.add('virtura-intro-running');
 
-  let gsap;
-
-  try {
-    ({ gsap } = await loadGsap());
-  } catch (error) {
-    console.error('Virtura intro animation could not load GSAP.', error);
-    cleanupIntro();
-    return;
-  }
+  const { gsap } = await loadGsap();
 
   if (reducedMotionMedia.matches) {
-    cleanupIntro();
+    root.classList.remove('virtura-intro-running');
+    overlay.remove();
     return;
   }
 
@@ -368,19 +320,13 @@ export const initIntroAnimation = async () => {
     return targetTransform;
   };
 
-  let resolveIntro = () => {};
-  const introCompletePromise = new Promise((resolve) => {
-    resolveIntro = resolve;
-  });
-
   const timeline = gsap.timeline({
     defaults: {
       ease: 'power3.out',
     },
     onComplete: () => {
-      root.classList.remove(INTRO_PENDING_CLASS);
-      root.classList.remove(INTRO_RUNNING_CLASS);
-      root.classList.remove(INTRO_REVEALING_CLASS);
+      root.classList.remove('virtura-intro-running');
+      root.classList.remove('virtura-intro-revealing');
       overlay.remove();
 
       if (headerSurface) {
@@ -402,8 +348,6 @@ export const initIntroAnimation = async () => {
             'clipPath,filter,opacity,scale,transform,visibility,webkitClipPath',
         });
       }
-
-      resolveIntro();
     },
   });
 
@@ -459,8 +403,8 @@ export const initIntroAnimation = async () => {
         setHeaderRevealClip(headerSurface, 0);
       }
 
-      root.classList.add(INTRO_REVEALING_CLASS);
-      root.classList.remove(INTRO_RUNNING_CLASS);
+      root.classList.add('virtura-intro-revealing');
+      root.classList.remove('virtura-intro-running');
     }, 'dockStart+=0.48')
     .add('headingReveal', 'dockStart+=0.32')
     .to(
@@ -561,6 +505,4 @@ export const initIntroAnimation = async () => {
       },
       'navReveal+=1.2'
     );
-
-  return introCompletePromise;
 };
