@@ -74,6 +74,18 @@ body {
   transform: translate3d(0, 0, 0);
 }
 
+.nav-btn {
+  --btn-hover-bg: var(--color-white, #fff);
+}
+
+.nav-btn:is(:hover, :focus-visible) {
+  color: var(--color-black, #000);
+}
+
+.footer-btn:is(:hover, :focus-visible) {
+  color: var(--color-white, #fff);
+}
+
 .btn:is(
     .btn-white,
     .btn--white,
@@ -113,24 +125,24 @@ body {
   color: inherit;
 }
 
-:is(.btn, .nav-btn, .footer-btn) svg,
-:is(.btn, .nav-btn, .footer-btn) svg * {
+:is(.btn:not(.footer-btn), .nav-btn) svg,
+:is(.btn:not(.footer-btn), .nav-btn) svg * {
   transition:
     fill 0.24s ease,
     stroke 0.24s ease;
 }
 
-:is(.btn, .nav-btn, .footer-btn):is(:hover, :focus-visible) svg {
+:is(.btn:not(.footer-btn), .nav-btn):is(:hover, :focus-visible) svg {
   color: currentColor;
 }
 
-:is(.btn, .nav-btn, .footer-btn):is(:hover, :focus-visible)
+:is(.btn:not(.footer-btn), .nav-btn):is(:hover, :focus-visible)
   svg
   [fill]:not([fill="none"]) {
   fill: currentColor;
 }
 
-:is(.btn, .nav-btn, .footer-btn):is(:hover, :focus-visible)
+:is(.btn:not(.footer-btn), .nav-btn):is(:hover, :focus-visible)
   svg
   [stroke]:not([stroke="none"]) {
   stroke: currentColor;
