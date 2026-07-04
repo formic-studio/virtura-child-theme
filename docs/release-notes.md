@@ -15,3 +15,5 @@
   submenu.
 - Giga menu can be forced open for editing by adding
   `giga-menu-builder-open` to `.section_nav`.
+- Added Carbon Fields meta box for `realizacja` posts to manage the dynamic
+  "Zakres prac" steps and nested step points.
