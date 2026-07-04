@@ -174,38 +174,41 @@ function virtura_child_theme_get_work_scope_posts( int $post_id ): array {
 		get_post_type( $post_id ) ?: 'realizacja'
 	);
 	$related_ids   = virtura_child_theme_extract_related_post_ids( $related_value );
+	$reverse_ids   = get_posts(
+		array(
+			'fields'         => 'ids',
+			'meta_query'     => array(
+				'relation' => 'OR',
+				array(
+					'key'     => 'powiazana_realizacja',
+					'value'   => (string) $post_id,
+					'compare' => '=',
+				),
+				array(
+					'key'     => 'powiazana_realizacja',
+					'value'   => '"' . $post_id . '"',
+					'compare' => 'LIKE',
+				),
+				array(
+					'key'     => 'powiazana_realizacja',
+					'value'   => ';i:' . $post_id . ';',
+					'compare' => 'LIKE',
+				),
+			),
+			'post_status'    => 'publish',
+			'post_type'      => 'zakres_prac',
+			'posts_per_page' => -1,
+		)
+	);
+
+	if ( is_array( $reverse_ids ) ) {
+		$related_ids = array_merge( $related_ids, array_map( 'absint', $reverse_ids ) );
+	}
+
+	$related_ids = array_values( array_unique( array_filter( $related_ids ) ) );
 
 	if ( empty( $related_ids ) ) {
-		$related_posts = get_posts(
-			array(
-				'meta_key'       => 'numer',
-				'meta_query'     => array(
-					'relation' => 'OR',
-					array(
-						'key'     => 'powiazana_realizacja',
-						'value'   => (string) $post_id,
-						'compare' => '=',
-					),
-					array(
-						'key'     => 'powiazana_realizacja',
-						'value'   => '"' . $post_id . '"',
-						'compare' => 'LIKE',
-					),
-					array(
-						'key'     => 'powiazana_realizacja',
-						'value'   => ';i:' . $post_id . ';',
-						'compare' => 'LIKE',
-					),
-				),
-				'orderby'        => 'meta_value_num',
-				'order'          => 'ASC',
-				'post_status'    => 'publish',
-				'post_type'      => 'zakres_prac',
-				'posts_per_page' => -1,
-			)
-		);
-
-		return is_array( $related_posts ) ? $related_posts : array();
+		return array();
 	}
 
 	$posts = get_posts(
@@ -290,7 +293,7 @@ function virtura_child_theme_render_work_scope_shortcode( $atts = array() ): str
 
 	ob_start();
 	?>
-	<div class="<?php echo esc_attr( $classes ); ?>">
+	<div class="<?php echo esc_attr( $classes ); ?> brxe-block">
 		<?php foreach ( $scope_posts as $index => $scope_post ) : ?>
 			<?php
 			$step_number = virtura_child_theme_get_pods_field_value( $scope_post->ID, 'numer', 'zakres_prac' );
@@ -304,22 +307,25 @@ function virtura_child_theme_render_work_scope_shortcode( $atts = array() ): str
 				virtura_child_theme_get_pods_field_value( $scope_post->ID, 'punkty_kroku', 'zakres_prac' )
 			);
 			?>
-			<article class="virtura-work-scope__item">
-				<div class="virtura-work-scope__card">
-					<p class="virtura-work-scope__eyebrow"><?php echo esc_html( $step_label ); ?></p>
-					<h3 class="virtura-work-scope__title"><?php echo esc_html( $step_title ); ?></h3>
+			<div class="virtura-work-scope__item brxe-block case-grid-item">
+				<div class="virtura-work-scope__card brxe-block block-violet">
+					<div class="virtura-work-scope__eyebrow brxe-text-basic font-size-label-small"><?php echo esc_html( $step_label ); ?></div>
+					<div class="virtura-work-scope__title brxe-text-basic font-size-h6"><?php echo wp_kses_post( nl2br( esc_html( $step_title ) ) ); ?></div>
 				</div>
 
 				<?php if ( ! empty( $points ) ) : ?>
-					<ul class="virtura-work-scope__points">
-						<?php foreach ( $points as $point ) : ?>
-							<li class="virtura-work-scope__point">
-								<span><?php echo wp_kses_post( nl2br( esc_html( $point ) ) ); ?></span>
-							</li>
-						<?php endforeach; ?>
-					</ul>
+					<div class="virtura-work-scope__points-shell brxe-block">
+						<div class="virtura-work-scope__points brxe-block tab-content-block" role="list">
+							<?php foreach ( $points as $point ) : ?>
+								<div class="virtura-work-scope__point brxe-block tab-content" role="listitem">
+									<div class="virtura-work-scope__dot brxe-block dot"></div>
+									<div class="virtura-work-scope__point-text brxe-text-basic"><?php echo wp_kses_post( nl2br( esc_html( $point ) ) ); ?></div>
+								</div>
+							<?php endforeach; ?>
+						</div>
+					</div>
 				<?php endif; ?>
-			</article>
+			</div>
 		<?php endforeach; ?>
 	</div>
 	<?php
