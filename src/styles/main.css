@@ -506,61 +506,6 @@ body {
   backdrop-filter: blur(15px) saturate(125%);
 }
 
-.virtura-work-scope.brxe-block {
-  margin-inline: auto;
-  max-width: 90rem;
-  row-gap: 14rem;
-  width: 100%;
-}
-
-.virtura-work-scope__item.case-grid-item.brxe-block {
-  align-items: stretch;
-  column-gap: 2rem;
-  width: 100%;
-}
-
-.virtura-work-scope__card.block-violet.brxe-block {
-  flex: 0 0 32rem;
-  min-height: 18rem;
-  width: 32rem;
-}
-
-.virtura-work-scope__points-shell.brxe-block {
-  flex: 1 1 auto;
-  max-width: 56rem;
-  min-width: 0;
-  width: 100%;
-}
-
-.virtura-work-scope__points.tab-content-block.brxe-block {
-  width: 100%;
-}
-
-.virtura-work-scope__point.tab-content.brxe-block {
-  min-height: 9rem;
-}
-
-.virtura-work-scope__point-text.brxe-text-basic {
-  min-width: 0;
-}
-
-@media (max-width: 767px) {
-  .virtura-work-scope.brxe-block {
-    row-gap: var(--space-48, 4.8rem);
-  }
-
-  .virtura-work-scope__item.case-grid-item.brxe-block {
-    flex-direction: column;
-  }
-
-  .virtura-work-scope__card.block-violet.brxe-block,
-  .virtura-work-scope__points-shell.brxe-block {
-    flex-basis: auto;
-    max-width: none;
-    width: 100%;
-  }
-}
-
 .text-overview,
 .fit-text-to-box {
   display: block;
