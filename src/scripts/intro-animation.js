@@ -17,6 +17,7 @@ const LOGO_MARK_CENTER_OFFSET = LOGO_WIDTH / 2 - LOGO_MARK_WIDTH / 2;
 const INTRO_CENTER_SCALE = 2.2;
 const INTRO_PRIME_CLASS = 'virtura-intro-prime';
 const INTRO_IMAGE_CLONE_CLASS = 'virtura-intro-image-clone';
+const INTRO_IMAGE_SOURCE_HIDDEN_CLASS = 'virtura-intro-image-source-hidden';
 
 const ICON_SVG = `
   <svg xmlns="http://www.w3.org/2000/svg" width="42" height="38" viewBox="0 0 42 38" fill="none" aria-hidden="true" focusable="false">
@@ -380,6 +381,10 @@ export const initIntroAnimation = async () => {
   const overlay = createIntroOverlay();
   const imageReadyPromise = waitForImage(imageLoadTarget);
 
+  if (heroImage && introImageClone) {
+    heroImage.classList.add(INTRO_IMAGE_SOURCE_HIDDEN_CLASS);
+  }
+
   root.classList.add('virtura-intro-running');
   root.classList.remove(INTRO_PRIME_CLASS);
 
@@ -388,6 +393,7 @@ export const initIntroAnimation = async () => {
   if (reducedMotionMedia.matches) {
     root.classList.remove(INTRO_PRIME_CLASS);
     root.classList.remove('virtura-intro-running');
+    heroImage?.classList.remove(INTRO_IMAGE_SOURCE_HIDDEN_CLASS);
     introImageClone?.remove();
     overlay.remove();
     return;
@@ -523,6 +529,7 @@ export const initIntroAnimation = async () => {
       }
 
       if (heroImage) {
+        heroImage.classList.remove(INTRO_IMAGE_SOURCE_HIDDEN_CLASS);
         gsap.set(heroImage, {
           clearProps:
             'clipPath,filter,opacity,scale,transform,visibility,webkitClipPath',
@@ -675,6 +682,7 @@ export const initIntroAnimation = async () => {
     )
     .add(() => {
       if (introImageClone && heroImage) {
+        heroImage.classList.remove(INTRO_IMAGE_SOURCE_HIDDEN_CLASS);
         gsap.set(heroImage, {
           autoAlpha: 1,
           clearProps:

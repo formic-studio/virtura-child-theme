@@ -504,6 +504,12 @@ body {
   z-index: 10045;
 }
 
+.virtura-intro-image-source-hidden,
+.virtura-intro-image-source-hidden img {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
 .font-color-gray {
   color: var(--color-text-grey);
 }
