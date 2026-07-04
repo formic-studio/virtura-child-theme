@@ -101,6 +101,25 @@ function virtura_child_theme_get_current_realization_id(): int {
 }
 
 /**
+ * Return the current post date in month.year format for Bricks dynamic data.
+ *
+ * @param int|string $post_id Optional post ID.
+ */
+function virtura_get_post_date_month_year( $post_id = 0 ): string {
+	$post_id = absint( $post_id );
+
+	if ( ! $post_id ) {
+		$post_id = get_the_ID();
+	}
+
+	if ( ! $post_id ) {
+		return '';
+	}
+
+	return get_the_date( 'm.Y', $post_id );
+}
+
+/**
  * Return Carbon Fields work-scope data as a PHP array.
  *
  * @param int|string $post_id Optional realization ID.
@@ -210,6 +229,7 @@ function virtura_child_theme_allow_bricks_echo_functions( $function_names ): arr
 
 	$function_names[] = 'virtura_get_realization_work_scope';
 	$function_names[] = 'virtura_get_realization_work_scope_json';
+	$function_names[] = 'virtura_get_post_date_month_year';
 
 	return array_values( array_unique( $function_names ) );
 }
