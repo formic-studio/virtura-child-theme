@@ -14,11 +14,15 @@ const initTheme = () => {
   initHeaderTheme();
   initHeaderScroll();
   initGigaMenu();
-  void initIntroAnimation();
+  const introReady = initIntroAnimation();
   initFitText();
   initCategoryStack();
   initTrainingTabs();
-  void initMotion();
+  void introReady
+    .catch(() => {})
+    .finally(() => {
+      void initMotion();
+    });
 };
 
 if (document.readyState === 'loading') {

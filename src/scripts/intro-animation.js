@@ -16,8 +16,6 @@ const LOGO_NAME_WIDTH = 97;
 const LOGO_MARK_CENTER_OFFSET = LOGO_WIDTH / 2 - LOGO_MARK_WIDTH / 2;
 const INTRO_CENTER_SCALE = 2.2;
 const INTRO_PRIME_CLASS = 'virtura-intro-prime';
-const INTRO_IMAGE_CLONE_CLASS = 'virtura-intro-image-clone';
-const INTRO_IMAGE_SOURCE_HIDDEN_CLASS = 'virtura-intro-image-source-hidden';
 
 const ICON_SVG = `
   <svg xmlns="http://www.w3.org/2000/svg" width="42" height="38" viewBox="0 0 42 38" fill="none" aria-hidden="true" focusable="false">
@@ -117,6 +115,8 @@ const getHeroHeading = () => document.querySelector(HERO_HEADING_SELECTOR);
 
 const getHeroImage = () => document.querySelector(HERO_IMAGE_SELECTOR);
 
+const isPlaceholderImageSource = (src) => !src || src.startsWith('data:image/svg+xml');
+
 const getNativeImage = (element) => {
   if (!element) {
     return null;
@@ -129,12 +129,47 @@ const getNativeImage = (element) => {
   return element.querySelector('img');
 };
 
+const promoteLazyImageSource = (image) => {
+  const dataSizes = image.dataset.sizes || image.getAttribute('data-sizes');
+  const dataSrcset = image.dataset.srcset ||
+    image.getAttribute('data-srcset') ||
+    image.getAttribute('data-lazy-srcset');
+  const dataSrc = image.dataset.src ||
+    image.getAttribute('data-src') ||
+    image.getAttribute('data-lazy-src') ||
+    image.getAttribute('data-original');
+
+  if (dataSizes) {
+    image.sizes = dataSizes;
+  }
+
+  if (dataSrcset) {
+    image.srcset = dataSrcset;
+  }
+
+  if (
+    dataSrc &&
+    (
+      isPlaceholderImageSource(image.currentSrc) ||
+      isPlaceholderImageSource(image.getAttribute('src')) ||
+      image.getAttribute('src') !== dataSrc
+    )
+  ) {
+    image.src = dataSrc;
+  }
+
+  image.classList.remove('lazy', 'lazyload', 'lazyloading');
+  image.classList.add('skip-lazy');
+};
+
 const primeImageLoad = (element) => {
   const image = getNativeImage(element);
 
   if (!image) {
     return null;
   }
+
+  promoteLazyImageSource(image);
 
   image.loading = 'eager';
   image.decoding = 'async';
@@ -146,83 +181,12 @@ const primeImageLoad = (element) => {
   return image;
 };
 
-const isPlaceholderImageSource = (src) => !src || src.startsWith('data:image/svg+xml');
-
-const getImageSource = (image) => {
-  if (!image) {
-    return '';
-  }
-
-  if (!isPlaceholderImageSource(image.currentSrc)) {
-    return image.currentSrc;
-  }
-
-  if (!isPlaceholderImageSource(image.getAttribute('src'))) {
-    return image.getAttribute('src');
-  }
-
-  return image.dataset.src || image.getAttribute('data-src') || '';
-};
-
-const createIntroImageClone = (sourceElement, nativeImage) => {
-  if (!sourceElement || !nativeImage) {
-    return null;
-  }
-
-  const src = getImageSource(nativeImage);
-
-  if (!src) {
-    return null;
-  }
-
-  const clone = document.createElement('img');
-  const srcset = nativeImage.dataset.srcset || nativeImage.getAttribute('srcset');
-  const sizes = nativeImage.dataset.sizes || nativeImage.getAttribute('sizes');
-  const sourceStyles = window.getComputedStyle(sourceElement);
-  const imageStyles = window.getComputedStyle(nativeImage);
-
-  clone.alt = nativeImage.alt || '';
-  clone.className = INTRO_IMAGE_CLONE_CLASS;
-  clone.decoding = 'async';
-  clone.loading = 'eager';
-  Object.assign(clone.style, {
-    borderRadius: sourceStyles.borderRadius,
-    display: 'block',
-    margin: '0',
-    maxWidth: 'none',
-    objectFit: imageStyles.objectFit || 'cover',
-    objectPosition: imageStyles.objectPosition || 'center center',
-    opacity: '0',
-    pointerEvents: 'none',
-    position: 'fixed',
-    visibility: 'hidden',
-    zIndex: '10045',
-  });
-
-  if ('fetchPriority' in clone) {
-    clone.fetchPriority = 'high';
-  }
-
-  if (srcset) {
-    clone.srcset = srcset;
-  }
-
-  if (sizes) {
-    clone.sizes = sizes;
-  }
-
-  clone.src = src;
-
-  document.body.appendChild(clone);
-
-  return clone;
-};
-
 const getHeroArrow = () => document.querySelector(HERO_ARROW_SELECTOR);
 
 const isImageReady = (image) => !image || (
   image.complete &&
-  image.naturalWidth > 0
+  image.naturalWidth > 0 &&
+  !isPlaceholderImageSource(image.currentSrc)
 );
 
 const waitForImage = (image, timeout = 6000) => new Promise((resolve) => {
@@ -303,25 +267,6 @@ const syncImageSweep = (sweep, image) => {
   sweep.style.width = `${rect.width}px`;
 };
 
-const syncIntroImageClone = (clone, sourceElement) => {
-  if (!clone || !sourceElement) {
-    return;
-  }
-
-  const rect = sourceElement.getBoundingClientRect();
-  const sourceStyles = window.getComputedStyle(sourceElement);
-
-  if (!rect.width || !rect.height) {
-    return;
-  }
-
-  clone.style.borderRadius = sourceStyles.borderRadius;
-  clone.style.height = `${rect.height}px`;
-  clone.style.left = `${rect.left}px`;
-  clone.style.top = `${rect.top}px`;
-  clone.style.width = `${rect.width}px`;
-};
-
 const createIntroOverlay = () => {
   const overlay = document.createElement('div');
 
@@ -373,17 +318,10 @@ export const initIntroAnimation = async () => {
   const heroHeading = getHeroHeading();
   const heroImage = getHeroImage();
   const heroNativeImage = primeImageLoad(heroImage);
-  const introImageClone = createIntroImageClone(heroImage, heroNativeImage);
-  const imageAnimationTarget = introImageClone || heroImage;
-  const imageLoadTarget = introImageClone || heroNativeImage;
   const heroArrow = getHeroArrow();
   const navLogo = getNavLogoTarget();
   const overlay = createIntroOverlay();
-  const imageReadyPromise = waitForImage(imageLoadTarget);
-
-  if (heroImage && introImageClone) {
-    heroImage.classList.add(INTRO_IMAGE_SOURCE_HIDDEN_CLASS);
-  }
+  const imageReadyPromise = waitForImage(heroNativeImage);
 
   root.classList.add('virtura-intro-running');
   root.classList.remove(INTRO_PRIME_CLASS);
@@ -393,8 +331,6 @@ export const initIntroAnimation = async () => {
   if (reducedMotionMedia.matches) {
     root.classList.remove(INTRO_PRIME_CLASS);
     root.classList.remove('virtura-intro-running');
-    heroImage?.classList.remove(INTRO_IMAGE_SOURCE_HIDDEN_CLASS);
-    introImageClone?.remove();
     overlay.remove();
     return;
   }
@@ -406,7 +342,7 @@ export const initIntroAnimation = async () => {
   const name = overlay.querySelector('[data-intro-name]');
   const imageSweep = createImageSweep(heroImage, overlay);
   const headerRevealState = { progress: 0 };
-  let imageReady = isImageReady(imageLoadTarget);
+  let imageReady = isImageReady(heroNativeImage);
   let imageGateReleased = imageReady;
   let imageRevealed = false;
   let arrowRevealed = false;
@@ -467,13 +403,6 @@ export const initIntroAnimation = async () => {
   if (heroImage) {
     gsap.set(heroImage, {
       autoAlpha: 0,
-    });
-  }
-
-  if (imageAnimationTarget) {
-    syncIntroImageClone(introImageClone, heroImage);
-    gsap.set(imageAnimationTarget, {
-      autoAlpha: 0,
       clipPath: 'polygon(0% 0%, 10% 0%, 0% 100%, 0% 100%)',
       filter: 'blur(10px) contrast(1.12) saturate(0.82)',
       scale: 1.035,
@@ -505,6 +434,11 @@ export const initIntroAnimation = async () => {
     return targetTransform;
   };
 
+  let resolveIntroComplete = () => {};
+  const introComplete = new Promise((resolve) => {
+    resolveIntroComplete = resolve;
+  });
+
   const timeline = gsap.timeline({
     defaults: {
       ease: 'power3.out',
@@ -529,14 +463,13 @@ export const initIntroAnimation = async () => {
       }
 
       if (heroImage) {
-        heroImage.classList.remove(INTRO_IMAGE_SOURCE_HIDDEN_CLASS);
         gsap.set(heroImage, {
           clearProps:
             'clipPath,filter,opacity,scale,transform,visibility,webkitClipPath',
         });
       }
 
-      introImageClone?.remove();
+      resolveIntroComplete(true);
     },
   });
 
@@ -547,7 +480,6 @@ export const initIntroAnimation = async () => {
 
     imageGateReleased = true;
     syncImageSweep(imageSweep, heroImage);
-    syncIntroImageClone(introImageClone, heroImage);
     timeline.play();
   };
 
@@ -633,29 +565,28 @@ export const initIntroAnimation = async () => {
       if (imageReady) {
         imageGateReleased = true;
         syncImageSweep(imageSweep, heroImage);
-        syncIntroImageClone(introImageClone, heroImage);
         return;
       }
 
       timeline.pause();
       imageReadyPromise.then(releaseImageGate);
     }, 'imageReveal-=0.02')
-    .to(
-      imageAnimationTarget ? [imageAnimationTarget] : [],
+    .fromTo(
+      heroImage ? [heroImage] : [],
       {
         autoAlpha: 1,
-        duration: 0.18,
-        ease: 'none',
+        clipPath: 'polygon(0% 0%, 10% 0%, 0% 100%, 0% 100%)',
+        filter: 'blur(10px) contrast(1.12) saturate(0.82)',
+        scale: 1.035,
+        webkitClipPath: 'polygon(0% 0%, 10% 0%, 0% 100%, 0% 100%)',
       },
-      'imageReveal'
-    )
-    .to(
-      imageAnimationTarget ? [imageAnimationTarget] : [],
       {
+        autoAlpha: 1,
         clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
         duration: 1.05,
         ease: 'power3.out',
         filter: 'blur(0px) contrast(1) saturate(1)',
+        immediateRender: false,
         scale: 1,
         webkitClipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
       },
@@ -681,16 +612,6 @@ export const initIntroAnimation = async () => {
       'imageReveal+=0.04'
     )
     .add(() => {
-      if (introImageClone && heroImage) {
-        heroImage.classList.remove(INTRO_IMAGE_SOURCE_HIDDEN_CLASS);
-        gsap.set(heroImage, {
-          autoAlpha: 1,
-          clearProps:
-            'clipPath,filter,opacity,scale,transform,visibility,webkitClipPath',
-        });
-        gsap.set(introImageClone, { autoAlpha: 0 });
-      }
-
       imageRevealed = true;
       revealArrowWhenReady();
     }, 'imageReveal+=1.05')
@@ -726,4 +647,6 @@ export const initIntroAnimation = async () => {
       },
       'navReveal+=1.2'
     );
+
+  return introComplete;
 };
