@@ -16,6 +16,7 @@ const LOGO_NAME_WIDTH = 97;
 const LOGO_MARK_CENTER_OFFSET = LOGO_WIDTH / 2 - LOGO_MARK_WIDTH / 2;
 const INTRO_CENTER_SCALE = 2.2;
 const INTRO_PRIME_CLASS = 'virtura-intro-prime';
+const INTRO_IMAGE_CLONE_CLASS = 'virtura-intro-image-clone';
 
 const ICON_SVG = `
   <svg xmlns="http://www.w3.org/2000/svg" width="42" height="38" viewBox="0 0 42 38" fill="none" aria-hidden="true" focusable="false">
@@ -144,6 +145,78 @@ const primeImageLoad = (element) => {
   return image;
 };
 
+const isPlaceholderImageSource = (src) => !src || src.startsWith('data:image/svg+xml');
+
+const getImageSource = (image) => {
+  if (!image) {
+    return '';
+  }
+
+  if (!isPlaceholderImageSource(image.currentSrc)) {
+    return image.currentSrc;
+  }
+
+  if (!isPlaceholderImageSource(image.getAttribute('src'))) {
+    return image.getAttribute('src');
+  }
+
+  return image.dataset.src || image.getAttribute('data-src') || '';
+};
+
+const createIntroImageClone = (sourceElement, nativeImage) => {
+  if (!sourceElement || !nativeImage) {
+    return null;
+  }
+
+  const src = getImageSource(nativeImage);
+
+  if (!src) {
+    return null;
+  }
+
+  const clone = document.createElement('img');
+  const srcset = nativeImage.dataset.srcset || nativeImage.getAttribute('srcset');
+  const sizes = nativeImage.dataset.sizes || nativeImage.getAttribute('sizes');
+  const sourceStyles = window.getComputedStyle(sourceElement);
+  const imageStyles = window.getComputedStyle(nativeImage);
+
+  clone.alt = nativeImage.alt || '';
+  clone.className = INTRO_IMAGE_CLONE_CLASS;
+  clone.decoding = 'async';
+  clone.loading = 'eager';
+  Object.assign(clone.style, {
+    borderRadius: sourceStyles.borderRadius,
+    display: 'block',
+    margin: '0',
+    maxWidth: 'none',
+    objectFit: imageStyles.objectFit || 'cover',
+    objectPosition: imageStyles.objectPosition || 'center center',
+    opacity: '0',
+    pointerEvents: 'none',
+    position: 'fixed',
+    visibility: 'hidden',
+    zIndex: '10045',
+  });
+
+  if ('fetchPriority' in clone) {
+    clone.fetchPriority = 'high';
+  }
+
+  if (srcset) {
+    clone.srcset = srcset;
+  }
+
+  if (sizes) {
+    clone.sizes = sizes;
+  }
+
+  clone.src = src;
+
+  document.body.appendChild(clone);
+
+  return clone;
+};
+
 const getHeroArrow = () => document.querySelector(HERO_ARROW_SELECTOR);
 
 const isImageReady = (image) => !image || (
@@ -229,6 +302,25 @@ const syncImageSweep = (sweep, image) => {
   sweep.style.width = `${rect.width}px`;
 };
 
+const syncIntroImageClone = (clone, sourceElement) => {
+  if (!clone || !sourceElement) {
+    return;
+  }
+
+  const rect = sourceElement.getBoundingClientRect();
+  const sourceStyles = window.getComputedStyle(sourceElement);
+
+  if (!rect.width || !rect.height) {
+    return;
+  }
+
+  clone.style.borderRadius = sourceStyles.borderRadius;
+  clone.style.height = `${rect.height}px`;
+  clone.style.left = `${rect.left}px`;
+  clone.style.top = `${rect.top}px`;
+  clone.style.width = `${rect.width}px`;
+};
+
 const createIntroOverlay = () => {
   const overlay = document.createElement('div');
 
@@ -280,10 +372,13 @@ export const initIntroAnimation = async () => {
   const heroHeading = getHeroHeading();
   const heroImage = getHeroImage();
   const heroNativeImage = primeImageLoad(heroImage);
+  const introImageClone = createIntroImageClone(heroImage, heroNativeImage);
+  const imageAnimationTarget = introImageClone || heroImage;
+  const imageLoadTarget = introImageClone || heroNativeImage;
   const heroArrow = getHeroArrow();
   const navLogo = getNavLogoTarget();
   const overlay = createIntroOverlay();
-  const imageReadyPromise = waitForImage(heroNativeImage);
+  const imageReadyPromise = waitForImage(imageLoadTarget);
 
   root.classList.add('virtura-intro-running');
   root.classList.remove(INTRO_PRIME_CLASS);
@@ -293,6 +388,7 @@ export const initIntroAnimation = async () => {
   if (reducedMotionMedia.matches) {
     root.classList.remove(INTRO_PRIME_CLASS);
     root.classList.remove('virtura-intro-running');
+    introImageClone?.remove();
     overlay.remove();
     return;
   }
@@ -304,7 +400,7 @@ export const initIntroAnimation = async () => {
   const name = overlay.querySelector('[data-intro-name]');
   const imageSweep = createImageSweep(heroImage, overlay);
   const headerRevealState = { progress: 0 };
-  let imageReady = isImageReady(heroNativeImage);
+  let imageReady = isImageReady(imageLoadTarget);
   let imageGateReleased = imageReady;
   let imageRevealed = false;
   let arrowRevealed = false;
@@ -364,6 +460,13 @@ export const initIntroAnimation = async () => {
 
   if (heroImage) {
     gsap.set(heroImage, {
+      autoAlpha: 0,
+    });
+  }
+
+  if (imageAnimationTarget) {
+    syncIntroImageClone(introImageClone, heroImage);
+    gsap.set(imageAnimationTarget, {
       autoAlpha: 0,
       clipPath: 'polygon(0% 0%, 10% 0%, 0% 100%, 0% 100%)',
       filter: 'blur(10px) contrast(1.12) saturate(0.82)',
@@ -425,6 +528,8 @@ export const initIntroAnimation = async () => {
             'clipPath,filter,opacity,scale,transform,visibility,webkitClipPath',
         });
       }
+
+      introImageClone?.remove();
     },
   });
 
@@ -435,6 +540,7 @@ export const initIntroAnimation = async () => {
 
     imageGateReleased = true;
     syncImageSweep(imageSweep, heroImage);
+    syncIntroImageClone(introImageClone, heroImage);
     timeline.play();
   };
 
@@ -520,6 +626,7 @@ export const initIntroAnimation = async () => {
       if (imageReady) {
         imageGateReleased = true;
         syncImageSweep(imageSweep, heroImage);
+        syncIntroImageClone(introImageClone, heroImage);
         return;
       }
 
@@ -527,7 +634,7 @@ export const initIntroAnimation = async () => {
       imageReadyPromise.then(releaseImageGate);
     }, 'imageReveal-=0.02')
     .to(
-      heroImage ? [heroImage] : [],
+      imageAnimationTarget ? [imageAnimationTarget] : [],
       {
         autoAlpha: 1,
         duration: 0.18,
@@ -536,7 +643,7 @@ export const initIntroAnimation = async () => {
       'imageReveal'
     )
     .to(
-      heroImage ? [heroImage] : [],
+      imageAnimationTarget ? [imageAnimationTarget] : [],
       {
         clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
         duration: 1.05,
@@ -567,6 +674,15 @@ export const initIntroAnimation = async () => {
       'imageReveal+=0.04'
     )
     .add(() => {
+      if (introImageClone && heroImage) {
+        gsap.set(heroImage, {
+          autoAlpha: 1,
+          clearProps:
+            'clipPath,filter,opacity,scale,transform,visibility,webkitClipPath',
+        });
+        gsap.set(introImageClone, { autoAlpha: 0 });
+      }
+
       imageRevealed = true;
       revealArrowWhenReady();
     }, 'imageReveal+=1.05')

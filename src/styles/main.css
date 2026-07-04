@@ -491,6 +491,19 @@ body {
   z-index: 2;
 }
 
+.virtura-intro-image-clone {
+  display: block;
+  margin: 0;
+  max-width: none;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  transform-origin: 50% 50%;
+  visibility: hidden;
+  will-change: clip-path, filter, opacity, transform;
+  z-index: 10045;
+}
+
 .font-color-gray {
   color: var(--color-text-grey);
 }
