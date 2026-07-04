@@ -101,11 +101,11 @@ function virtura_child_theme_get_current_realization_id(): int {
 }
 
 /**
- * Return Carbon Fields work-scope data as a Bricks Array Query-friendly array.
+ * Return Carbon Fields work-scope data as a PHP array.
  *
- * @param int|string $post_id Optional realization ID. Useful when called from Bricks via {post_id}.
+ * @param int|string $post_id Optional realization ID.
  */
-function virtura_get_realization_work_scope( $post_id = 0 ): array {
+function virtura_child_theme_get_realization_work_scope_data( $post_id = 0 ): array {
 	if ( ! function_exists( 'carbon_get_post_meta' ) ) {
 		return array();
 	}
@@ -166,15 +166,51 @@ function virtura_get_realization_work_scope( $post_id = 0 ): array {
 }
 
 /**
+ * Return Carbon Fields work-scope items as JSON objects for Bricks Array Query editor.
+ *
+ * This is meant to be used inside the editor's outer brackets:
+ * [
+ *   {echo:virtura_get_realization_work_scope()}
+ * ]
+ *
+ * @param int|string $post_id Optional realization ID. Useful when called from Bricks via {post_id}.
+ */
+function virtura_get_realization_work_scope( $post_id = 0 ): string {
+	$json = wp_json_encode( virtura_child_theme_get_realization_work_scope_data( $post_id ) );
+
+	if ( ! is_string( $json ) || '[]' === $json ) {
+		return '';
+	}
+
+	return trim( $json, '[]' );
+}
+
+/**
+ * Return Carbon Fields work-scope data as a full JSON array.
+ *
+ * @param int|string $post_id Optional realization ID. Useful when called from Bricks via {post_id}.
+ */
+function virtura_get_realization_work_scope_json( $post_id = 0 ): string {
+	$json = wp_json_encode( virtura_child_theme_get_realization_work_scope_data( $post_id ) );
+
+	return is_string( $json ) ? $json : '[]';
+}
+
+/**
  * Allow Bricks dynamic data `{echo:...}` to call the work-scope helper.
  *
- * @param string[] $function_names Allowed function names.
+ * @param mixed $function_names Allowed function names.
  *
  * @return string[]
  */
-function virtura_child_theme_allow_bricks_echo_functions( array $function_names ): array {
-	$function_names[] = 'virtura_get_realization_work_scope';
+function virtura_child_theme_allow_bricks_echo_functions( $function_names ): array {
+	if ( ! is_array( $function_names ) ) {
+		$function_names = array();
+	}
 
-	return $function_names;
+	$function_names[] = 'virtura_get_realization_work_scope';
+	$function_names[] = 'virtura_get_realization_work_scope_json';
+
+	return array_values( array_unique( $function_names ) );
 }
 add_filter( 'bricks/code/echo_function_names', 'virtura_child_theme_allow_bricks_echo_functions' );
