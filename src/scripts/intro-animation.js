@@ -115,25 +115,77 @@ const getHeroHeading = () => document.querySelector(HERO_HEADING_SELECTOR);
 
 const getHeroImage = () => document.querySelector(HERO_IMAGE_SELECTOR);
 
+const getNativeImage = (element) => {
+  if (!element) {
+    return null;
+  }
+
+  if (element instanceof HTMLImageElement) {
+    return element;
+  }
+
+  return element.querySelector('img');
+};
+
+const primeImageLoad = (element) => {
+  const image = getNativeImage(element);
+
+  if (!image) {
+    return null;
+  }
+
+  image.loading = 'eager';
+  image.decoding = 'async';
+
+  if ('fetchPriority' in image) {
+    image.fetchPriority = 'high';
+  }
+
+  return image;
+};
+
 const getHeroArrow = () => document.querySelector(HERO_ARROW_SELECTOR);
 
-const waitForImage = (image, timeout = 2200) => new Promise((resolve) => {
-  if (!image || image.complete) {
+const isImageReady = (image) => !image || (
+  image.complete &&
+  image.naturalWidth > 0
+);
+
+const waitForImage = (image, timeout = 6000) => new Promise((resolve) => {
+  if (!image) {
     resolve();
     return;
   }
 
   let timeoutId;
-  const cleanup = () => {
+  let settled = false;
+
+  const finish = () => {
+    if (settled) {
+      return;
+    }
+
+    settled = true;
     window.clearTimeout(timeoutId);
-    image.removeEventListener('load', cleanup);
-    image.removeEventListener('error', cleanup);
+    image.removeEventListener('load', finish);
+    image.removeEventListener('error', finish);
+
+    if (image.complete && typeof image.decode === 'function') {
+      image.decode().catch(() => {}).finally(resolve);
+      return;
+    }
+
     resolve();
   };
 
-  timeoutId = window.setTimeout(cleanup, timeout);
-  image.addEventListener('load', cleanup, { once: true });
-  image.addEventListener('error', cleanup, { once: true });
+  if (image.complete) {
+    finish();
+    return;
+  }
+
+  timeoutId = window.setTimeout(finish, timeout);
+  image.addEventListener('load', finish, { once: true });
+  image.addEventListener('error', finish, { once: true });
 });
 
 const createImageSweep = (image, overlay) => {
@@ -158,6 +210,23 @@ const createImageSweep = (image, overlay) => {
   overlay.appendChild(sweep);
 
   return sweep;
+};
+
+const syncImageSweep = (sweep, image) => {
+  if (!sweep || !image) {
+    return;
+  }
+
+  const rect = image.getBoundingClientRect();
+
+  if (!rect.width || !rect.height) {
+    return;
+  }
+
+  sweep.style.height = `${rect.height}px`;
+  sweep.style.left = `${rect.left}px`;
+  sweep.style.top = `${rect.top}px`;
+  sweep.style.width = `${rect.width}px`;
 };
 
 const createIntroOverlay = () => {
@@ -210,9 +279,11 @@ export const initIntroAnimation = async () => {
   const headerSurface = document.querySelector(HEADER_SURFACE_SELECTOR);
   const heroHeading = getHeroHeading();
   const heroImage = getHeroImage();
+  const heroNativeImage = primeImageLoad(heroImage);
   const heroArrow = getHeroArrow();
   const navLogo = getNavLogoTarget();
   const overlay = createIntroOverlay();
+  const imageReadyPromise = waitForImage(heroNativeImage);
 
   root.classList.add('virtura-intro-running');
   root.classList.remove(INTRO_PRIME_CLASS);
@@ -233,8 +304,8 @@ export const initIntroAnimation = async () => {
   const name = overlay.querySelector('[data-intro-name]');
   const imageSweep = createImageSweep(heroImage, overlay);
   const headerRevealState = { progress: 0 };
-  const imageReadyPromise = waitForImage(heroImage);
-  let imageReady = !heroImage || heroImage.complete;
+  let imageReady = isImageReady(heroNativeImage);
+  let imageGateReleased = imageReady;
   let imageRevealed = false;
   let arrowRevealed = false;
   let targetTransform = null;
@@ -357,6 +428,16 @@ export const initIntroAnimation = async () => {
     },
   });
 
+  const releaseImageGate = () => {
+    if (imageGateReleased) {
+      return;
+    }
+
+    imageGateReleased = true;
+    syncImageSweep(imageSweep, heroImage);
+    timeline.play();
+  };
+
   timeline
     .to(mark, {
       duration: 2.25,
@@ -435,6 +516,16 @@ export const initIntroAnimation = async () => {
       'headingReveal'
     )
     .add('imageReveal', 'headingReveal+=1.5')
+    .add(() => {
+      if (imageReady) {
+        imageGateReleased = true;
+        syncImageSweep(imageSweep, heroImage);
+        return;
+      }
+
+      timeline.pause();
+      imageReadyPromise.then(releaseImageGate);
+    }, 'imageReveal-=0.02')
     .to(
       heroImage ? [heroImage] : [],
       {
