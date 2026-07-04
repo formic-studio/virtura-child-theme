@@ -58,6 +58,10 @@ function virtura_child_theme_extract_related_post_ids( $value ): array {
 		return array( absint( $value ) );
 	}
 
+	if ( is_string( $value ) && preg_match( '/^\s*\d+(?:\s*,\s*\d+)*\s*$/', $value ) ) {
+		return array_map( 'absint', explode( ',', $value ) );
+	}
+
 	if ( $value instanceof WP_Post ) {
 		return array( absint( $value->ID ) );
 	}
@@ -72,7 +76,11 @@ function virtura_child_theme_extract_related_post_ids( $value ): array {
 
 	$ids = array();
 
-	foreach ( $value as $item ) {
+	foreach ( $value as $key => $item ) {
+		if ( is_numeric( $key ) && ! is_numeric( $item ) ) {
+			$ids[] = absint( $key );
+		}
+
 		if ( is_array( $item ) ) {
 			if ( isset( $item['ID'] ) ) {
 				$ids[] = absint( $item['ID'] );

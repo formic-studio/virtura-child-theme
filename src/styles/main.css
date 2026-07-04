@@ -509,13 +509,15 @@ body {
 .virtura-work-scope {
   display: grid;
   gap: var(--space-96, 9.6rem);
+  margin-inline: auto;
+  max-width: 90.4rem;
   width: 100%;
 }
 
 .virtura-work-scope__item {
   display: grid;
   gap: var(--space-24, 2.4rem);
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 32rem) minmax(0, 56rem);
 }
 
 .virtura-work-scope__card {
@@ -525,8 +527,10 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  max-width: 32rem;
   min-height: 18rem;
   padding: var(--space-16, 1.6rem);
+  width: 100%;
 }
 
 .virtura-work-scope__eyebrow {
@@ -552,7 +556,9 @@ body {
   gap: var(--space-24, 2.4rem);
   list-style: none;
   margin: 0;
+  max-width: 56rem;
   padding: 0;
+  width: 100%;
 }
 
 .virtura-work-scope__point {
@@ -590,6 +596,11 @@ body {
 
   .virtura-work-scope__item {
     grid-template-columns: 1fr;
+  }
+
+  .virtura-work-scope__card,
+  .virtura-work-scope__points {
+    max-width: none;
   }
 }
 
