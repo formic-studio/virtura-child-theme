@@ -506,6 +506,93 @@ body {
   backdrop-filter: blur(15px) saturate(125%);
 }
 
+.virtura-work-scope {
+  display: grid;
+  gap: var(--space-96, 9.6rem);
+  width: 100%;
+}
+
+.virtura-work-scope__item {
+  display: grid;
+  gap: var(--space-24, 2.4rem);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.virtura-work-scope__card {
+  background: var(--color-violet, #a970ff);
+  border-radius: var(--space-16, 1.6rem);
+  color: var(--color-white, #fff);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 18rem;
+  padding: var(--space-16, 1.6rem);
+}
+
+.virtura-work-scope__eyebrow {
+  color: currentColor;
+  font-size: var(--fs-label-small, 1.2rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.virtura-work-scope__title {
+  color: currentColor;
+  font-size: var(--fs-h6, 2.4rem);
+  font-weight: 400;
+  line-height: 1;
+  margin: 0;
+  max-width: 12em;
+}
+
+.virtura-work-scope__points {
+  display: grid;
+  gap: var(--space-24, 2.4rem);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.virtura-work-scope__point {
+  align-items: start;
+  background: var(--color-white, #fff);
+  border-radius: var(--space-16, 1.6rem);
+  color: var(--color-black, #000);
+  display: grid;
+  font-size: var(--fs-body-small, 1.6rem);
+  font-weight: 700;
+  gap: var(--space-16, 1.6rem);
+  grid-template-columns: auto minmax(0, 1fr);
+  line-height: 1.35;
+  min-height: 9rem;
+  padding: var(--space-24, 2.4rem) var(--space-32, 3.2rem);
+}
+
+.virtura-work-scope__point::before {
+  background: currentColor;
+  border-radius: 999px;
+  content: "";
+  height: 0.5rem;
+  margin-top: 0.55em;
+  width: 0.5rem;
+}
+
+.virtura-work-scope__point span {
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .virtura-work-scope {
+    gap: var(--space-48, 4.8rem);
+  }
+
+  .virtura-work-scope__item {
+    grid-template-columns: 1fr;
+  }
+}
+
 .text-overview,
 .fit-text-to-box {
   display: block;

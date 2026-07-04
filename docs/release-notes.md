@@ -15,3 +15,6 @@
   submenu.
 - Giga menu can be forced open for editing by adding
   `giga-menu-builder-open` to `.section_nav`.
+- Added `[virtura_work_scope]` shortcode for rendering Pods-powered work scope
+  steps on single `realizacja` templates. In Bricks, place a Shortcode element
+  where the dynamic "Zakres prac" list should appear.
