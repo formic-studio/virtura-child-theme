@@ -314,8 +314,8 @@ body {
 .grid-2-item .archive-grid > .archive-block:nth-child(2),
 .grid-2-item.archive-grid > .bricks-layout-wrapper > .bricks-layout-item:nth-child(2),
 .grid-2-item .archive-grid > .bricks-layout-wrapper > .bricks-layout-item:nth-child(2) {
-  align-self: stretch;
-  aspect-ratio: auto !important;
+  align-self: auto;
+  aspect-ratio: 1.84 / 1 !important;
   grid-column: span 2 !important;
 }
 
