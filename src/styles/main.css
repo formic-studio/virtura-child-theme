@@ -23,6 +23,55 @@ body {
   padding: 0;
 }
 
+.archive-grid {
+  display: grid;
+  gap: var(--space-24, 2.4rem);
+  grid-auto-flow: dense;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.archive-block {
+  aspect-ratio: 1 / 1.12;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.archive-block:nth-child(5n) {
+  aspect-ratio: 2.08 / 1;
+  grid-column: span 2;
+}
+
+.archive-block :where(img, picture) {
+  height: 100%;
+  width: 100%;
+}
+
+.archive-block img {
+  object-fit: cover;
+}
+
+@media (max-width: 991px) {
+  .archive-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .archive-block:nth-child(5n) {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 767px) {
+  .archive-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .archive-block,
+  .archive-block:nth-child(5n) {
+    aspect-ratio: 1 / 1.15;
+    grid-column: auto;
+  }
+}
+
 :is(.btn, .nav-btn, .footer-btn) {
   --btn-hover-bg: var(--color-darker-grey, #8f8f8f);
   --btn-hover-transition:
