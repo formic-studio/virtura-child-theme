@@ -16,6 +16,7 @@ const LOGO_NAME_WIDTH = 97;
 const LOGO_MARK_CENTER_OFFSET = LOGO_WIDTH / 2 - LOGO_MARK_WIDTH / 2;
 const INTRO_CENTER_SCALE = 2.2;
 const INTRO_PRIME_CLASS = 'virtura-intro-prime';
+const INTRO_FAILSAFE_TIMEOUT = 15000;
 
 const ICON_SVG = `
   <svg xmlns="http://www.w3.org/2000/svg" width="42" height="38" viewBox="0 0 42 38" fill="none" aria-hidden="true" focusable="false">
@@ -322,16 +323,33 @@ export const initIntroAnimation = async () => {
   const navLogo = getNavLogoTarget();
   const overlay = createIntroOverlay();
   const imageReadyPromise = waitForImage(heroNativeImage);
+  const cleanupIntroState = () => {
+    root.classList.remove(INTRO_PRIME_CLASS);
+    root.classList.remove('virtura-intro-running');
+    root.classList.remove('virtura-intro-revealing');
+    overlay.remove();
+  };
+  const introFailsafeTimer = window.setTimeout(
+    cleanupIntroState,
+    INTRO_FAILSAFE_TIMEOUT,
+  );
 
   root.classList.add('virtura-intro-running');
   root.classList.remove(INTRO_PRIME_CLASS);
 
-  const { gsap } = await loadGsap();
+  let gsap;
+
+  try {
+    ({ gsap } = await loadGsap());
+  } catch (error) {
+    window.clearTimeout(introFailsafeTimer);
+    cleanupIntroState();
+    return;
+  }
 
   if (reducedMotionMedia.matches) {
-    root.classList.remove(INTRO_PRIME_CLASS);
-    root.classList.remove('virtura-intro-running');
-    overlay.remove();
+    window.clearTimeout(introFailsafeTimer);
+    cleanupIntroState();
     return;
   }
 
@@ -444,6 +462,7 @@ export const initIntroAnimation = async () => {
       ease: 'power3.out',
     },
     onComplete: () => {
+      window.clearTimeout(introFailsafeTimer);
       root.classList.remove(INTRO_PRIME_CLASS);
       root.classList.remove('virtura-intro-running');
       root.classList.remove('virtura-intro-revealing');

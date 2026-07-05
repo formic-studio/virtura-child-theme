@@ -8,6 +8,21 @@ body {
   color: var(--color-black, #000);
 }
 
+:is(
+  a[href],
+  button,
+  [role="button"],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  label[for],
+  select,
+  summary,
+  .bricks-button
+):not(:disabled, [aria-disabled="true"]) {
+  cursor: pointer;
+}
+
 .list-reset-spaced,
 .list-reset-spaced ul {
   display: flex;
@@ -674,7 +689,7 @@ body {
 .virtura-intro {
   inset: 0;
   overflow: hidden;
-  pointer-events: auto;
+  pointer-events: none;
   position: fixed;
   z-index: 10050;
 }
