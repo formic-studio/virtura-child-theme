@@ -23,6 +23,33 @@ body {
   padding: 0;
 }
 
+.brxe-filter-select.dropdown {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: var(--color-light-grey, #ececec);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='8' viewBox='0 0 16 8' fill='none'%3E%3Cpath d='M14.2122 0.94275L9.28334 5.87164C8.34112 6.81385 6.81349 6.81385 5.87127 5.87164L0.942383 0.942749' stroke='black' stroke-width='2.66667'/%3E%3C/svg%3E");
+  background-position: right var(--space-12, 1.2rem) center;
+  background-repeat: no-repeat;
+  background-size: 1.6rem 0.8rem;
+  border: 0;
+  border-radius: var(--space-8, 0.8rem);
+  box-shadow: none;
+  color: var(--color-black, #000);
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  line-height: 1.375;
+  padding: var(--space-12, 1.2rem)
+    calc(var(--space-12, 1.2rem) + var(--space-16, 1.6rem) + 1.6rem)
+    var(--space-12, 1.2rem) var(--space-12, 1.2rem);
+  width: auto;
+}
+
+.brxe-filter-select.dropdown:focus-visible {
+  outline: 2px solid var(--color-black, #000);
+  outline-offset: var(--space-4, 0.4rem);
+}
+
 .archive-grid {
   --archive-grid-gap: var(--space-24, 2.4rem);
   display: grid;
