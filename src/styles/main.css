@@ -50,6 +50,147 @@ body {
   outline-offset: var(--space-4, 0.4rem);
 }
 
+.brxe-filter-select.dropdown.virtura-filter-select-native {
+  block-size: 1px !important;
+  clip-path: inset(50%);
+  inline-size: 1px !important;
+  margin: 0 !important;
+  opacity: 0 !important;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute !important;
+  white-space: nowrap;
+}
+
+.virtura-filter-select {
+  --filter-select-radius: var(--space-8, 0.8rem);
+  display: inline-flex;
+  position: relative;
+  width: max-content;
+  z-index: 1;
+}
+
+.virtura-filter-select.is-open {
+  z-index: 20;
+}
+
+.virtura-filter-select__button {
+  align-items: center;
+  background: var(--color-light-grey, #ececec);
+  border: 0;
+  border-radius: var(--filter-select-radius);
+  box-shadow: none;
+  color: var(--color-black, #000);
+  column-gap: var(--space-16, 1.6rem);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 600;
+  justify-content: space-between;
+  line-height: 1.375;
+  padding: var(--space-12, 1.2rem);
+  text-align: left;
+  transition:
+    background-color 0.2s ease,
+    border-radius 0.2s ease;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.virtura-filter-select__button:focus {
+  outline: none;
+}
+
+.virtura-filter-select__button:focus-visible {
+  outline: 2px solid var(--color-black, #000);
+  outline-offset: var(--space-4, 0.4rem);
+}
+
+.virtura-filter-select__icon {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='8' viewBox='0 0 16 8' fill='none'%3E%3Cpath d='M14.2122 0.94275L9.28334 5.87164C8.34112 6.81385 6.81349 6.81385 5.87127 5.87164L0.942383 0.942749' stroke='black' stroke-width='2.66667'/%3E%3C/svg%3E");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  flex: 0 0 auto;
+  height: 0.8rem;
+  transition: transform 0.28s var(--virtura-motion-ease);
+  width: 1.6rem;
+}
+
+.virtura-filter-select.is-open .virtura-filter-select__button {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.virtura-filter-select.is-open .virtura-filter-select__icon {
+  transform: rotate(180deg);
+}
+
+.virtura-filter-select__panel {
+  background: var(--color-light-grey, #ececec);
+  border-radius: 0 0 var(--filter-select-radius) var(--filter-select-radius);
+  box-shadow: 0 1.6rem 3.2rem rgba(0, 0, 0, 0.12);
+  left: 0;
+  min-width: 100%;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  top: 100%;
+  transform: translateY(-0.8rem) scaleY(0.86);
+  transform-origin: top center;
+  transition:
+    opacity 0.26s ease,
+    transform 0.34s var(--virtura-motion-ease);
+  width: max-content;
+}
+
+.virtura-filter-select.is-open .virtura-filter-select__panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scaleY(1);
+}
+
+.virtura-filter-select__list {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4, 0.4rem);
+}
+
+.virtura-filter-select__option {
+  background: transparent;
+  border: 0;
+  border-radius: calc(var(--filter-select-radius) - 0.2rem);
+  color: var(--color-black, #000);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  line-height: 1.375;
+  padding: var(--space-8, 0.8rem);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.virtura-filter-select__option:hover,
+.virtura-filter-select__option:focus-visible,
+.virtura-filter-select__option[aria-selected="true"] {
+  background: var(--color-white, #fff);
+  outline: none;
+}
+
+.virtura-filter-select__option:disabled {
+  color: var(--color-grey, #a5a5a5);
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .virtura-filter-select__button,
+  .virtura-filter-select__icon,
+  .virtura-filter-select__panel {
+    transition: none;
+  }
+}
+
 .archive-grid {
   --archive-grid-gap: var(--space-24, 2.4rem);
   display: grid;

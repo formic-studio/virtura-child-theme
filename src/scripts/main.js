@@ -1,4 +1,5 @@
 import '../styles/main.css';
+import { initArchiveFilters } from './archive-filters.js';
 import { initCategoryStack } from './category-stack.js';
 import { initFitText } from './fit-text.js';
 import { initGigaMenu } from './giga-menu.js';
@@ -18,6 +19,7 @@ const initTheme = () => {
   initFitText();
   initCategoryStack();
   initTrainingTabs();
+  initArchiveFilters();
   void introReady
     .catch(() => {})
     .finally(() => {
