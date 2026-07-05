@@ -50,8 +50,14 @@ body {
 
 .archive-block:nth-child(5n),
 .archive-grid > .bricks-layout-wrapper > .bricks-layout-item:nth-child(5n) {
-  aspect-ratio: 2.08 / 1;
+  align-self: stretch;
+  aspect-ratio: auto;
   grid-column: span 2;
+}
+
+.archive-block > *,
+.archive-grid > .bricks-layout-wrapper > .bricks-layout-item > .bricks-layout-inner {
+  height: 100%;
 }
 
 .archive-block :where(img, picture),
