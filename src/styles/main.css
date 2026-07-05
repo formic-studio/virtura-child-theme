@@ -596,6 +596,67 @@ body {
   backdrop-filter: blur(15px) saturate(125%);
 }
 
+.btn-glass {
+  background-color: rgba(87, 87, 87, 0.46);
+  background-image:
+    radial-gradient(
+      120% 140% at 18% 20%,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0.08) 34%,
+      rgba(255, 255, 255, 0) 62%
+    ),
+    linear-gradient(
+      100deg,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(87, 87, 87, 0.5) 34%,
+      rgba(45, 45, 45, 0.64) 70%,
+      rgba(120, 120, 120, 0.46) 100%
+    );
+  background-size: 100% 100%;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+    0 1.2rem 3.6rem rgba(0, 0, 0, 0.2);
+  color: var(--color-white, #fff);
+  isolation: isolate;
+  overflow: hidden;
+  position: relative;
+  -webkit-backdrop-filter: blur(15px) saturate(120%);
+  backdrop-filter: blur(15px) saturate(120%);
+}
+
+.btn-glass::before {
+  background: linear-gradient(
+    105deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.18) 42%,
+    rgba(255, 255, 255, 0.44) 50%,
+    rgba(255, 255, 255, 0.08) 62%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  content: "";
+  inset: 0;
+  opacity: 0.46;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+.btn-glass > * {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-glass :where(a, button, span, .brxe-text-basic, .brxe-button-text) {
+  color: inherit;
+}
+
+.btn-glass:is(:hover, :focus-visible) {
+  background-size: 100% 100%;
+  color: var(--color-white, #fff);
+}
+
 .text-overview,
 .fit-text-to-box {
   display: block;
