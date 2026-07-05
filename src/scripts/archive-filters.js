@@ -1,4 +1,5 @@
-const SELECT_SELECTOR = '.brxe-filter-select.dropdown';
+const FILTERS_SCOPE_SELECTOR = '.brxe-fjvljt';
+const SELECT_SELECTOR = `${FILTERS_SCOPE_SELECTOR} > select.brxe-filter-select.dropdown`;
 const READY_CLASS = 'virtura-filter-select-ready';
 const NATIVE_CLASS = 'virtura-filter-select-native';
 const OPEN_CLASS = 'is-open';
@@ -10,6 +11,20 @@ const getEnabledOptions = (dropdown) =>
   Array.from(dropdown.querySelectorAll('.virtura-filter-select__option')).filter(
     (option) => option instanceof HTMLButtonElement && !option.disabled,
   );
+
+const getFilterKey = (select) => {
+  try {
+    const filterConfig = JSON.parse(select.dataset.brxFilter || '{}');
+
+    if (filterConfig.filterId) {
+      return filterConfig.filterId;
+    }
+  } catch {
+    // Ignore malformed Bricks data and fall back to stable DOM attributes.
+  }
+
+  return select.name || select.dataset.scriptId || '';
+};
 
 const closeDropdown = (dropdown, shouldFocus = false) => {
   const button = dropdown.querySelector('.virtura-filter-select__button');
@@ -81,7 +96,6 @@ const syncDropdown = (select, dropdown) => {
 };
 
 const dispatchNativeChange = (select) => {
-  select.dispatchEvent(new Event('input', { bubbles: true }));
   select.dispatchEvent(new Event('change', { bubbles: true }));
 };
 
@@ -219,15 +233,95 @@ const createDropdown = (select) => {
   return dropdown;
 };
 
-const initSelect = (select) => {
-  if (!(select instanceof HTMLSelectElement) || select.classList.contains(READY_CLASS)) {
+const getExistingDropdown = (select) => {
+  const nextElement = select.nextElementSibling;
+
+  if (nextElement instanceof HTMLElement && nextElement.classList.contains('virtura-filter-select')) {
+    return nextElement;
+  }
+
+  return null;
+};
+
+const hideNativeSelect = (select) => {
+  select.classList.add(READY_CLASS, NATIVE_CLASS);
+  select.setAttribute('aria-hidden', 'true');
+  select.tabIndex = -1;
+};
+
+const removeAdjacentDuplicateDropdowns = (dropdown) => {
+  let nextElement = dropdown.nextElementSibling;
+
+  while (nextElement instanceof HTMLElement && nextElement.classList.contains('virtura-filter-select')) {
+    const duplicateDropdown = nextElement;
+
+    nextElement = nextElement.nextElementSibling;
+    duplicateDropdown.remove();
+  }
+};
+
+const cleanupStaleDropdowns = (scope) => {
+  scope.querySelectorAll('.virtura-filter-select').forEach((dropdown) => {
+    const previousElement = dropdown.previousElementSibling;
+
+    if (
+      previousElement instanceof HTMLSelectElement &&
+      previousElement.matches('select.brxe-filter-select.dropdown')
+    ) {
+      removeAdjacentDuplicateDropdowns(dropdown);
+      return;
+    }
+
+    dropdown.remove();
+  });
+};
+
+const initSelect = (select, seenFilterKeys) => {
+  if (!(select instanceof HTMLSelectElement) || !select.closest(FILTERS_SCOPE_SELECTOR)) {
     return;
   }
 
+  const filterKey = getFilterKey(select);
+  const existingDropdown = getExistingDropdown(select);
+
+  if (filterKey && seenFilterKeys.has(filterKey)) {
+    existingDropdown?.remove();
+    hideNativeSelect(select);
+    return;
+  }
+
+  if (filterKey) {
+    seenFilterKeys.add(filterKey);
+  }
+
+  if (select.classList.contains(READY_CLASS)) {
+    if (existingDropdown) {
+      buildOptions(select, existingDropdown);
+      syncDropdown(select, existingDropdown);
+      removeAdjacentDuplicateDropdowns(existingDropdown);
+    }
+
+    return;
+  }
+
+  existingDropdown?.remove();
+
   const dropdown = createDropdown(select);
 
-  select.classList.add(READY_CLASS, NATIVE_CLASS);
+  hideNativeSelect(select);
   select.insertAdjacentElement('afterend', dropdown);
+};
+
+const syncFilterControls = () => {
+  const seenFilterKeys = new Set();
+
+  document.querySelectorAll(FILTERS_SCOPE_SELECTOR).forEach((scope) => {
+    cleanupStaleDropdowns(scope);
+  });
+
+  document.querySelectorAll(SELECT_SELECTOR).forEach((select) => {
+    initSelect(select, seenFilterKeys);
+  });
 };
 
 const initDocumentListeners = () => {
@@ -249,21 +343,13 @@ const initDocumentListeners = () => {
     }
   });
 
+  document.addEventListener('bricks/ajax/query_result/displayed', syncFilterControls);
+  document.addEventListener('bricks/ajax/end', syncFilterControls);
+
   documentListenersReady = true;
 };
 
 export const initArchiveFilters = () => {
-  document.querySelectorAll(SELECT_SELECTOR).forEach(initSelect);
+  syncFilterControls();
   initDocumentListeners();
-
-  if ('MutationObserver' in window) {
-    const observer = new MutationObserver(() => {
-      document.querySelectorAll(SELECT_SELECTOR).forEach(initSelect);
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-  }
 };
