@@ -23,6 +23,10 @@ body {
   cursor: pointer;
 }
 
+:is(a[href], button, [role="button"], .bricks-button) :where(*) {
+  cursor: inherit !important;
+}
+
 .list-reset-spaced,
 .list-reset-spaced ul {
   display: flex;
@@ -227,6 +231,7 @@ body {
 .archive-block,
 .archive-grid > .bricks-layout-wrapper > .bricks-layout-item {
   aspect-ratio: 1 / 1.12;
+  cursor: pointer;
   min-width: 0;
   overflow: hidden;
 }
@@ -252,6 +257,10 @@ body {
 .archive-block img,
 .archive-grid > .bricks-layout-wrapper > .bricks-layout-item img {
   object-fit: cover;
+}
+
+.archive-block :where(.brxe-video, .brxe-video video) {
+  pointer-events: none;
 }
 
 @media (max-width: 991px) {
