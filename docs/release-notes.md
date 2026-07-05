@@ -17,3 +17,8 @@
   `giga-menu-builder-open` to `.section_nav`.
 - Added Carbon Fields meta box for `realizacja` posts to manage the dynamic
   "Zakres prac" steps and nested step points.
+- Added media switch behavior for Bricks blocks that can receive either an
+  image or a video from one file field. Add `media-switch` to the common
+  wrapper, `media-switch-img` to the Image element, and `media-switch-video`
+  to the Video element. The script detects the uploaded file type and hides
+  the unused element.

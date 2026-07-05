@@ -27,6 +27,10 @@ body {
   cursor: inherit !important;
 }
 
+.virtura-media-hidden {
+  display: none !important;
+}
+
 .list-reset-spaced,
 .list-reset-spaced ul {
   display: flex;
