@@ -2,6 +2,7 @@
 
 :root {
   --virtura-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --virtura-underline-hover-duration: 0.52s;
 }
 
 body {
@@ -512,6 +513,19 @@ body {
   text-decoration: none;
 }
 
+#brx-header .giga-menu-heading,
+:where(#brx-footer, footer) a:not(.btn):not(.footer-btn):not(
+    .bricks-button
+  ):not(.brxe-button) {
+  display: inline-block;
+  position: relative;
+  text-decoration: none;
+}
+
+#brx-header .giga-menu-heading {
+  align-self: flex-start;
+}
+
 #brx-header
   .bricks-nav-menu
   > .menu-item:not(.giga-menu-trigger):not(.menu-item-has-children):not(
@@ -524,7 +538,11 @@ body {
     [data-giga-menu-trigger]
   )
   > .brx-submenu-toggle
-  > :where(a, button)::after {
+  > :where(a, button)::after,
+#brx-header .giga-menu-heading::after,
+:where(#brx-footer, footer) a:not(.btn):not(.footer-btn):not(
+    .bricks-button
+  ):not(.brxe-button)::after {
   background-color: currentColor;
   bottom: -0.3em;
   content: "";
@@ -533,7 +551,8 @@ body {
   position: absolute;
   transform: scaleX(0);
   transform-origin: left center;
-  transition: transform 0.32s var(--virtura-motion-ease, ease);
+  transition: transform var(--virtura-underline-hover-duration)
+    var(--virtura-motion-ease, ease);
   width: 100%;
 }
 
@@ -562,8 +581,18 @@ body {
     [data-giga-menu-trigger]
   )
   > .brx-submenu-toggle
-  > :where(a, button):focus-visible::after {
+  > :where(a, button):focus-visible::after,
+#brx-header .giga-menu-heading:is(:hover, :focus-visible)::after,
+:where(#brx-footer, footer) a:not(.btn):not(.footer-btn):not(
+    .bricks-button
+  ):not(.brxe-button):is(:hover, :focus-visible)::after {
   transform: scaleX(1);
+}
+
+:where(#brx-footer, footer)
+  :where(.btn, .footer-btn, .bricks-button, .brxe-button)
+  a::after {
+  content: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -572,7 +601,9 @@ body {
     .bricks-nav-menu
     > .menu-item
     > .brx-submenu-toggle
-    > :where(a, button)::after {
+    > :where(a, button)::after,
+  #brx-header .giga-menu-heading::after,
+  :where(#brx-footer, footer) a::after {
     transition: none;
   }
 }
