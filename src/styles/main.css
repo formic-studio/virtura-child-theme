@@ -544,7 +544,7 @@ body {
     .bricks-button
   ):not(.brxe-button)::after {
   background-color: currentColor;
-  bottom: -0.3em;
+  bottom: -0.18em;
   content: "";
   height: 0.1rem;
   left: 0;
