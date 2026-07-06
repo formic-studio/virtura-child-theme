@@ -495,6 +495,88 @@ body {
   transition: color 0.2s ease;
 }
 
+#brx-header
+  .bricks-nav-menu
+  > .menu-item:not(.giga-menu-trigger):not(.menu-item-has-children):not(
+    [data-giga-menu-trigger]
+  )
+  > :where(a, button),
+#brx-header
+  .bricks-nav-menu
+  > .menu-item:not(.giga-menu-trigger):not(.menu-item-has-children):not(
+    [data-giga-menu-trigger]
+  )
+  > .brx-submenu-toggle
+  > :where(a, button) {
+  position: relative;
+  text-decoration: none;
+}
+
+#brx-header
+  .bricks-nav-menu
+  > .menu-item:not(.giga-menu-trigger):not(.menu-item-has-children):not(
+    [data-giga-menu-trigger]
+  )
+  > :where(a, button)::after,
+#brx-header
+  .bricks-nav-menu
+  > .menu-item:not(.giga-menu-trigger):not(.menu-item-has-children):not(
+    [data-giga-menu-trigger]
+  )
+  > .brx-submenu-toggle
+  > :where(a, button)::after {
+  background-color: currentColor;
+  bottom: -0.3em;
+  content: "";
+  height: 0.1rem;
+  left: 0;
+  position: absolute;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.32s var(--virtura-motion-ease, ease);
+  width: 100%;
+}
+
+#brx-header
+  .bricks-nav-menu
+  > .menu-item:not(.giga-menu-trigger):not(.menu-item-has-children):not(
+    [data-giga-menu-trigger]
+  ):hover
+  > :where(a, button)::after,
+#brx-header
+  .bricks-nav-menu
+  > .menu-item:not(.giga-menu-trigger):not(.menu-item-has-children):not(
+    [data-giga-menu-trigger]
+  )
+  > :where(a, button):focus-visible::after,
+#brx-header
+  .bricks-nav-menu
+  > .menu-item:not(.giga-menu-trigger):not(.menu-item-has-children):not(
+    [data-giga-menu-trigger]
+  ):hover
+  > .brx-submenu-toggle
+  > :where(a, button)::after,
+#brx-header
+  .bricks-nav-menu
+  > .menu-item:not(.giga-menu-trigger):not(.menu-item-has-children):not(
+    [data-giga-menu-trigger]
+  )
+  > .brx-submenu-toggle
+  > :where(a, button):focus-visible::after {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #brx-header .bricks-nav-menu > .menu-item > :where(a, button)::after,
+  #brx-header
+    .bricks-nav-menu
+    > .menu-item
+    > .brx-submenu-toggle
+    > :where(a, button)::after {
+    transition: none;
+  }
+}
+
 #brx-header svg {
   color: var(--header-fg);
 }
