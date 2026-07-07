@@ -1013,6 +1013,42 @@ body {
   overflow: hidden;
 }
 
+@media (max-width: 767px) {
+  .section_category .category-block {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .section_category .category-heading-block {
+    display: contents !important;
+  }
+
+  .section_category
+    .category-heading-block
+    > :is(h1, h2, h3, h4, h5, h6, .brxe-heading) {
+    order: 0 !important;
+  }
+
+  .section_category .subcategory-wrapper {
+    order: 10 !important;
+  }
+
+  .section_category .category-img {
+    order: 20 !important;
+  }
+
+  .section_category .category-heading-block > .btn {
+    align-self: stretch;
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    margin-top: auto;
+    max-width: none !important;
+    min-width: 0;
+    order: 30 !important;
+    width: 100% !important;
+  }
+}
+
 .section_category
   .category-wrapper.virtura-category-stack-ready
   > .category-block {
