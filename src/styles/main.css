@@ -1004,6 +1004,17 @@ body {
   overflow: hidden;
 }
 
+@media (max-width: 767px) {
+  .virtura-hero-img-clone {
+    display: none !important;
+  }
+
+  .hero-img.virtura-hero-img-source-hidden {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+}
+
 .section_category .category-wrapper.virtura-category-stack-ready {
   isolation: isolate;
   margin-bottom: var(--virtura-category-stack-layout-y, 0px);

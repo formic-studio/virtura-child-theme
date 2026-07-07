@@ -12,7 +12,7 @@
     "isDynamicEntry": true
   },
   "src/scripts/main.js": {
-    "file": "assets/main-CzNb3TFr.js",
+    "file": "assets/main-CYrZ3V9G.js",
     "name": "main",
     "src": "src/scripts/main.js",
     "isEntry": true,
@@ -21,7 +21,7 @@
       "node_modules/gsap/ScrollTrigger.js"
     ],
     "css": [
-      "assets/main-B5SlG3vd.css"
+      "assets/main-OP6Xz45T.css"
     ]
   }
 }

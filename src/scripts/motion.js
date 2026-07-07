@@ -8,6 +8,7 @@ const HERO_SOURCE_HIDDEN_CLASS = 'virtura-hero-img-source-hidden';
 const HERO_ACTIVE_CLASS = 'virtura-hero-img-motion-active';
 const HERO_DOCKED_CLASS = 'virtura-hero-img-motion-docked';
 const HERO_TARGET_OVERSCAN = '6rem';
+const MOBILE_L_MEDIA_QUERY = '(max-width: 767px)';
 const CATEGORY_BLOCK_SELECTOR = '.section_category .category-block';
 const CATEGORY_HEADER_SELECTOR = '.category-heading-block';
 const CATEGORY_HEADING_SELECTOR = ':is(h1, h2, h3, h4, h5, h6, .brxe-heading)';
@@ -26,6 +27,8 @@ const CATEGORY_SUBCATEGORY_BUTTON_SELECTOR = '.subcategory-block .btn';
 
 let gsapApiPromise;
 let motionInitialized = false;
+
+const mobileLMedia = window.matchMedia(MOBILE_L_MEDIA_QUERY);
 
 export const loadGsap = async () => {
   if (!gsapApiPromise) {
@@ -52,6 +55,8 @@ const getCategoryBlocks = () => Array.from(document.querySelectorAll(CATEGORY_BL
 const getHeroImage = () => document.querySelector(HERO_IMAGE_SELECTOR);
 
 const getHeroSection = (image) => image?.closest(HERO_SECTION_SELECTOR);
+
+const shouldInitHeroImageScale = () => !mobileLMedia.matches;
 
 const getCssLengthInPixels = (value) => {
   if (!value) {
@@ -211,7 +216,7 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
   const image = getHeroImage();
   const section = getHeroSection(image);
 
-  if (!image || !section) {
+  if (!image || !section || !shouldInitHeroImageScale()) {
     return;
   }
 
@@ -563,4 +568,18 @@ if ('addEventListener' in reducedMotionMedia) {
   reducedMotionMedia.addListener(() => {
     void initMotion();
   });
+}
+
+const restartMotion = () => {
+  document.documentElement.classList.remove('virtura-motion-ready');
+  clearAnimations();
+  resetMotionElements();
+  resetCategoryRevealElements();
+  void initMotion();
+};
+
+if ('addEventListener' in mobileLMedia) {
+  mobileLMedia.addEventListener('change', restartMotion);
+} else {
+  mobileLMedia.addListener(restartMotion);
 }
