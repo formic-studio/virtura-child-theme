@@ -1157,7 +1157,28 @@ body {
   }
 
   .brxe-section:has(.team-wrapper) .team-wrapper {
+    display: flex !important;
+    gap: var(--space-24, 2.4rem) !important;
     order: 10 !important;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-padding-inline: 0;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .brxe-section:has(.team-wrapper) .team-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  .brxe-section:has(.team-wrapper) .team-wrapper {
+    scrollbar-width: none;
+  }
+
+  .brxe-section:has(.team-wrapper) .team-wrapper > .team-block {
+    flex: 0 0 min(86vw, 44rem) !important;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
   }
 
   .brxe-section:has(.team-wrapper) .glass-block {
