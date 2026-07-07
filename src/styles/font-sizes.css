@@ -74,7 +74,7 @@ html:root {
 
 @media (max-width: 767px) {
   html:root {
-    --fs-h1: 6.4rem;
+    --fs-h1: 6rem;
     --fs-h2: 5.2rem;
     --fs-h3: 4.2rem;
     --fs-h4: 3.6rem;
