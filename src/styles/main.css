@@ -1057,246 +1057,100 @@ body {
     margin-left: auto !important;
   }
 
-  :is(
-      .section_realization,
-      .section_realizations,
-      .section_realizacje,
-      [class*="section_realizac"],
-      [class*="section-realizac"],
-      [class*="section_realization"],
-      [class*="section-realization"]
-    ) {
-    display: flex;
-    flex-direction: column;
+  .section_category:has(.projects-block) .projects-block,
+  .brxe-section:has(.team-wrapper) .brxe-block:has(> .team-wrapper) {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--space-24, 2.4rem) !important;
   }
 
-  :is(
-      .section_realization,
-      .section_realizations,
-      .section_realizacje,
-      [class*="section_realizac"],
-      [class*="section-realizac"],
-      [class*="section_realization"],
-      [class*="section-realization"]
-    )
-    :is(
-      .realization-heading-block,
-      .realizations-heading-block,
-      .realizacje-heading-block,
-      [class*="realizac"][class*="heading"],
-      [class*="realization"][class*="heading"]
-    ) {
+  .section_category:has(.projects-block) .projects-block > .brxe-block:has(> .btn),
+  .brxe-section:has(.team-wrapper) .brxe-block:has(> .btn) {
     display: contents !important;
   }
 
-  :is(
-      .section_realization,
-      .section_realizations,
-      .section_realizacje,
-      [class*="section_realizac"],
-      [class*="section-realizac"],
-      [class*="section_realization"],
-      [class*="section-realization"]
-    )
-    :is(
-      .realization-wrapper,
-      .realizations-wrapper,
-      .realizacje-wrapper,
-      .realization-grid,
-      .realizations-grid,
-      .realizacje-grid,
-      [class*="realizac"][class*="wrapper"],
-      [class*="realization"][class*="wrapper"],
-      [class*="realizac"][class*="grid"],
-      [class*="realization"][class*="grid"],
-      .bricks-layout-wrapper
-    ) {
+  .section_category:has(.projects-block)
+    .projects-block
+    > .brxe-block:has(> .btn)
+    > :is(h1, h2, h3, h4, h5, h6, .brxe-heading),
+  .brxe-section:has(.team-wrapper)
+    .brxe-block:has(> .btn)
+    > :is(h1, h2, h3, h4, h5, h6, .brxe-heading) {
+    order: 0 !important;
+  }
+
+  .section_category:has(.projects-block) .projects-block > .archive-grid.grid-2-item {
+    align-self: stretch !important;
     display: flex !important;
     flex-direction: column !important;
     gap: var(--space-24, 2.4rem) !important;
     grid-template-columns: none !important;
-    order: 20 !important;
+    margin-inline: 0 !important;
+    order: 10 !important;
+    padding-inline: 0 !important;
+    width: 100% !important;
   }
 
-  :is(
-      .section_realization,
-      .section_realizations,
-      .section_realizacje,
-      [class*="section_realizac"],
-      [class*="section-realizac"],
-      [class*="section_realization"],
-      [class*="section-realization"]
-    )
-    :is(
-      .realization-wrapper,
-      .realizations-wrapper,
-      .realizacje-wrapper,
-      .realization-grid,
-      .realizations-grid,
-      .realizacje-grid,
-      [class*="realizac"][class*="wrapper"],
-      [class*="realization"][class*="wrapper"],
-      [class*="realizac"][class*="grid"],
-      [class*="realization"][class*="grid"],
-      .bricks-layout-wrapper
-    )
-    > :nth-child(n + 3) {
+  .section_category:has(.projects-block)
+    .projects-block
+    > .archive-grid.grid-2-item
+    > :is(.archive-block, .bricks-layout-item) {
+    align-self: stretch !important;
+    grid-column: auto !important;
+    margin-inline: 0 !important;
+    transform: none !important;
+    width: 100% !important;
+  }
+
+  .section_category:has(.projects-block)
+    .projects-block
+    > .archive-grid.grid-2-item
+    > :is(.archive-block, .bricks-layout-item):nth-child(-n + 2) {
+    display: flex !important;
+  }
+
+  .section_category:has(.projects-block)
+    .projects-block
+    > .archive-grid.grid-2-item
+    > :is(.archive-block, .bricks-layout-item):nth-child(n + 3) {
     display: none !important;
   }
 
-  :is(
-      .section_about,
-      .section_team,
-      .section_studio,
-      [class*="section_about"],
-      [class*="section-about"],
-      [class*="section_team"],
-      [class*="section-team"],
-      [class*="section_studio"],
-      [class*="section-studio"]
-    ) {
-    display: flex;
-    flex-direction: column;
-  }
-
-  :is(
-      .section_about,
-      .section_team,
-      .section_studio,
-      [class*="section_about"],
-      [class*="section-about"],
-      [class*="section_team"],
-      [class*="section-team"],
-      [class*="section_studio"],
-      [class*="section-studio"]
-    )
-    :is(
-      .about-heading-block,
-      .team-heading-block,
-      .studio-heading-block,
-      [class*="about"][class*="heading"],
-      [class*="team"][class*="heading"],
-      [class*="studio"][class*="heading"]
-    ) {
-    display: contents !important;
-  }
-
-  :is(
-      .section_realization,
-      .section_realizations,
-      .section_realizacje,
-      [class*="section_realizac"],
-      [class*="section-realizac"],
-      [class*="section_realization"],
-      [class*="section-realization"],
-      .section_about,
-      .section_team,
-      .section_studio,
-      [class*="section_about"],
-      [class*="section-about"],
-      [class*="section_team"],
-      [class*="section-team"],
-      [class*="section_studio"],
-      [class*="section-studio"]
-    )
-    :is(
-      .realization-heading-block,
-      .realizations-heading-block,
-      .realizacje-heading-block,
-      .about-heading-block,
-      .team-heading-block,
-      .studio-heading-block,
-      [class*="realizac"][class*="heading"],
-      [class*="realization"][class*="heading"],
-      [class*="about"][class*="heading"],
-      [class*="team"][class*="heading"],
-      [class*="studio"][class*="heading"]
-    )
-    > :has(> .btn) {
-    display: contents !important;
-  }
-
-  :is(
-      .section_realization,
-      .section_realizations,
-      .section_realizacje,
-      [class*="section_realizac"],
-      [class*="section-realizac"],
-      [class*="section_realization"],
-      [class*="section-realization"],
-      .section_about,
-      .section_team,
-      .section_studio,
-      [class*="section_about"],
-      [class*="section-about"],
-      [class*="section_team"],
-      [class*="section-team"],
-      [class*="section_studio"],
-      [class*="section-studio"]
-    )
-    :is(
-      .realization-heading-block,
-      .realizations-heading-block,
-      .realizacje-heading-block,
-      .about-heading-block,
-      .team-heading-block,
-      .studio-heading-block,
-      [class*="realizac"][class*="heading"],
-      [class*="realization"][class*="heading"],
-      [class*="about"][class*="heading"],
-      [class*="team"][class*="heading"],
-      [class*="studio"][class*="heading"]
-    )
-    .btn {
+  .section_category:has(.projects-block)
+    .projects-block
+    > .brxe-block:has(> .btn)
+    > .btn,
+  .brxe-section:has(.team-wrapper) .brxe-block:has(> .btn) > .btn {
     align-items: center !important;
-    align-self: stretch;
+    align-self: stretch !important;
     box-sizing: border-box;
     display: flex !important;
     flex: 0 0 auto;
     gap: var(--space-16, 1.6rem);
     justify-content: space-between !important;
-    margin-top: var(--space-24, 2.4rem);
+    margin-top: 0 !important;
     max-width: none !important;
     min-width: 0;
-    order: 30 !important;
+    order: 20 !important;
     width: 100% !important;
   }
 
-  :is(
-      .section_realization,
-      .section_realizations,
-      .section_realizacje,
-      [class*="section_realizac"],
-      [class*="section-realizac"],
-      [class*="section_realization"],
-      [class*="section-realization"],
-      .section_about,
-      .section_team,
-      .section_studio,
-      [class*="section_about"],
-      [class*="section-about"],
-      [class*="section_team"],
-      [class*="section-team"],
-      [class*="section_studio"],
-      [class*="section-studio"]
-    )
-    :is(
-      .realization-heading-block,
-      .realizations-heading-block,
-      .realizacje-heading-block,
-      .about-heading-block,
-      .team-heading-block,
-      .studio-heading-block,
-      [class*="realizac"][class*="heading"],
-      [class*="realization"][class*="heading"],
-      [class*="about"][class*="heading"],
-      [class*="team"][class*="heading"],
-      [class*="studio"][class*="heading"]
-    )
-    .btn
-    > :last-child {
+  .section_category:has(.projects-block)
+    .projects-block
+    > .brxe-block:has(> .btn)
+    > .btn
+    > :last-child,
+  .brxe-section:has(.team-wrapper) .brxe-block:has(> .btn) > .btn > :last-child {
     flex: 0 0 auto;
     margin-left: auto !important;
+  }
+
+  .brxe-section:has(.team-wrapper) .team-wrapper {
+    order: 10 !important;
+  }
+
+  .brxe-section:has(.team-wrapper) .glass-block {
+    order: 30 !important;
   }
 }
 
