@@ -1056,6 +1056,248 @@ body {
     flex: 0 0 auto;
     margin-left: auto !important;
   }
+
+  :is(
+      .section_realization,
+      .section_realizations,
+      .section_realizacje,
+      [class*="section_realizac"],
+      [class*="section-realizac"],
+      [class*="section_realization"],
+      [class*="section-realization"]
+    ) {
+    display: flex;
+    flex-direction: column;
+  }
+
+  :is(
+      .section_realization,
+      .section_realizations,
+      .section_realizacje,
+      [class*="section_realizac"],
+      [class*="section-realizac"],
+      [class*="section_realization"],
+      [class*="section-realization"]
+    )
+    :is(
+      .realization-heading-block,
+      .realizations-heading-block,
+      .realizacje-heading-block,
+      [class*="realizac"][class*="heading"],
+      [class*="realization"][class*="heading"]
+    ) {
+    display: contents !important;
+  }
+
+  :is(
+      .section_realization,
+      .section_realizations,
+      .section_realizacje,
+      [class*="section_realizac"],
+      [class*="section-realizac"],
+      [class*="section_realization"],
+      [class*="section-realization"]
+    )
+    :is(
+      .realization-wrapper,
+      .realizations-wrapper,
+      .realizacje-wrapper,
+      .realization-grid,
+      .realizations-grid,
+      .realizacje-grid,
+      [class*="realizac"][class*="wrapper"],
+      [class*="realization"][class*="wrapper"],
+      [class*="realizac"][class*="grid"],
+      [class*="realization"][class*="grid"],
+      .bricks-layout-wrapper
+    ) {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--space-24, 2.4rem) !important;
+    grid-template-columns: none !important;
+    order: 20 !important;
+  }
+
+  :is(
+      .section_realization,
+      .section_realizations,
+      .section_realizacje,
+      [class*="section_realizac"],
+      [class*="section-realizac"],
+      [class*="section_realization"],
+      [class*="section-realization"]
+    )
+    :is(
+      .realization-wrapper,
+      .realizations-wrapper,
+      .realizacje-wrapper,
+      .realization-grid,
+      .realizations-grid,
+      .realizacje-grid,
+      [class*="realizac"][class*="wrapper"],
+      [class*="realization"][class*="wrapper"],
+      [class*="realizac"][class*="grid"],
+      [class*="realization"][class*="grid"],
+      .bricks-layout-wrapper
+    )
+    > :nth-child(n + 3) {
+    display: none !important;
+  }
+
+  :is(
+      .section_about,
+      .section_team,
+      .section_studio,
+      [class*="section_about"],
+      [class*="section-about"],
+      [class*="section_team"],
+      [class*="section-team"],
+      [class*="section_studio"],
+      [class*="section-studio"]
+    ) {
+    display: flex;
+    flex-direction: column;
+  }
+
+  :is(
+      .section_about,
+      .section_team,
+      .section_studio,
+      [class*="section_about"],
+      [class*="section-about"],
+      [class*="section_team"],
+      [class*="section-team"],
+      [class*="section_studio"],
+      [class*="section-studio"]
+    )
+    :is(
+      .about-heading-block,
+      .team-heading-block,
+      .studio-heading-block,
+      [class*="about"][class*="heading"],
+      [class*="team"][class*="heading"],
+      [class*="studio"][class*="heading"]
+    ) {
+    display: contents !important;
+  }
+
+  :is(
+      .section_realization,
+      .section_realizations,
+      .section_realizacje,
+      [class*="section_realizac"],
+      [class*="section-realizac"],
+      [class*="section_realization"],
+      [class*="section-realization"],
+      .section_about,
+      .section_team,
+      .section_studio,
+      [class*="section_about"],
+      [class*="section-about"],
+      [class*="section_team"],
+      [class*="section-team"],
+      [class*="section_studio"],
+      [class*="section-studio"]
+    )
+    :is(
+      .realization-heading-block,
+      .realizations-heading-block,
+      .realizacje-heading-block,
+      .about-heading-block,
+      .team-heading-block,
+      .studio-heading-block,
+      [class*="realizac"][class*="heading"],
+      [class*="realization"][class*="heading"],
+      [class*="about"][class*="heading"],
+      [class*="team"][class*="heading"],
+      [class*="studio"][class*="heading"]
+    )
+    > :has(> .btn) {
+    display: contents !important;
+  }
+
+  :is(
+      .section_realization,
+      .section_realizations,
+      .section_realizacje,
+      [class*="section_realizac"],
+      [class*="section-realizac"],
+      [class*="section_realization"],
+      [class*="section-realization"],
+      .section_about,
+      .section_team,
+      .section_studio,
+      [class*="section_about"],
+      [class*="section-about"],
+      [class*="section_team"],
+      [class*="section-team"],
+      [class*="section_studio"],
+      [class*="section-studio"]
+    )
+    :is(
+      .realization-heading-block,
+      .realizations-heading-block,
+      .realizacje-heading-block,
+      .about-heading-block,
+      .team-heading-block,
+      .studio-heading-block,
+      [class*="realizac"][class*="heading"],
+      [class*="realization"][class*="heading"],
+      [class*="about"][class*="heading"],
+      [class*="team"][class*="heading"],
+      [class*="studio"][class*="heading"]
+    )
+    .btn {
+    align-items: center !important;
+    align-self: stretch;
+    box-sizing: border-box;
+    display: flex !important;
+    flex: 0 0 auto;
+    gap: var(--space-16, 1.6rem);
+    justify-content: space-between !important;
+    margin-top: var(--space-24, 2.4rem);
+    max-width: none !important;
+    min-width: 0;
+    order: 30 !important;
+    width: 100% !important;
+  }
+
+  :is(
+      .section_realization,
+      .section_realizations,
+      .section_realizacje,
+      [class*="section_realizac"],
+      [class*="section-realizac"],
+      [class*="section_realization"],
+      [class*="section-realization"],
+      .section_about,
+      .section_team,
+      .section_studio,
+      [class*="section_about"],
+      [class*="section-about"],
+      [class*="section_team"],
+      [class*="section-team"],
+      [class*="section_studio"],
+      [class*="section-studio"]
+    )
+    :is(
+      .realization-heading-block,
+      .realizations-heading-block,
+      .realizacje-heading-block,
+      .about-heading-block,
+      .team-heading-block,
+      .studio-heading-block,
+      [class*="realizac"][class*="heading"],
+      [class*="realization"][class*="heading"],
+      [class*="about"][class*="heading"],
+      [class*="team"][class*="heading"],
+      [class*="studio"][class*="heading"]
+    )
+    .btn
+    > :last-child {
+    flex: 0 0 auto;
+    margin-left: auto !important;
+  }
 }
 
 .section_category
