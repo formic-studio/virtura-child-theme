@@ -1038,14 +1038,23 @@ body {
   }
 
   .section_category .category-heading-block > .btn {
+    align-items: center !important;
     align-self: stretch;
     box-sizing: border-box;
+    display: flex !important;
     flex: 0 0 auto;
+    gap: var(--space-16, 1.6rem);
+    justify-content: space-between !important;
     margin-top: auto;
     max-width: none !important;
     min-width: 0;
     order: 30 !important;
     width: 100% !important;
+  }
+
+  .section_category .category-heading-block > .btn > :last-child {
+    flex: 0 0 auto;
+    margin-left: auto !important;
   }
 }
 
