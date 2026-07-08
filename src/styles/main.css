@@ -979,6 +979,24 @@ body {
   will-change: auto;
 }
 
+.about-slider.virtura-about-slider-ready :is(.slider-img-item, .slider-text-block) {
+  flex: 0 0 100%;
+  transition: transform 0.72s var(--virtura-motion-ease);
+  will-change: transform;
+}
+
+.about-slider.virtura-about-slider-ready .svg-arrow-block {
+  cursor: pointer;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-slider.virtura-about-slider-ready
+    :is(.slider-img-item, .slider-text-block) {
+    transition: none;
+  }
+}
+
 .virtura-hero-img-clone {
   border-radius: var(--space-16, 1.6rem);
   display: block;
