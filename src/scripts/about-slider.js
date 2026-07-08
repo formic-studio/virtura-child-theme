@@ -1,33 +1,37 @@
-import { loadGsap } from './motion.js';
+import { loadGsap } from "./motion.js";
 
-const SLIDER_SELECTOR = '.about-slider';
-const IMAGE_SELECTOR = '.slider-img-item';
-const TEXT_SELECTOR = '.slider-text-block';
-const CONTROLS_SELECTOR = '.slider-paggination .svg-arrow-block';
-const ACTIVE_CLASS = 'is-active';
-const DISABLED_CLASS = 'is-disabled';
-const READY_CLASS = 'virtura-about-slider-ready';
-const GSAP_CLASS = 'virtura-about-slider-gsap';
-const PREV_LABEL = 'Poprzedni slajd';
-const NEXT_LABEL = 'Następny slajd';
+const SLIDER_SELECTOR = ".about-slider";
+const IMAGE_SELECTOR = ".slider-img-item";
+const TEXT_SELECTOR = ".slider-text-block";
+const CONTROLS_SELECTOR = ".slider-paggination .svg-arrow-block";
+const ACTIVE_CLASS = "is-active";
+const DISABLED_CLASS = "is-disabled";
+const READY_CLASS = "virtura-about-slider-ready";
+const GSAP_CLASS = "virtura-about-slider-gsap";
+const PREV_LABEL = "Poprzedni slajd";
+const NEXT_LABEL = "Następny slajd";
 const ANIMATION_DURATION = 0.92;
-const ANIMATION_EASE = 'power3.out';
+const ANIMATION_EASE = "power3.out";
 const IMAGE_REVEAL_DURATION = 0.96;
-const IMAGE_REVEAL_EASE = 'power4.out';
-const IMAGE_NEXT_HIDDEN_CLIP = 'inset(0 100% 0 0)';
-const IMAGE_PREV_HIDDEN_CLIP = 'inset(0 0 0 100%)';
-const IMAGE_REVEAL_VISIBLE_CLIP = 'inset(0 0% 0 0)';
+const IMAGE_REVEAL_EASE = "power4.out";
+const IMAGE_NEXT_HIDDEN_CLIP = "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)";
+const IMAGE_PREV_HIDDEN_CLIP =
+  "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)";
+const IMAGE_REVEAL_VISIBLE_CLIP =
+  "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)";
 const IMAGE_ENTER_SCALE = 1.025;
-const IMAGE_ENTER_OFFSET = '1.2rem';
+const IMAGE_ENTER_OFFSET = "1.2rem";
 const IMAGE_OUTGOING_SCALE = 0.985;
 const TEXT_WORD_DELAY = 0.38;
-const TEXT_WORD_DURATION = 0.8;
-const TEXT_WORD_EASE = 'sine.out';
-const TEXT_WORD_STAGGER = 0.045;
+const TEXT_WORD_DURATION = 0.6;
+const TEXT_WORD_EASE = "sine.out";
+const TEXT_WORD_STAGGER = 0.035;
 const TEXT_FADE_OUT_DURATION = 0.22;
 const SWIPE_THRESHOLD = 40;
 
-const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
+const reducedMotionMedia = window.matchMedia(
+  "(prefers-reduced-motion: reduce)",
+);
 const textSplitInstances = new WeakMap();
 const textTransitionTokens = new WeakMap();
 
@@ -36,7 +40,8 @@ let fontsReadyPromise;
 
 const waitForFonts = () => {
   if (!fontsReadyPromise) {
-    fontsReadyPromise = document.fonts?.ready?.catch(() => {}) || Promise.resolve();
+    fontsReadyPromise =
+      document.fonts?.ready?.catch(() => {}) || Promise.resolve();
   }
 
   return fontsReadyPromise;
@@ -46,7 +51,7 @@ const loadSliderAnimation = async () => {
   if (!sliderAnimationPromise) {
     sliderAnimationPromise = Promise.all([
       loadGsap(),
-      import('gsap/SplitText'),
+      import("gsap/SplitText"),
       waitForFonts(),
     ]).then(([{ gsap }, splitTextModule]) => {
       const SplitText = splitTextModule.SplitText || splitTextModule.default;
@@ -77,9 +82,9 @@ const splitTextWords = (SplitText, item) => {
   revertTextSplit(item);
 
   const split = SplitText.create(item, {
-    aria: 'auto',
-    type: 'words',
-    wordsClass: 'virtura-slider-word',
+    aria: "auto",
+    type: "words",
+    wordsClass: "virtura-slider-word",
   });
 
   textSplitInstances.set(item, split);
@@ -87,42 +92,50 @@ const splitTextWords = (SplitText, item) => {
   return split;
 };
 
-const getImageHiddenClip = (direction) => (
-  direction < 0 ? IMAGE_PREV_HIDDEN_CLIP : IMAGE_NEXT_HIDDEN_CLIP
-);
+const getImageHiddenClip = (direction) =>
+  direction < 0 ? IMAGE_PREV_HIDDEN_CLIP : IMAGE_NEXT_HIDDEN_CLIP;
 
-const getImageEnterX = (direction) => (
-  direction < 0 ? IMAGE_ENTER_OFFSET : `-${IMAGE_ENTER_OFFSET}`
-);
+const getImageEnterX = (direction) =>
+  direction < 0 ? IMAGE_ENTER_OFFSET : `-${IMAGE_ENTER_OFFSET}`;
+
+const setClipPath = (item, clipPath) => {
+  item.style.clipPath = clipPath;
+  item.style.webkitClipPath = clipPath;
+};
 
 const setActiveState = (items, index) => {
   items.forEach((item, itemIndex) => {
     const isActive = itemIndex === index;
 
     item.classList.toggle(ACTIVE_CLASS, isActive);
-    item.setAttribute('aria-hidden', String(!isActive));
+    item.setAttribute("aria-hidden", String(!isActive));
   });
 };
 
-const setImageState = (items, index, previousIndex, { animate = true } = {}) => {
+const setImageState = (
+  items,
+  index,
+  previousIndex,
+  { animate = true } = {},
+) => {
   const incoming = items[index];
   const outgoing = items[previousIndex];
   const direction = index < previousIndex ? -1 : 1;
   const hiddenClip = getImageHiddenClip(direction);
   const enterX = getImageEnterX(direction);
 
-  setActiveState(items, index);
-
   if (!animate || reducedMotionMedia.matches) {
     items.forEach((item, itemIndex) => {
       const isActive = itemIndex === index;
 
-      item.style.clipPath = IMAGE_REVEAL_VISIBLE_CLIP;
-      item.style.filter = 'none';
-      item.style.opacity = isActive ? '1' : '0';
-      item.style.transform = 'translate3d(0, 0, 0)';
-      item.style.zIndex = isActive ? '2' : '1';
+      setClipPath(item, IMAGE_REVEAL_VISIBLE_CLIP);
+      item.style.filter = "none";
+      item.style.opacity = isActive ? "1" : "0";
+      item.style.transform = "translate3d(0, 0, 0)";
+      item.style.zIndex = isActive ? "2" : "1";
     });
+
+    setActiveState(items, index);
 
     return;
   }
@@ -130,20 +143,22 @@ const setImageState = (items, index, previousIndex, { animate = true } = {}) => 
   items.forEach((item, itemIndex) => {
     const isOutgoing = itemIndex === previousIndex;
 
-    item.style.clipPath = IMAGE_REVEAL_VISIBLE_CLIP;
-    item.style.filter = 'none';
-    item.style.opacity = isOutgoing ? '1' : '0';
-    item.style.transform = 'translate3d(0, 0, 0)';
-    item.style.zIndex = isOutgoing ? '2' : '1';
+    setClipPath(item, IMAGE_REVEAL_VISIBLE_CLIP);
+    item.style.filter = "none";
+    item.style.opacity = isOutgoing ? "1" : "0";
+    item.style.transform = "translate3d(0, 0, 0)";
+    item.style.zIndex = isOutgoing ? "2" : "1";
   });
 
   if (incoming) {
-    incoming.style.clipPath = hiddenClip;
-    incoming.style.filter = 'brightness(1.06)';
-    incoming.style.opacity = '1';
+    setClipPath(incoming, hiddenClip);
+    incoming.style.filter = "brightness(1.06)";
+    incoming.style.opacity = "1";
     incoming.style.transform = `translate3d(${enterX}, 0, 0) scale(${IMAGE_ENTER_SCALE})`;
-    incoming.style.zIndex = '3';
+    incoming.style.zIndex = "3";
   }
+
+  setActiveState(items, index);
 
   void loadGsap()
     .then(({ gsap }) => {
@@ -153,10 +168,11 @@ const setImageState = (items, index, previousIndex, { animate = true } = {}) => 
       gsap.killTweensOf(items);
       gsap.set(items, {
         clipPath: IMAGE_REVEAL_VISIBLE_CLIP,
-        filter: 'none',
+        filter: "none",
         opacity: 0,
         scale: 1,
-        transformOrigin: 'center center',
+        transformOrigin: "center center",
+        webkitClipPath: IMAGE_REVEAL_VISIBLE_CLIP,
         x: 0,
         xPercent: 0,
         zIndex: 1,
@@ -172,9 +188,10 @@ const setImageState = (items, index, previousIndex, { animate = true } = {}) => 
       if (incoming) {
         gsap.set(incoming, {
           clipPath: hiddenClip,
-          filter: 'brightness(1.06)',
+          filter: "brightness(1.06)",
           opacity: 1,
           scale: IMAGE_ENTER_SCALE,
+          webkitClipPath: hiddenClip,
           x: enterX,
           zIndex: 3,
         });
@@ -184,7 +201,7 @@ const setImageState = (items, index, previousIndex, { animate = true } = {}) => 
         onComplete: () => {
           if (outgoing && outgoing !== incoming) {
             gsap.set(outgoing, {
-              filter: 'none',
+              filter: "none",
               opacity: 0,
               scale: 1,
               x: 0,
@@ -195,9 +212,10 @@ const setImageState = (items, index, previousIndex, { animate = true } = {}) => 
           if (incoming) {
             gsap.set(incoming, {
               clipPath: IMAGE_REVEAL_VISIBLE_CLIP,
-              filter: 'none',
+              filter: "none",
               opacity: 1,
               scale: 1,
+              webkitClipPath: IMAGE_REVEAL_VISIBLE_CLIP,
               x: 0,
               zIndex: 2,
             });
@@ -206,12 +224,16 @@ const setImageState = (items, index, previousIndex, { animate = true } = {}) => 
       });
 
       if (outgoing && outgoing !== incoming) {
-        timeline.to(outgoing, {
-          duration: 0.68,
-          ease: 'power2.out',
-          filter: 'brightness(0.92)',
-          scale: IMAGE_OUTGOING_SCALE,
-        }, 0);
+        timeline.to(
+          outgoing,
+          {
+            duration: 0.68,
+            ease: "power2.out",
+            filter: "brightness(0.92)",
+            scale: IMAGE_OUTGOING_SCALE,
+          },
+          0,
+        );
       }
 
       if (incoming) {
@@ -219,16 +241,18 @@ const setImageState = (items, index, previousIndex, { animate = true } = {}) => 
           incoming,
           {
             clipPath: hiddenClip,
-            filter: 'brightness(1.06)',
+            filter: "brightness(1.06)",
             scale: IMAGE_ENTER_SCALE,
+            webkitClipPath: hiddenClip,
             x: enterX,
           },
           {
             clipPath: IMAGE_REVEAL_VISIBLE_CLIP,
             duration: IMAGE_REVEAL_DURATION,
             ease: IMAGE_REVEAL_EASE,
-            filter: 'brightness(1)',
+            filter: "brightness(1)",
             scale: 1,
+            webkitClipPath: IMAGE_REVEAL_VISIBLE_CLIP,
             x: 0,
           },
           0,
@@ -239,12 +263,14 @@ const setImageState = (items, index, previousIndex, { animate = true } = {}) => 
       items.forEach((item, itemIndex) => {
         const isActive = itemIndex === index;
 
-        item.style.clipPath = IMAGE_REVEAL_VISIBLE_CLIP;
-        item.style.filter = 'none';
-        item.style.opacity = isActive ? '1' : '0';
-        item.style.transform = 'translate3d(0, 0, 0)';
-        item.style.zIndex = isActive ? '2' : '1';
+        setClipPath(item, IMAGE_REVEAL_VISIBLE_CLIP);
+        item.style.filter = "none";
+        item.style.opacity = isActive ? "1" : "0";
+        item.style.transform = "translate3d(0, 0, 0)";
+        item.style.zIndex = isActive ? "2" : "1";
       });
+
+      setActiveState(items, index);
     });
 };
 
@@ -259,7 +285,7 @@ const setTextState = (items, index, previousIndex, { animate = true } = {}) => {
   if (!animate || reducedMotionMedia.matches) {
     items.forEach((item, itemIndex) => {
       revertTextSplit(item);
-      item.style.opacity = itemIndex === index ? '1' : '0';
+      item.style.opacity = itemIndex === index ? "1" : "0";
       item.style.transform = `translate3d(${xPercent}%, 0, 0)`;
     });
 
@@ -268,7 +294,7 @@ const setTextState = (items, index, previousIndex, { animate = true } = {}) => {
 
   items.forEach((item, itemIndex) => {
     if (itemIndex !== previousIndex || itemIndex === index) {
-      item.style.opacity = '0';
+      item.style.opacity = "0";
     }
   });
 
@@ -288,16 +314,16 @@ const setTextState = (items, index, previousIndex, { animate = true } = {}) => {
         duration: ANIMATION_DURATION,
         ease: ANIMATION_EASE,
         force3D: true,
-        overwrite: 'auto',
+        overwrite: "auto",
         xPercent,
       });
 
       if (outgoing && outgoing !== incoming) {
         gsap.to(outgoing, {
           duration: TEXT_FADE_OUT_DURATION,
-          ease: 'power1.out',
+          ease: "power1.out",
           opacity: 0,
-          overwrite: 'auto',
+          overwrite: "auto",
         });
       }
 
@@ -311,7 +337,7 @@ const setTextState = (items, index, previousIndex, { animate = true } = {}) => {
           duration: TEXT_WORD_DURATION,
           ease: TEXT_WORD_EASE,
           opacity: 1,
-          overwrite: 'auto',
+          overwrite: "auto",
           stagger: TEXT_WORD_STAGGER,
         });
       }
@@ -319,7 +345,7 @@ const setTextState = (items, index, previousIndex, { animate = true } = {}) => {
     .catch(() => {
       items.forEach((item, itemIndex) => {
         revertTextSplit(item);
-        item.style.opacity = itemIndex === index ? '1' : '0';
+        item.style.opacity = itemIndex === index ? "1" : "0";
         item.style.transform = `translate3d(${xPercent}%, 0, 0)`;
       });
     });
@@ -327,22 +353,22 @@ const setTextState = (items, index, previousIndex, { animate = true } = {}) => {
 
 const setControlState = (control, isDisabled) => {
   control.classList.toggle(DISABLED_CLASS, isDisabled);
-  control.setAttribute('aria-disabled', String(isDisabled));
-  control.setAttribute('tabindex', isDisabled ? '-1' : '0');
+  control.setAttribute("aria-disabled", String(isDisabled));
+  control.setAttribute("tabindex", isDisabled ? "-1" : "0");
 };
 
 const setupControl = (control, label, onClick) => {
-  control.setAttribute('aria-label', label);
-  control.setAttribute('role', 'button');
-  control.setAttribute('tabindex', '0');
+  control.setAttribute("aria-label", label);
+  control.setAttribute("role", "button");
+  control.setAttribute("tabindex", "0");
 
-  control.addEventListener('click', onClick);
-  control.addEventListener('keydown', (event) => {
-    if (control.getAttribute('aria-disabled') === 'true') {
+  control.addEventListener("click", onClick);
+  control.addEventListener("keydown", (event) => {
+    if (control.getAttribute("aria-disabled") === "true") {
       return;
     }
 
-    if (event.key !== 'Enter' && event.key !== ' ') {
+    if (event.key !== "Enter" && event.key !== " ") {
       return;
     }
 
@@ -402,29 +428,37 @@ const initSlider = (slider) => {
     }
   });
 
-  slider.addEventListener('touchstart', (event) => {
-    touchStartX = event.touches[0]?.clientX ?? null;
-  }, { passive: true });
+  slider.addEventListener(
+    "touchstart",
+    (event) => {
+      touchStartX = event.touches[0]?.clientX ?? null;
+    },
+    { passive: true },
+  );
 
-  slider.addEventListener('touchend', (event) => {
-    if (touchStartX === null) {
-      return;
-    }
+  slider.addEventListener(
+    "touchend",
+    (event) => {
+      if (touchStartX === null) {
+        return;
+      }
 
-    const touchEndX = event.changedTouches[0]?.clientX ?? touchStartX;
-    const distance = touchEndX - touchStartX;
+      const touchEndX = event.changedTouches[0]?.clientX ?? touchStartX;
+      const distance = touchEndX - touchStartX;
 
-    touchStartX = null;
+      touchStartX = null;
 
-    if (Math.abs(distance) < SWIPE_THRESHOLD) {
-      return;
-    }
+      if (Math.abs(distance) < SWIPE_THRESHOLD) {
+        return;
+      }
 
-    goTo(distance < 0 ? activeIndex + 1 : activeIndex - 1);
-  }, { passive: true });
+      goTo(distance < 0 ? activeIndex + 1 : activeIndex - 1);
+    },
+    { passive: true },
+  );
 
   slider.classList.add(READY_CLASS);
-  slider.setAttribute('aria-roledescription', 'carousel');
+  slider.setAttribute("aria-roledescription", "carousel");
   goTo(0, { animate: false, force: true });
 };
 
