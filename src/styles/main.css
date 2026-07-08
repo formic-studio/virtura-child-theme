@@ -1168,7 +1168,6 @@ body {
     --team-card-width: min(86vw, 44rem);
     display: flex !important;
     gap: var(--space-24, 2.4rem) !important;
-    order: 10 !important;
     overflow-x: auto;
     overscroll-behavior-inline: contain;
     padding-inline-end: max(0px, calc(100% - var(--team-card-width)));
@@ -1189,6 +1188,10 @@ body {
     flex: 0 0 var(--team-card-width) !important;
     scroll-snap-align: start;
     scroll-snap-stop: always;
+  }
+
+  .brxe-section:has(.team-wrapper):has(.glass-block) .team-wrapper {
+    order: 10 !important;
   }
 
   .brxe-section:has(.team-wrapper) .glass-block {
