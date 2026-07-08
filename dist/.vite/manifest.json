@@ -12,17 +12,16 @@
     "isDynamicEntry": true
   },
   "src/scripts/main.js": {
-    "file": "assets/main-BjGwdbJI.js",
+    "file": "assets/main-CxBApCn5.js",
     "name": "main",
     "src": "src/scripts/main.js",
     "isEntry": true,
     "dynamicImports": [
       "node_modules/gsap/index.js",
-      "node_modules/gsap/index.js",
       "node_modules/gsap/ScrollTrigger.js"
     ],
     "css": [
-      "assets/main-BGlEPuV8.css"
+      "assets/main-Bvi3BnOR.css"
     ]
   }
 }

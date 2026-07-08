@@ -1,3 +1,5 @@
+import { loadGsap } from './motion.js';
+
 const SLIDER_SELECTOR = '.about-slider';
 const IMAGE_SELECTOR = '.slider-img-item';
 const TEXT_SELECTOR = '.slider-text-block';
@@ -10,31 +12,29 @@ const PREV_LABEL = 'Poprzedni slajd';
 const NEXT_LABEL = 'Następny slajd';
 const ANIMATION_DURATION = 0.92;
 const ANIMATION_EASE = 'power3.out';
+const TEXT_FADE_DELAY = 0.14;
+const TEXT_FADE_DURATION = 0.54;
+const TEXT_FADE_OUT_DURATION = 0.22;
+const TEXT_FADE_EASE = 'power2.out';
 const SWIPE_THRESHOLD = 40;
 
 const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-let gsapPromise;
-
-const loadSliderGsap = async () => {
-  if (!gsapPromise) {
-    gsapPromise = import('gsap').then((gsapModule) => gsapModule.gsap || gsapModule.default);
-  }
-
-  return gsapPromise;
-};
-
 const clampIndex = (index, length) => Math.min(Math.max(index, 0), length - 1);
 
-const setSlideState = (items, index, { animate = true } = {}) => {
-  const xPercent = index * -100;
-
+const setActiveState = (items, index) => {
   items.forEach((item, itemIndex) => {
     const isActive = itemIndex === index;
 
     item.classList.toggle(ACTIVE_CLASS, isActive);
     item.setAttribute('aria-hidden', String(!isActive));
   });
+};
+
+const setTrackState = (items, index, { animate = true } = {}) => {
+  const xPercent = index * -100;
+
+  setActiveState(items, index);
 
   if (!animate || reducedMotionMedia.matches) {
     items.forEach((item) => {
@@ -44,8 +44,8 @@ const setSlideState = (items, index, { animate = true } = {}) => {
     return;
   }
 
-  void loadSliderGsap()
-    .then((gsap) => {
+  void loadGsap()
+    .then(({ gsap }) => {
       const slider = items[0]?.closest(SLIDER_SELECTOR);
 
       slider?.classList.add(GSAP_CLASS);
@@ -59,6 +59,74 @@ const setSlideState = (items, index, { animate = true } = {}) => {
     })
     .catch(() => {
       items.forEach((item) => {
+        item.style.transform = `translate3d(${xPercent}%, 0, 0)`;
+      });
+    });
+};
+
+const setTextState = (items, index, previousIndex, { animate = true } = {}) => {
+  const xPercent = index * -100;
+
+  setActiveState(items, index);
+
+  if (!animate || reducedMotionMedia.matches) {
+    items.forEach((item, itemIndex) => {
+      item.style.opacity = itemIndex === index ? '1' : '0';
+      item.style.transform = `translate3d(${xPercent}%, 0, 0)`;
+    });
+
+    return;
+  }
+
+  items.forEach((item, itemIndex) => {
+    if (itemIndex !== previousIndex) {
+      item.style.opacity = '0';
+    }
+  });
+
+  void loadGsap()
+    .then(({ gsap }) => {
+      const slider = items[0]?.closest(SLIDER_SELECTOR);
+      const incoming = items[index];
+      const outgoing = items[previousIndex];
+
+      slider?.classList.add(GSAP_CLASS);
+      gsap.killTweensOf(items);
+
+      gsap.to(items, {
+        duration: ANIMATION_DURATION,
+        ease: ANIMATION_EASE,
+        force3D: true,
+        overwrite: 'auto',
+        xPercent,
+      });
+
+      if (outgoing && outgoing !== incoming) {
+        gsap.to(outgoing, {
+          duration: TEXT_FADE_OUT_DURATION,
+          ease: 'power1.out',
+          opacity: 0,
+          overwrite: 'auto',
+        });
+      }
+
+      if (incoming) {
+        gsap.fromTo(
+          incoming,
+          { opacity: 0 },
+          {
+            delay: TEXT_FADE_DELAY,
+            duration: TEXT_FADE_DURATION,
+            ease: TEXT_FADE_EASE,
+            opacity: 1,
+            overwrite: 'auto',
+          },
+        );
+      }
+    })
+    .catch(() => {
+      items.forEach((item, itemIndex) => {
+        item.style.opacity = itemIndex === index ? '1' : '0';
         item.style.transform = `translate3d(${xPercent}%, 0, 0)`;
       });
     });
@@ -109,19 +177,22 @@ const initSlider = (slider) => {
     return;
   }
 
-  const slides = [images.slice(0, slideCount), textBlocks.slice(0, slideCount)];
+  const imageSlides = images.slice(0, slideCount);
+  const textSlides = textBlocks.slice(0, slideCount);
   let activeIndex = 0;
   let touchStartX = null;
 
   const goTo = (nextIndex, options) => {
     const clampedIndex = clampIndex(nextIndex, slideCount);
+    const previousIndex = activeIndex;
 
     if (clampedIndex === activeIndex && options?.force !== true) {
       return;
     }
 
     activeIndex = clampedIndex;
-    slides.forEach((items) => setSlideState(items, activeIndex, options));
+    setTrackState(imageSlides, activeIndex, options);
+    setTextState(textSlides, activeIndex, previousIndex, options);
     updateControls(controls, activeIndex, slideCount);
     slider.dataset.activeSlide = String(activeIndex + 1);
   };
