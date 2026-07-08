@@ -991,6 +991,10 @@ body {
     transform 0.72s var(--virtura-motion-ease);
 }
 
+.about-slider.virtura-about-slider-ready .slider-img-item {
+  will-change: clip-path, opacity, transform;
+}
+
 .about-slider.virtura-about-slider-gsap :is(.slider-img-item, .slider-text-block) {
   transition: none;
 }

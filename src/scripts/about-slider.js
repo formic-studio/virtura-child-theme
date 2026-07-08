@@ -12,8 +12,15 @@ const PREV_LABEL = 'Poprzedni slajd';
 const NEXT_LABEL = 'Następny slajd';
 const ANIMATION_DURATION = 0.92;
 const ANIMATION_EASE = 'power3.out';
+const IMAGE_REVEAL_DURATION = 0.86;
+const IMAGE_REVEAL_EASE = 'expo.out';
+const IMAGE_REVEAL_OFFSET = '18%';
+const IMAGE_ENTER_SCALE = 1.055;
+const IMAGE_ENTER_OPACITY = 0.72;
+const IMAGE_OUTGOING_SCALE = 0.985;
+const IMAGE_OUTGOING_OPACITY = 0.88;
 const TEXT_WORD_DELAY = 0.38;
-const TEXT_WORD_DURATION = 0.78;
+const TEXT_WORD_DURATION = 0.8;
 const TEXT_WORD_EASE = 'sine.out';
 const TEXT_WORD_STAGGER = 0.045;
 const TEXT_FADE_OUT_DURATION = 0.22;
@@ -79,6 +86,12 @@ const splitTextWords = (SplitText, item) => {
   return split;
 };
 
+const getImageRevealClip = (direction) => (
+  direction < 0
+    ? `inset(0 ${IMAGE_REVEAL_OFFSET} 0 0)`
+    : `inset(0 0 0 ${IMAGE_REVEAL_OFFSET})`
+);
+
 const setActiveState = (items, index) => {
   items.forEach((item, itemIndex) => {
     const isActive = itemIndex === index;
@@ -88,13 +101,16 @@ const setActiveState = (items, index) => {
   });
 };
 
-const setTrackState = (items, index, { animate = true } = {}) => {
+const setImageState = (items, index, previousIndex, { animate = true } = {}) => {
   const xPercent = index * -100;
+  const direction = index > previousIndex ? 1 : -1;
 
   setActiveState(items, index);
 
   if (!animate || reducedMotionMedia.matches) {
     items.forEach((item) => {
+      item.style.clipPath = 'inset(0 0 0 0)';
+      item.style.opacity = '1';
       item.style.transform = `translate3d(${xPercent}%, 0, 0)`;
     });
 
@@ -104,18 +120,70 @@ const setTrackState = (items, index, { animate = true } = {}) => {
   void loadGsap()
     .then(({ gsap }) => {
       const slider = items[0]?.closest(SLIDER_SELECTOR);
+      const incoming = items[index];
+      const outgoing = items[previousIndex];
+      const revealClip = getImageRevealClip(direction);
 
       slider?.classList.add(GSAP_CLASS);
-      gsap.to(items, {
+      gsap.killTweensOf(items);
+      gsap.set(items, {
+        clipPath: 'inset(0 0 0 0)',
+        opacity: 1,
+        scale: 1,
+        transformOrigin: 'center center',
+      });
+
+      const timeline = gsap.timeline({
+        onComplete: () => {
+          if (outgoing && outgoing !== incoming) {
+            gsap.set(outgoing, {
+              clipPath: 'inset(0 0 0 0)',
+              opacity: 1,
+              scale: 1,
+            });
+          }
+        },
+      });
+
+      timeline.to(items, {
         duration: ANIMATION_DURATION,
         ease: ANIMATION_EASE,
         force3D: true,
-        overwrite: 'auto',
         xPercent,
-      });
+      }, 0);
+
+      if (outgoing && outgoing !== incoming) {
+        timeline.to(outgoing, {
+          duration: 0.42,
+          ease: 'power2.out',
+          opacity: IMAGE_OUTGOING_OPACITY,
+          scale: IMAGE_OUTGOING_SCALE,
+        }, 0);
+      }
+
+      if (incoming) {
+        timeline.fromTo(
+          incoming,
+          {
+            clipPath: revealClip,
+            opacity: IMAGE_ENTER_OPACITY,
+            scale: IMAGE_ENTER_SCALE,
+          },
+          {
+            clipPath: 'inset(0 0 0 0)',
+            duration: IMAGE_REVEAL_DURATION,
+            ease: IMAGE_REVEAL_EASE,
+            opacity: 1,
+            scale: 1,
+          },
+          0.06,
+        );
+      }
     })
     .catch(() => {
       items.forEach((item) => {
+        item.style.clipPath = 'inset(0 0 0 0)';
+        item.style.opacity = '1';
         item.style.transform = `translate3d(${xPercent}%, 0, 0)`;
       });
     });
@@ -257,7 +325,7 @@ const initSlider = (slider) => {
     }
 
     activeIndex = clampedIndex;
-    setTrackState(imageSlides, activeIndex, options);
+    setImageState(imageSlides, activeIndex, previousIndex, options);
     setTextState(textSlides, activeIndex, previousIndex, options);
     updateControls(controls, activeIndex, slideCount);
     slider.dataset.activeSlide = String(activeIndex + 1);
