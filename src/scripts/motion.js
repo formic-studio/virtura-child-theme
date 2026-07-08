@@ -64,10 +64,8 @@ const OPTION_TEXT_REVEAL_DURATION = 1.24;
 const OPTION_TEXT_REVEAL_STAGGER = 0.08;
 const OPTION_BUTTON_REVEAL_DURATION = 0.85;
 const OPTION_BUTTON_REVEAL_START = 'top 92%';
-const OPTION_MEDIA_DRIFT_DISTANCE = 7.5;
-const OPTION_MEDIA_DRIFT_DURATION = 0.48;
-const OPTION_MEDIA_DRIFT_SETTLE_DELAY = 0.12;
-const OPTION_MEDIA_SCALE = 1.16;
+const OPTION_MEDIA_PARALLAX_DISTANCE = 8.5;
+const OPTION_MEDIA_SCALE = 1.18;
 
 let gsapApiPromise;
 let splitTextApiPromise;
@@ -554,55 +552,29 @@ const initOptionMediaMotion = (gsap, ScrollTrigger, block) => {
     media.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
   }
 
-  gsap.set(media, {
-    scale: OPTION_MEDIA_SCALE,
-    transformOrigin: 'center center',
-    xPercent: 0,
-    yPercent: 0,
-  });
-
-  const driftYTo = gsap.quickTo(media, 'yPercent', {
-    duration: OPTION_MEDIA_DRIFT_DURATION,
-    ease: 'power3.out',
-  });
-  const settleDrift = gsap.delayedCall(
-    OPTION_MEDIA_DRIFT_SETTLE_DELAY,
-    () => driftYTo(0),
-  ).pause();
-  const trigger = ScrollTrigger.create({
-    end: 'bottom top',
-    invalidateOnRefresh: true,
-    onLeave: () => {
-      settleDrift.restart(true);
-    },
-    onLeaveBack: () => {
-      settleDrift.restart(true);
-    },
-    onRefresh: () => {
-      driftYTo(0);
-    },
-    onUpdate: (self) => {
-      const direction = self.direction || 1;
-      const velocity = Math.abs(self.getVelocity());
-      const velocityFactor = Math.min(1, Math.max(0.35, velocity / 1800));
-      const targetY = direction > 0
-        ? OPTION_MEDIA_DRIFT_DISTANCE * -velocityFactor
-        : OPTION_MEDIA_DRIFT_DISTANCE * velocityFactor;
-
-      driftYTo(targetY);
-      settleDrift.restart(true);
-    },
-    start: 'top bottom',
-    trigger: card,
-  });
-
-  storeAnimation({
-    kill: () => {
-      trigger.kill();
-      settleDrift.kill();
-      gsap.killTweensOf(media);
-    },
-  });
+  storeAnimation(
+    gsap.fromTo(
+      media,
+      {
+        scale: OPTION_MEDIA_SCALE,
+        transformOrigin: 'center center',
+        xPercent: 0,
+        yPercent: OPTION_MEDIA_PARALLAX_DISTANCE,
+      },
+      {
+        ease: 'none',
+        scale: OPTION_MEDIA_SCALE,
+        scrollTrigger: {
+          end: 'bottom top',
+          invalidateOnRefresh: true,
+          scrub: true,
+          start: 'top bottom',
+          trigger: card,
+        },
+        yPercent: -OPTION_MEDIA_PARALLAX_DISTANCE,
+      },
+    ),
+  );
 };
 
 const initOptionBlockMotion = async (gsap, ScrollTrigger, optionBlocks) => {
