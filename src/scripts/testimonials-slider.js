@@ -60,16 +60,22 @@ const updateControls = (controls, activeIndex, slideCount) => {
   setControlState(controls[1], activeIndex === slideCount - 1);
 };
 
-const setSlideState = (slider, items, index, { animate = true } = {}) => {
+const clearItemTransforms = (items) => {
+  items.forEach((item) => {
+    item.style.removeProperty('transform');
+  });
+};
+
+const setSlideState = (slider, track, items, index, { animate = true } = {}) => {
   const offset = getItemOffset(items[index]);
   const targetX = -offset;
 
   setActiveState(items, index);
+  clearItemTransforms(items);
+  track.style.willChange = 'transform';
 
   if (!animate || reducedMotionMedia.matches) {
-    items.forEach((item) => {
-      item.style.transform = `translate3d(${targetX}px, 0, 0)`;
-    });
+    track.style.transform = `translate3d(${targetX}px, 0, 0)`;
 
     return;
   }
@@ -77,8 +83,8 @@ const setSlideState = (slider, items, index, { animate = true } = {}) => {
   void loadGsap()
     .then(({ gsap }) => {
       slider.classList.add(GSAP_CLASS);
-      gsap.killTweensOf(items);
-      gsap.to(items, {
+      gsap.killTweensOf(track);
+      gsap.to(track, {
         duration: ANIMATION_DURATION,
         ease: ANIMATION_EASE,
         force3D: true,
@@ -87,9 +93,7 @@ const setSlideState = (slider, items, index, { animate = true } = {}) => {
       });
     })
     .catch(() => {
-      items.forEach((item) => {
-        item.style.transform = `translate3d(${targetX}px, 0, 0)`;
-      });
+      track.style.transform = `translate3d(${targetX}px, 0, 0)`;
     });
 };
 
@@ -118,14 +122,14 @@ const initSlider = (slider) => {
     }
 
     activeIndex = clampedIndex;
-    setSlideState(slider, items, activeIndex, options);
+    setSlideState(slider, track, items, activeIndex, options);
     updateControls(controls, activeIndex, items.length);
     slider.dataset.activeSlide = String(activeIndex + 1);
   };
 
   const refreshPosition = () => {
     resizeFrame = null;
-    setSlideState(slider, items, activeIndex, { animate: false, force: true });
+    setSlideState(slider, track, items, activeIndex, { animate: false, force: true });
   };
 
   const scheduleRefresh = () => {

@@ -1026,10 +1026,6 @@ body {
   pointer-events: none;
 }
 
-.testimonials-slider.virtura-testimonials-slider-ready .slider-item {
-  will-change: transform;
-}
-
 .testimonials-slider.virtura-testimonials-slider-ready .svg-arrow-block {
   cursor: pointer;
   transition:
@@ -1048,10 +1044,6 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .about-slider.virtura-about-slider-ready
     :is(.slider-img-item, .slider-text-block) {
-    transition: none;
-  }
-
-  .testimonials-slider.virtura-testimonials-slider-ready .slider-item {
     transition: none;
   }
 }
