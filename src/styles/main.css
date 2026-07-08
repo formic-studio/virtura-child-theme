@@ -975,6 +975,36 @@ body {
   width: 100% !important;
 }
 
+.specs-wrapper .spec-slider-item {
+  position: relative;
+}
+
+.specs-wrapper .spec-top {
+  --virtura-spec-sticky-cover: var(--space-72, 7.2rem);
+
+  background-color: var(--color-white, #fff);
+  isolation: isolate;
+  overflow: visible;
+  z-index: 30;
+}
+
+.specs-wrapper .spec-top::before {
+  background: var(--color-white, #fff);
+  bottom: 100%;
+  content: "";
+  height: calc(var(--virtura-spec-sticky-cover) + 1px);
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  z-index: -1;
+}
+
+.specs-wrapper .spec-bottom {
+  position: relative;
+  z-index: 0;
+}
+
 .virtura-motion-ready [data-motion] {
   will-change: opacity, transform;
 }
