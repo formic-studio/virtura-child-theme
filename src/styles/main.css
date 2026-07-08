@@ -1309,6 +1309,18 @@ body {
   outline-offset: calc(var(--space-4, 0.4rem) * -1);
 }
 
+#brx-content .tab-content.brxe-block > .dot {
+  align-self: flex-start !important;
+  flex: 0 0 var(--space-6, 0.6rem) !important;
+  height: var(--space-6, 0.6rem) !important;
+  margin-top: 0.75em;
+  max-height: var(--space-6, 0.6rem) !important;
+  max-width: var(--space-6, 0.6rem) !important;
+  min-height: var(--space-6, 0.6rem) !important;
+  min-width: var(--space-6, 0.6rem) !important;
+  width: var(--space-6, 0.6rem) !important;
+}
+
 @media (max-width: 767px) {
   .tabs-wrapper.brxe-block {
     align-items: stretch !important;
@@ -1381,15 +1393,7 @@ body {
   }
 
   .tabs-wrapper.brxe-block .tab-content.brxe-block > .dot {
-    align-self: flex-start !important;
-    flex: 0 0 var(--space-6, 0.6rem) !important;
-    height: var(--space-6, 0.6rem) !important;
-    margin-top: 0.9rem;
-    max-height: var(--space-6, 0.6rem) !important;
-    max-width: var(--space-6, 0.6rem) !important;
-    min-height: var(--space-6, 0.6rem) !important;
-    min-width: var(--space-6, 0.6rem) !important;
-    width: var(--space-6, 0.6rem) !important;
+    margin-top: 0.75em;
   }
 }
 
