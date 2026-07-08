@@ -12,7 +12,7 @@ const PREV_LABEL = "Poprzedni slajd";
 const NEXT_LABEL = "Następny slajd";
 const ANIMATION_DURATION = 0.92;
 const ANIMATION_EASE = "power3.out";
-const IMAGE_REVEAL_DURATION = 0.96;
+const IMAGE_REVEAL_DURATION = 1.12;
 const IMAGE_REVEAL_EASE = "power4.out";
 const IMAGE_NEXT_HIDDEN_CLIP = "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)";
 const IMAGE_PREV_HIDDEN_CLIP =
@@ -21,6 +21,7 @@ const IMAGE_REVEAL_VISIBLE_CLIP =
   "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)";
 const IMAGE_ENTER_SCALE = 1.025;
 const IMAGE_ENTER_OFFSET = "1.2rem";
+const IMAGE_OUTGOING_DURATION = 0.82;
 const IMAGE_OUTGOING_SCALE = 0.985;
 const TEXT_WORD_DELAY = 0.38;
 const TEXT_WORD_DURATION = 0.6;
@@ -227,7 +228,7 @@ const setImageState = (
         timeline.to(
           outgoing,
           {
-            duration: 0.68,
+            duration: IMAGE_OUTGOING_DURATION,
             ease: "power2.out",
             filter: "brightness(0.92)",
             scale: IMAGE_OUTGOING_SCALE,
