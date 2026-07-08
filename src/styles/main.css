@@ -1157,11 +1157,13 @@ body {
   }
 
   .brxe-section:has(.team-wrapper) .team-wrapper {
+    --team-card-width: min(86vw, 44rem);
     display: flex !important;
     gap: var(--space-24, 2.4rem) !important;
     order: 10 !important;
     overflow-x: auto;
     overscroll-behavior-inline: contain;
+    padding-inline-end: max(0px, calc(100% - var(--team-card-width)));
     scroll-padding-inline: 0;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
@@ -1176,7 +1178,7 @@ body {
   }
 
   .brxe-section:has(.team-wrapper) .team-wrapper > .team-block {
-    flex: 0 0 min(86vw, 44rem) !important;
+    flex: 0 0 var(--team-card-width) !important;
     scroll-snap-align: start;
     scroll-snap-stop: always;
   }
