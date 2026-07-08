@@ -962,6 +962,8 @@ body {
 }
 
 .text-overview {
+  --fit-text-letter-spacing-base-font-size: 32rem;
+
   max-width: 100% !important;
   text-align: center;
   width: 100% !important;
