@@ -64,10 +64,10 @@ const OPTION_TEXT_REVEAL_DURATION = 1.24;
 const OPTION_TEXT_REVEAL_STAGGER = 0.08;
 const OPTION_BUTTON_REVEAL_DURATION = 0.85;
 const OPTION_BUTTON_REVEAL_START = 'top 92%';
-const OPTION_MEDIA_PARALLAX_DISTANCE = 3.4;
-const OPTION_MEDIA_PARALLAX_X = 1.15;
-const OPTION_MEDIA_SCALE_FROM = 1.075;
-const OPTION_MEDIA_SCALE_TO = 1.045;
+const OPTION_MEDIA_DRIFT_DISTANCE = 7.5;
+const OPTION_MEDIA_DRIFT_DURATION = 0.48;
+const OPTION_MEDIA_DRIFT_SETTLE_DELAY = 0.12;
+const OPTION_MEDIA_SCALE = 1.16;
 
 let gsapApiPromise;
 let splitTextApiPromise;
@@ -531,7 +531,7 @@ const initOptionButtonReveal = (gsap, block) => {
   );
 };
 
-const initOptionMediaMotion = (gsap, ScrollTrigger, block, index) => {
+const initOptionMediaMotion = (gsap, ScrollTrigger, block) => {
   const media = getOptionMedia(block);
 
   if (!media) {
@@ -545,7 +545,6 @@ const initOptionMediaMotion = (gsap, ScrollTrigger, block, index) => {
   }
 
   const card = block.closest(OPTION_CARD_SELECTOR) || block;
-  const xDirection = index % 2 === 0 ? -1 : 1;
 
   frame.classList.add(OPTION_MEDIA_FRAME_CLASS);
   applyOptionMediaFrameRadius(frame, media);
@@ -555,30 +554,55 @@ const initOptionMediaMotion = (gsap, ScrollTrigger, block, index) => {
     media.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
   }
 
-  storeAnimation(
-    gsap.fromTo(
-      media,
-      {
-        scale: OPTION_MEDIA_SCALE_FROM,
-        transformOrigin: 'center center',
-        xPercent: xDirection * OPTION_MEDIA_PARALLAX_X,
-        yPercent: -OPTION_MEDIA_PARALLAX_DISTANCE,
-      },
-      {
-        ease: 'none',
-        scale: OPTION_MEDIA_SCALE_TO,
-        scrollTrigger: {
-          end: 'bottom top',
-          invalidateOnRefresh: true,
-          scrub: true,
-          start: 'top bottom',
-          trigger: card,
-        },
-        xPercent: xDirection * -OPTION_MEDIA_PARALLAX_X,
-        yPercent: OPTION_MEDIA_PARALLAX_DISTANCE,
-      },
-    ),
-  );
+  gsap.set(media, {
+    scale: OPTION_MEDIA_SCALE,
+    transformOrigin: 'center center',
+    xPercent: 0,
+    yPercent: 0,
+  });
+
+  const driftYTo = gsap.quickTo(media, 'yPercent', {
+    duration: OPTION_MEDIA_DRIFT_DURATION,
+    ease: 'power3.out',
+  });
+  const settleDrift = gsap.delayedCall(
+    OPTION_MEDIA_DRIFT_SETTLE_DELAY,
+    () => driftYTo(0),
+  ).pause();
+  const trigger = ScrollTrigger.create({
+    end: 'bottom top',
+    invalidateOnRefresh: true,
+    onLeave: () => {
+      settleDrift.restart(true);
+    },
+    onLeaveBack: () => {
+      settleDrift.restart(true);
+    },
+    onRefresh: () => {
+      driftYTo(0);
+    },
+    onUpdate: (self) => {
+      const direction = self.direction || 1;
+      const velocity = Math.abs(self.getVelocity());
+      const velocityFactor = Math.min(1, Math.max(0.35, velocity / 1800));
+      const targetY = direction > 0
+        ? OPTION_MEDIA_DRIFT_DISTANCE * -velocityFactor
+        : OPTION_MEDIA_DRIFT_DISTANCE * velocityFactor;
+
+      driftYTo(targetY);
+      settleDrift.restart(true);
+    },
+    start: 'top bottom',
+    trigger: card,
+  });
+
+  storeAnimation({
+    kill: () => {
+      trigger.kill();
+      settleDrift.kill();
+      gsap.killTweensOf(media);
+    },
+  });
 };
 
 const initOptionBlockMotion = async (gsap, ScrollTrigger, optionBlocks) => {
@@ -588,10 +612,10 @@ const initOptionBlockMotion = async (gsap, ScrollTrigger, optionBlocks) => {
 
   const SplitText = await loadSplitText(gsap);
 
-  optionBlocks.forEach((block, index) => {
+  optionBlocks.forEach((block) => {
     initOptionTextReveal(gsap, SplitText, block);
     initOptionButtonReveal(gsap, block);
-    initOptionMediaMotion(gsap, ScrollTrigger, block, index);
+    initOptionMediaMotion(gsap, ScrollTrigger, block);
   });
 };
 
