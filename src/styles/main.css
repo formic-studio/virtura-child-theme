@@ -249,12 +249,18 @@ body {
 }
 
 .archive-block > *,
-.archive-grid > .bricks-layout-wrapper > .bricks-layout-item > .bricks-layout-inner {
+.archive-grid
+  > .bricks-layout-wrapper
+  > .bricks-layout-item
+  > .bricks-layout-inner {
   height: 100%;
 }
 
 .archive-block :where(img, picture),
-.archive-grid > .bricks-layout-wrapper > .bricks-layout-item :where(img, picture) {
+.archive-grid
+  > .bricks-layout-wrapper
+  > .bricks-layout-item
+  :where(img, picture) {
   height: 100%;
   width: 100%;
 }
@@ -313,8 +319,13 @@ body {
 
 .grid-2-item.archive-grid > .archive-block:nth-child(2),
 .grid-2-item .archive-grid > .archive-block:nth-child(2),
-.grid-2-item.archive-grid > .bricks-layout-wrapper > .bricks-layout-item:nth-child(2),
-.grid-2-item .archive-grid > .bricks-layout-wrapper > .bricks-layout-item:nth-child(2) {
+.grid-2-item.archive-grid
+  > .bricks-layout-wrapper
+  > .bricks-layout-item:nth-child(2),
+.grid-2-item
+  .archive-grid
+  > .bricks-layout-wrapper
+  > .bricks-layout-item:nth-child(2) {
   align-self: auto;
   aspect-ratio: 1.84 / 1 !important;
   grid-column: span 2 !important;
@@ -330,8 +341,13 @@ body {
 
   .grid-2-item.archive-grid > .archive-block:nth-child(2),
   .grid-2-item .archive-grid > .archive-block:nth-child(2),
-  .grid-2-item.archive-grid > .bricks-layout-wrapper > .bricks-layout-item:nth-child(2),
-  .grid-2-item .archive-grid > .bricks-layout-wrapper > .bricks-layout-item:nth-child(2) {
+  .grid-2-item.archive-grid
+    > .bricks-layout-wrapper
+    > .bricks-layout-item:nth-child(2),
+  .grid-2-item
+    .archive-grid
+    > .bricks-layout-wrapper
+    > .bricks-layout-item:nth-child(2) {
     aspect-ratio: 1 / 1.15 !important;
     grid-column: auto !important;
   }
@@ -340,8 +356,7 @@ body {
 :is(.btn, .nav-btn, .footer-btn) {
   --btn-hover-bg: var(--color-darker-grey, #8f8f8f);
   --btn-hover-transition:
-    background-size 0.62s var(--virtura-motion-ease),
-    border-color 0.24s ease,
+    background-size 0.62s var(--virtura-motion-ease), border-color 0.24s ease,
     color 0.24s ease;
   background-image: linear-gradient(var(--btn-hover-bg), var(--btn-hover-bg));
   background-position: left center;
@@ -376,17 +391,17 @@ body {
 }
 
 .btn:is(
-    .btn-white,
-    .btn--white,
-    .btn-light,
-    .is-white,
-    .is-light,
-    .bg-white,
-    .background-white,
-    [data-btn-variant="white"],
-    [data-button-variant="white"],
-    [data-theme="white"]
-  ),
+  .btn-white,
+  .btn--white,
+  .btn-light,
+  .is-white,
+  .is-light,
+  .bg-white,
+  .background-white,
+  [data-btn-variant="white"],
+  [data-button-variant="white"],
+  [data-theme="white"]
+),
 .btn[class*="white"],
 .btn[class*="White"] {
   --btn-hover-bg: var(--color-black, #000);
@@ -514,9 +529,8 @@ body {
 }
 
 #brx-header .giga-menu-heading,
-:where(#brx-footer, footer) a:not(.btn):not(.footer-btn):not(
-    .bricks-button
-  ):not(.brxe-button) {
+:where(#brx-footer, footer)
+  a:not(.btn):not(.footer-btn):not(.bricks-button):not(.brxe-button) {
   display: inline-block;
   position: relative;
   text-decoration: none;
@@ -540,9 +554,8 @@ body {
   > .brx-submenu-toggle
   > :where(a, button)::after,
 #brx-header .giga-menu-heading::after,
-:where(#brx-footer, footer) a:not(.btn):not(.footer-btn):not(
-    .bricks-button
-  ):not(.brxe-button)::after {
+:where(#brx-footer, footer)
+  a:not(.btn):not(.footer-btn):not(.bricks-button):not(.brxe-button)::after {
   background-color: currentColor;
   bottom: -0.18em;
   content: "";
@@ -583,9 +596,11 @@ body {
   > .brx-submenu-toggle
   > :where(a, button):focus-visible::after,
 #brx-header .giga-menu-heading:is(:hover, :focus-visible)::after,
-:where(#brx-footer, footer) a:not(.btn):not(.footer-btn):not(
-    .bricks-button
-  ):not(.brxe-button):is(:hover, :focus-visible)::after {
+:where(#brx-footer, footer)
+  a:not(.btn):not(.footer-btn):not(.bricks-button):not(.brxe-button):is(
+    :hover,
+    :focus-visible
+  )::after {
   transform: scaleX(1);
 }
 
@@ -626,7 +641,9 @@ body {
   stroke: currentColor;
 }
 
-#brx-header svg :where(path, rect, circle, polygon, polyline, line, ellipse):not(
+#brx-header
+  svg
+  :where(path, rect, circle, polygon, polyline, line, ellipse):not(
     [fill="none"]
   ):not([fill]) {
   fill: currentColor;
@@ -985,7 +1002,6 @@ body {
   background-color: var(--color-white, #fff);
   isolation: isolate;
   overflow: visible;
-  z-index: 30;
 }
 
 .specs-wrapper .spec-top::before {
@@ -1013,7 +1029,8 @@ body {
   will-change: auto;
 }
 
-.about-slider.virtura-about-slider-ready :is(.slider-img-item, .slider-text-block) {
+.about-slider.virtura-about-slider-ready
+  :is(.slider-img-item, .slider-text-block) {
   flex: 0 0 100%;
   transition: transform 0.72s var(--virtura-motion-ease);
   will-change: transform;
@@ -1041,7 +1058,8 @@ body {
   opacity: 1;
 }
 
-.about-slider.virtura-about-slider-gsap :is(.slider-img-item, .slider-text-block) {
+.about-slider.virtura-about-slider-gsap
+  :is(.slider-img-item, .slider-text-block) {
   transition: none;
 }
 
@@ -1073,11 +1091,13 @@ body {
   scrollbar-width: none;
 }
 
-.testimonials-slider.virtura-testimonials-slider-ready .slider-wrapper::-webkit-scrollbar {
+.testimonials-slider.virtura-testimonials-slider-ready
+  .slider-wrapper::-webkit-scrollbar {
   display: none;
 }
 
-.testimonials-slider.virtura-testimonials-slider-ready .svg-arrow-block.is-disabled {
+.testimonials-slider.virtura-testimonials-slider-ready
+  .svg-arrow-block.is-disabled {
   cursor: default;
   filter: grayscale(1);
   opacity: 0.34;
@@ -1199,7 +1219,9 @@ body {
     overflow: visible !important;
   }
 
-  .section_category:has(.projects-block) .projects-block > .brxe-block:has(> .btn),
+  .section_category:has(.projects-block)
+    .projects-block
+    > .brxe-block:has(> .btn),
   .brxe-section:has(.team-wrapper) .brxe-block:has(> .btn) {
     display: contents !important;
   }
@@ -1214,7 +1236,9 @@ body {
     order: 0 !important;
   }
 
-  .section_category:has(.projects-block) .projects-block > .archive-grid.grid-2-item {
+  .section_category:has(.projects-block)
+    .projects-block
+    > .archive-grid.grid-2-item {
     align-self: stretch !important;
     display: flex !important;
     flex-direction: column !important;
@@ -1275,7 +1299,10 @@ body {
     > .brxe-block:has(> .btn)
     > .btn
     > :last-child,
-  .brxe-section:has(.team-wrapper) .brxe-block:has(> .btn) > .btn > :last-child {
+  .brxe-section:has(.team-wrapper)
+    .brxe-block:has(> .btn)
+    > .btn
+    > :last-child {
     flex: 0 0 auto;
     margin-left: auto !important;
   }
