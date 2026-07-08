@@ -1034,6 +1034,15 @@ body {
   user-select: none;
 }
 
+.testimonials-slider.virtura-testimonials-slider-ready .slider-wrapper {
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+.testimonials-slider.virtura-testimonials-slider-ready .slider-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
 .testimonials-slider.virtura-testimonials-slider-ready .svg-arrow-block.is-disabled {
   cursor: default;
   filter: grayscale(1);

@@ -12,20 +12,43 @@ const PREV_LABEL = 'Poprzednia opinia';
 const NEXT_LABEL = 'Nastepna opinia';
 const ANIMATION_DURATION = 0.92;
 const ANIMATION_EASE = 'power3.out';
+const SCROLL_EPSILON = 1;
 const SWIPE_THRESHOLD = 40;
 
 const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 const clampIndex = (index, length) => Math.min(Math.max(index, 0), length - 1);
 
-const getItemOffset = (item) => item?.offsetLeft || 0;
+const getItemOffset = (track, item) => {
+  if (!track || !item) {
+    return 0;
+  }
+
+  const trackRect = track.getBoundingClientRect();
+  const itemRect = item.getBoundingClientRect();
+
+  return itemRect.left - trackRect.left + track.scrollLeft;
+};
+
+const getMaxScroll = (track) => Math.max(0, track.scrollWidth - track.clientWidth);
+
+const getScrollPositions = (track, items) => {
+  const maxScroll = getMaxScroll(track);
+  const positions = items
+    .map((item) => Math.min(getItemOffset(track, item), maxScroll))
+    .filter((position, index, allPositions) => (
+      index === 0 || Math.abs(position - allPositions[index - 1]) > SCROLL_EPSILON
+    ));
+
+  return positions.length ? positions : [0];
+};
 
 const setActiveState = (items, index) => {
   items.forEach((item, itemIndex) => {
     const isActive = itemIndex === index;
 
     item.classList.toggle(ACTIVE_CLASS, isActive);
-    item.setAttribute('aria-hidden', String(!isActive));
+    item.removeAttribute('aria-hidden');
   });
 };
 
@@ -66,16 +89,31 @@ const clearItemTransforms = (items) => {
   });
 };
 
-const setSlideState = (slider, track, items, index, { animate = true } = {}) => {
-  const offset = getItemOffset(items[index]);
-  const targetX = -offset;
+const clearTrackTransform = (track) => {
+  track.style.removeProperty('transform');
+};
+
+const clearPreviousMotionStyles = (track, items) => {
+  clearItemTransforms(items);
+  clearTrackTransform(track);
+};
+
+const setSlideState = (
+  slider,
+  track,
+  items,
+  positions,
+  index,
+  { animate = true } = {},
+) => {
+  const targetScroll = positions[index] || 0;
 
   setActiveState(items, index);
-  clearItemTransforms(items);
-  track.style.willChange = 'transform';
+  clearPreviousMotionStyles(track, items);
+  track.style.willChange = 'scroll-position';
 
   if (!animate || reducedMotionMedia.matches) {
-    track.style.transform = `translate3d(${targetX}px, 0, 0)`;
+    track.scrollLeft = targetScroll;
 
     return;
   }
@@ -87,13 +125,12 @@ const setSlideState = (slider, track, items, index, { animate = true } = {}) => 
       gsap.to(track, {
         duration: ANIMATION_DURATION,
         ease: ANIMATION_EASE,
-        force3D: true,
         overwrite: 'auto',
-        x: targetX,
+        scrollLeft: targetScroll,
       });
     })
     .catch(() => {
-      track.style.transform = `translate3d(${targetX}px, 0, 0)`;
+      track.scrollTo({ left: targetScroll, behavior: 'smooth' });
     });
 };
 
@@ -113,23 +150,36 @@ const initSlider = (slider) => {
   let activeIndex = 0;
   let touchStartX = null;
   let resizeFrame = null;
+  let positions = [];
+
+  const refreshPositions = () => {
+    positions = getScrollPositions(track, items);
+    activeIndex = clampIndex(activeIndex, positions.length);
+    updateControls(controls, activeIndex, positions.length);
+  };
 
   const goTo = (nextIndex, options) => {
-    const clampedIndex = clampIndex(nextIndex, items.length);
+    refreshPositions();
+
+    const clampedIndex = clampIndex(nextIndex, positions.length);
 
     if (clampedIndex === activeIndex && options?.force !== true) {
       return;
     }
 
     activeIndex = clampedIndex;
-    setSlideState(slider, track, items, activeIndex, options);
-    updateControls(controls, activeIndex, items.length);
+    setSlideState(slider, track, items, positions, activeIndex, options);
+    updateControls(controls, activeIndex, positions.length);
     slider.dataset.activeSlide = String(activeIndex + 1);
   };
 
   const refreshPosition = () => {
     resizeFrame = null;
-    setSlideState(slider, track, items, activeIndex, { animate: false, force: true });
+    refreshPositions();
+    setSlideState(slider, track, items, positions, activeIndex, {
+      animate: false,
+      force: true,
+    });
   };
 
   const scheduleRefresh = () => {
@@ -147,7 +197,7 @@ const initSlider = (slider) => {
   });
 
   setupControl(controls[1], NEXT_LABEL, () => {
-    if (activeIndex < items.length - 1) {
+    if (activeIndex < positions.length - 1) {
       goTo(activeIndex + 1);
     }
   });
@@ -192,6 +242,8 @@ const initSlider = (slider) => {
 
   slider.classList.add(READY_CLASS);
   slider.setAttribute('aria-roledescription', 'carousel');
+  clearPreviousMotionStyles(track, items);
+  positions = getScrollPositions(track, items);
   goTo(0, { animate: false, force: true });
 };
 
