@@ -1026,14 +1026,7 @@ body {
   pointer-events: none;
 }
 
-.testimonials-slider.virtura-testimonials-slider-ready .slider-wrapper {
-  display: flex;
-  overflow: hidden;
-}
-
 .testimonials-slider.virtura-testimonials-slider-ready .slider-item {
-  flex: 0 0 100%;
-  max-width: 100%;
   will-change: transform;
 }
 
