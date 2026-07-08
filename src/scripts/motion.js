@@ -42,6 +42,7 @@ const OPTION_TEXT_EXCLUDE_SELECTOR = [
 ].join(', ');
 const OPTION_DOT_SELECTOR = ':scope .brxe-list .icon, :scope .brxe-list .dot';
 const OPTION_BUTTON_SELECTOR = '.btn';
+const OPTION_MEDIA_FRAME_SELECTOR = '.offer-img-block';
 const OPTION_MEDIA_SELECTOR = 'img, video';
 const OPTION_MEDIA_EXCLUDE_SELECTOR = [
   '.btn',
@@ -346,8 +347,19 @@ const getOptionButton = (block) => {
 
 const getMediaArea = (media) => {
   const rect = media.getBoundingClientRect();
-  const width = media.naturalWidth || media.videoWidth || rect.width;
-  const height = media.naturalHeight || media.videoHeight || rect.height;
+  const attrWidth = Number.parseFloat(media.getAttribute('width') || '');
+  const attrHeight = Number.parseFloat(media.getAttribute('height') || '');
+  const frameRect = media.closest(OPTION_MEDIA_FRAME_SELECTOR)?.getBoundingClientRect();
+  const width = media.naturalWidth
+    || media.videoWidth
+    || rect.width
+    || attrWidth
+    || frameRect?.width;
+  const height = media.naturalHeight
+    || media.videoHeight
+    || rect.height
+    || attrHeight
+    || frameRect?.height;
 
   return Math.max(0, width) * Math.max(0, height);
 };
@@ -364,12 +376,20 @@ const getOptionMedia = (block) => {
     })
     .sort((first, second) => getMediaArea(second) - getMediaArea(first));
 
+  const framedMedia = candidates.find((media) =>
+    media.closest(OPTION_MEDIA_FRAME_SELECTOR) && !block.contains(media));
   const externalMedia = candidates.find((media) => !block.contains(media));
 
-  return externalMedia || candidates[0] || null;
+  return framedMedia || externalMedia || candidates[0] || null;
 };
 
 const getOptionMediaFrame = (media) => {
+  const explicitFrame = media.closest(OPTION_MEDIA_FRAME_SELECTOR);
+
+  if (explicitFrame && explicitFrame !== media && !explicitFrame.matches(OPTION_CARD_SELECTOR)) {
+    return explicitFrame;
+  }
+
   const wrapper = media.closest('picture, figure, .brxe-video');
 
   if (wrapper && wrapper !== media) {
@@ -511,7 +531,7 @@ const initOptionButtonReveal = (gsap, block) => {
   );
 };
 
-const initOptionMediaMotion = (gsap, block, index) => {
+const initOptionMediaMotion = (gsap, ScrollTrigger, block, index) => {
   const media = getOptionMedia(block);
 
   if (!media) {
@@ -530,6 +550,10 @@ const initOptionMediaMotion = (gsap, block, index) => {
   frame.classList.add(OPTION_MEDIA_FRAME_CLASS);
   applyOptionMediaFrameRadius(frame, media);
   media.classList.add(OPTION_MEDIA_TARGET_CLASS);
+
+  if (media instanceof HTMLImageElement && !media.complete) {
+    media.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
+  }
 
   storeAnimation(
     gsap.fromTo(
@@ -557,7 +581,7 @@ const initOptionMediaMotion = (gsap, block, index) => {
   );
 };
 
-const initOptionBlockMotion = async (gsap, optionBlocks) => {
+const initOptionBlockMotion = async (gsap, ScrollTrigger, optionBlocks) => {
   if (!optionBlocks.length) {
     return;
   }
@@ -567,7 +591,7 @@ const initOptionBlockMotion = async (gsap, optionBlocks) => {
   optionBlocks.forEach((block, index) => {
     initOptionTextReveal(gsap, SplitText, block);
     initOptionButtonReveal(gsap, block);
-    initOptionMediaMotion(gsap, block, index);
+    initOptionMediaMotion(gsap, ScrollTrigger, block, index);
   });
 };
 
@@ -926,7 +950,7 @@ export const initMotion = async () => {
   initHeroImageScale(gsap, ScrollTrigger);
   initScrollReveal(gsap, motionElements);
   initCategoryBlockReveal(gsap, categoryBlocks);
-  await initOptionBlockMotion(gsap, optionBlocks);
+  await initOptionBlockMotion(gsap, ScrollTrigger, optionBlocks);
 
   if (reducedMotionMedia.matches) {
     document.documentElement.classList.remove('virtura-motion-ready');
