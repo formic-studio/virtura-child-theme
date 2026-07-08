@@ -24,9 +24,49 @@ const CATEGORY_REVEAL_START = 'top 95%';
 const CATEGORY_SUBCATEGORY_BUTTON_REVEAL_DURATION = 0.85;
 const CATEGORY_SUBCATEGORY_BUTTON_REVEAL_START = 'top 92%';
 const CATEGORY_SUBCATEGORY_BUTTON_SELECTOR = '.subcategory-block .btn';
+const OPTION_BLOCK_SELECTOR = '.option-block';
+const OPTION_CARD_SELECTOR = '.offer-block';
+const OPTION_TEXT_SELECTOR = [
+  ':scope :is(h1, h2, h3, h4, h5, h6, .brxe-heading)',
+  ':scope :is(.brxe-text-basic, .brxe-text-link)',
+  ':scope .brxe-list .title',
+].join(', ');
+const OPTION_TEXT_EXCLUDE_SELECTOR = [
+  '.btn',
+  '.svg-arrow-block',
+  '.brxe-image',
+  '.brxe-video',
+  'picture',
+  'figure',
+  'svg',
+].join(', ');
+const OPTION_MEDIA_SELECTOR = 'img, video';
+const OPTION_MEDIA_EXCLUDE_SELECTOR = [
+  '.btn',
+  '.svg-arrow-block',
+  '.spec-level',
+  '.level-dot',
+  'svg',
+].join(', ');
+const OPTION_LINE_READY_CLASS = 'virtura-option-line-ready';
+const OPTION_LINE_CLASS = 'virtura-option-line';
+const OPTION_MEDIA_FRAME_CLASS = 'virtura-option-media-frame';
+const OPTION_MEDIA_RADIUS_ATTR = 'data-virtura-option-media-radius';
+const OPTION_MEDIA_TARGET_CLASS = 'virtura-option-media-target';
+const OPTION_MEDIA_MIN_AREA = 12000;
+const OPTION_TEXT_REVEAL_START = 'top 86%';
+const OPTION_TEXT_REVEAL_DURATION = 0.92;
+const OPTION_TEXT_REVEAL_STAGGER = 0.055;
+const OPTION_MEDIA_PARALLAX_DISTANCE = 3.4;
+const OPTION_MEDIA_PARALLAX_X = 1.15;
+const OPTION_MEDIA_SCALE_FROM = 1.075;
+const OPTION_MEDIA_SCALE_TO = 1.045;
 
 let gsapApiPromise;
+let splitTextApiPromise;
+let fontsReadyPromise;
 let motionInitialized = false;
+const optionTextSplits = new Map();
 
 const mobileLMedia = window.matchMedia(MOBILE_L_MEDIA_QUERY);
 
@@ -48,9 +88,37 @@ export const loadGsap = async () => {
   return gsapApiPromise;
 };
 
+const waitForFonts = () => {
+  if (!fontsReadyPromise) {
+    fontsReadyPromise =
+      document.fonts?.ready?.catch(() => {}) || Promise.resolve();
+  }
+
+  return fontsReadyPromise;
+};
+
+export const loadSplitText = async (gsap) => {
+  if (!splitTextApiPromise) {
+    splitTextApiPromise = Promise.all([
+      import('gsap/SplitText'),
+      waitForFonts(),
+    ]).then(([splitTextModule]) => {
+      const SplitText = splitTextModule.SplitText || splitTextModule.default;
+
+      gsap.registerPlugin(SplitText);
+
+      return SplitText;
+    });
+  }
+
+  return splitTextApiPromise;
+};
+
 const getMotionElements = () => Array.from(document.querySelectorAll('[data-motion]'));
 
 const getCategoryBlocks = () => Array.from(document.querySelectorAll(CATEGORY_BLOCK_SELECTOR));
+
+const getOptionBlocks = () => Array.from(document.querySelectorAll(OPTION_BLOCK_SELECTOR));
 
 const getHeroImage = () => document.querySelector(HERO_IMAGE_SELECTOR);
 
@@ -166,6 +234,8 @@ const clearAnimations = () => {
     animation.kill();
   });
 
+  optionTextSplits.forEach((split) => split.revert());
+  optionTextSplits.clear();
   motionInitialized = false;
 };
 
@@ -199,6 +269,218 @@ const resetCategoryRevealElements = () => {
     element.style.removeProperty('filter');
     element.style.removeProperty('transform');
     element.style.removeProperty('visibility');
+  });
+};
+
+const resetOptionMotionElements = () => {
+  document.querySelectorAll(`.${OPTION_LINE_READY_CLASS}`).forEach((element) => {
+    element.classList.remove(OPTION_LINE_READY_CLASS);
+  });
+
+  document.querySelectorAll(`.${OPTION_MEDIA_FRAME_CLASS}`).forEach((element) => {
+    element.classList.remove(OPTION_MEDIA_FRAME_CLASS);
+
+    if (element.hasAttribute(OPTION_MEDIA_RADIUS_ATTR)) {
+      element.removeAttribute(OPTION_MEDIA_RADIUS_ATTR);
+      element.style.removeProperty('border-radius');
+    }
+  });
+
+  document.querySelectorAll(`.${OPTION_MEDIA_TARGET_CLASS}`).forEach((element) => {
+    element.classList.remove(OPTION_MEDIA_TARGET_CLASS);
+    element.style.removeProperty('transform');
+    element.style.removeProperty('transform-origin');
+    element.style.removeProperty('will-change');
+  });
+};
+
+const hasReadableText = (element) =>
+  Boolean(element.textContent?.replace(/\s+/g, ' ').trim());
+
+const getOptionTextElements = (block) => Array.from(block.querySelectorAll(OPTION_TEXT_SELECTOR))
+  .filter((element) => {
+    if (!hasReadableText(element)) {
+      return false;
+    }
+
+    return !element.closest(OPTION_TEXT_EXCLUDE_SELECTOR);
+  });
+
+const getMediaArea = (media) => {
+  const rect = media.getBoundingClientRect();
+  const width = media.naturalWidth || media.videoWidth || rect.width;
+  const height = media.naturalHeight || media.videoHeight || rect.height;
+
+  return Math.max(0, width) * Math.max(0, height);
+};
+
+const getOptionMedia = (block) => {
+  const card = block.closest(OPTION_CARD_SELECTOR) || block;
+  const candidates = Array.from(card.querySelectorAll(OPTION_MEDIA_SELECTOR))
+    .filter((media) => {
+      if (media.closest(OPTION_MEDIA_EXCLUDE_SELECTOR)) {
+        return false;
+      }
+
+      return getMediaArea(media) >= OPTION_MEDIA_MIN_AREA;
+    })
+    .sort((first, second) => getMediaArea(second) - getMediaArea(first));
+
+  const externalMedia = candidates.find((media) => !block.contains(media));
+
+  return externalMedia || candidates[0] || null;
+};
+
+const getOptionMediaFrame = (media) => {
+  const wrapper = media.closest('picture, figure, .brxe-video');
+
+  if (wrapper && wrapper !== media) {
+    return wrapper;
+  }
+
+  const parent = media.parentElement;
+
+  if (!parent || parent === document.body) {
+    return null;
+  }
+
+  if (
+    parent.children.length === 1
+    || parent.classList.contains('brxe-image')
+    || parent.classList.contains('brxe-video')
+  ) {
+    return parent;
+  }
+
+  return null;
+};
+
+const applyOptionMediaFrameRadius = (frame, media) => {
+  const frameBorderRadius = window.getComputedStyle(frame).borderRadius;
+  const mediaBorderRadius = window.getComputedStyle(media).borderRadius;
+
+  if (
+    frameBorderRadius !== '0px'
+    || !mediaBorderRadius
+    || mediaBorderRadius === '0px'
+  ) {
+    return;
+  }
+
+  frame.setAttribute(OPTION_MEDIA_RADIUS_ATTR, 'true');
+  frame.style.borderRadius = mediaBorderRadius;
+};
+
+const splitOptionTextLines = (SplitText, element) => {
+  const existingSplit = optionTextSplits.get(element);
+
+  if (existingSplit) {
+    existingSplit.revert();
+    optionTextSplits.delete(element);
+  }
+
+  const split = SplitText.create(element, {
+    aria: 'auto',
+    linesClass: OPTION_LINE_CLASS,
+    mask: 'lines',
+    type: 'lines',
+  });
+
+  optionTextSplits.set(element, split);
+  element.classList.add(OPTION_LINE_READY_CLASS);
+
+  return split.lines || [];
+};
+
+const initOptionTextReveal = (gsap, SplitText, block) => {
+  const lines = getOptionTextElements(block)
+    .flatMap((element) => splitOptionTextLines(SplitText, element));
+
+  if (!lines.length) {
+    return;
+  }
+
+  gsap.set(lines, {
+    autoAlpha: 0,
+    yPercent: 112,
+  });
+
+  const timeline = gsap.timeline({
+    scrollTrigger: {
+      invalidateOnRefresh: true,
+      start: OPTION_TEXT_REVEAL_START,
+      toggleActions: 'play none none reverse',
+      trigger: block,
+    },
+  });
+
+  timeline.to(lines, {
+    autoAlpha: 1,
+    duration: OPTION_TEXT_REVEAL_DURATION,
+    ease: 'power4.out',
+    stagger: OPTION_TEXT_REVEAL_STAGGER,
+    yPercent: 0,
+  });
+
+  storeAnimation(timeline);
+};
+
+const initOptionMediaMotion = (gsap, block, index) => {
+  const media = getOptionMedia(block);
+
+  if (!media) {
+    return;
+  }
+
+  const frame = getOptionMediaFrame(media);
+
+  if (!frame) {
+    return;
+  }
+
+  const card = block.closest(OPTION_CARD_SELECTOR) || block;
+  const xDirection = index % 2 === 0 ? -1 : 1;
+
+  frame.classList.add(OPTION_MEDIA_FRAME_CLASS);
+  applyOptionMediaFrameRadius(frame, media);
+  media.classList.add(OPTION_MEDIA_TARGET_CLASS);
+
+  storeAnimation(
+    gsap.fromTo(
+      media,
+      {
+        scale: OPTION_MEDIA_SCALE_FROM,
+        transformOrigin: 'center center',
+        xPercent: xDirection * OPTION_MEDIA_PARALLAX_X,
+        yPercent: -OPTION_MEDIA_PARALLAX_DISTANCE,
+      },
+      {
+        ease: 'none',
+        scale: OPTION_MEDIA_SCALE_TO,
+        scrollTrigger: {
+          end: 'bottom top',
+          invalidateOnRefresh: true,
+          scrub: true,
+          start: 'top bottom',
+          trigger: card,
+        },
+        xPercent: xDirection * -OPTION_MEDIA_PARALLAX_X,
+        yPercent: OPTION_MEDIA_PARALLAX_DISTANCE,
+      },
+    ),
+  );
+};
+
+const initOptionBlockMotion = async (gsap, optionBlocks) => {
+  if (!optionBlocks.length) {
+    return;
+  }
+
+  const SplitText = await loadSplitText(gsap);
+
+  optionBlocks.forEach((block, index) => {
+    initOptionTextReveal(gsap, SplitText, block);
+    initOptionMediaMotion(gsap, block, index);
   });
 };
 
@@ -524,8 +806,9 @@ export const initMotion = async () => {
   const motionElements = getMotionElements();
   const heroImage = getHeroImage();
   const categoryBlocks = getCategoryBlocks();
+  const optionBlocks = getOptionBlocks();
 
-  if (!motionElements.length && !heroImage && !categoryBlocks.length) {
+  if (!motionElements.length && !heroImage && !categoryBlocks.length && !optionBlocks.length) {
     return;
   }
 
@@ -534,6 +817,7 @@ export const initMotion = async () => {
     clearAnimations();
     resetMotionElements();
     resetCategoryRevealElements();
+    resetOptionMotionElements();
     return;
   }
 
@@ -548,12 +832,24 @@ export const initMotion = async () => {
     clearAnimations();
     resetMotionElements();
     resetCategoryRevealElements();
+    resetOptionMotionElements();
     return;
   }
 
   initHeroImageScale(gsap, ScrollTrigger);
   initScrollReveal(gsap, motionElements);
   initCategoryBlockReveal(gsap, categoryBlocks);
+  await initOptionBlockMotion(gsap, optionBlocks);
+
+  if (reducedMotionMedia.matches) {
+    document.documentElement.classList.remove('virtura-motion-ready');
+    clearAnimations();
+    resetMotionElements();
+    resetCategoryRevealElements();
+    resetOptionMotionElements();
+    return;
+  }
+
   ScrollTrigger.sort();
   ScrollTrigger.refresh();
   document.documentElement.classList.add('virtura-motion-ready');
@@ -575,6 +871,7 @@ const restartMotion = () => {
   clearAnimations();
   resetMotionElements();
   resetCategoryRevealElements();
+  resetOptionMotionElements();
   void initMotion();
 };
 

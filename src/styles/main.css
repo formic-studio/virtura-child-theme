@@ -1029,6 +1029,21 @@ body {
   will-change: auto;
 }
 
+.virtura-option-line {
+  display: block;
+  will-change: opacity, transform;
+}
+
+.virtura-option-media-frame {
+  overflow: hidden;
+}
+
+.virtura-option-media-target {
+  display: block;
+  transform-origin: center center;
+  will-change: transform;
+}
+
 .about-slider.virtura-about-slider-ready
   :is(.slider-img-item, .slider-text-block) {
   flex: 0 0 100%;
@@ -1548,6 +1563,13 @@ body {
   [data-motion] {
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  .virtura-option-line,
+  .virtura-option-media-target {
+    opacity: 1 !important;
+    transform: none !important;
+    will-change: auto;
   }
 
   .hero-img {

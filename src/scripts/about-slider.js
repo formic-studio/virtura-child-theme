@@ -1,4 +1,4 @@
-import { loadGsap } from "./motion.js";
+import { loadGsap, loadSplitText } from "./motion.js";
 
 const SLIDER_SELECTOR = ".about-slider";
 const IMAGE_SELECTOR = ".slider-img-item";
@@ -37,27 +37,11 @@ const textSplitInstances = new WeakMap();
 const textTransitionTokens = new WeakMap();
 
 let sliderAnimationPromise;
-let fontsReadyPromise;
-
-const waitForFonts = () => {
-  if (!fontsReadyPromise) {
-    fontsReadyPromise =
-      document.fonts?.ready?.catch(() => {}) || Promise.resolve();
-  }
-
-  return fontsReadyPromise;
-};
 
 const loadSliderAnimation = async () => {
   if (!sliderAnimationPromise) {
-    sliderAnimationPromise = Promise.all([
-      loadGsap(),
-      import("gsap/SplitText"),
-      waitForFonts(),
-    ]).then(([{ gsap }, splitTextModule]) => {
-      const SplitText = splitTextModule.SplitText || splitTextModule.default;
-
-      gsap.registerPlugin(SplitText);
+    sliderAnimationPromise = loadGsap().then(async ({ gsap }) => {
+      const SplitText = await loadSplitText(gsap);
 
       return { gsap, SplitText };
     });
