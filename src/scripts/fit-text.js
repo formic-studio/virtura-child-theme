@@ -6,14 +6,25 @@ const getNumberAttribute = (element, name, fallback) => {
   return Number.isFinite(value) && value > 0 ? value : fallback;
 };
 
+const getViewportWidth = () =>
+  window.visualViewport?.width ||
+  document.documentElement.clientWidth ||
+  window.innerWidth ||
+  0;
+
 const getInnerWidth = (element) => {
   const rect = element.getBoundingClientRect();
   const styles = window.getComputedStyle(element);
   const paddingX =
     Number.parseFloat(styles.paddingLeft) +
     Number.parseFloat(styles.paddingRight);
+  const innerWidth = Math.max(0, rect.width - paddingX);
+  const visibleWidth = Math.max(
+    0,
+    Math.min(rect.right, getViewportWidth()) - Math.max(rect.left, 0) - paddingX
+  );
 
-  return Math.max(0, rect.width - paddingX);
+  return visibleWidth ? Math.min(innerWidth, visibleWidth) : innerWidth;
 };
 
 const getFitTarget = (element) => {
@@ -28,7 +39,13 @@ const getFitTarget = (element) => {
   }
 
   if (element.classList.contains('text-overview')) {
-    return element.closest('.parent') || element.parentElement || element;
+    return (
+      element.closest('.padding-global') ||
+      element.closest('.brxe-container') ||
+      element.closest('.parent') ||
+      element.parentElement ||
+      element
+    );
   }
 
   if (element.classList.contains('fit-text-to-box')) {
