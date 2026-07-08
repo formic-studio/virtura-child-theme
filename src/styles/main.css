@@ -1309,6 +1309,90 @@ body {
   outline-offset: calc(var(--space-4, 0.4rem) * -1);
 }
 
+@media (max-width: 767px) {
+  .tabs-wrapper.brxe-block {
+    align-items: stretch !important;
+    column-gap: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    row-gap: var(--space-48, 4.8rem) !important;
+    width: 100% !important;
+  }
+
+  .tabs-wrapper.brxe-block > .tab-content-wrapper {
+    display: contents !important;
+  }
+
+  .tabs-wrapper.brxe-block .tab-options.brxe-block {
+    align-items: stretch !important;
+    align-self: stretch !important;
+    box-sizing: border-box;
+    display: flex !important;
+    flex-direction: row !important;
+    min-height: 7.2rem;
+    order: 0 !important;
+    width: 100% !important;
+  }
+
+  .tabs-wrapper.brxe-block .tab-options.brxe-block > * {
+    align-items: center;
+    border-radius: 6px;
+    display: flex;
+    flex: 1 1 0;
+    justify-content: center;
+    min-height: 5.2rem;
+    min-width: 0;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .tabs-wrapper.brxe-block > .tab-img-block {
+    align-self: stretch !important;
+    aspect-ratio: 3 / 2;
+    border-radius: var(--space-16, 1.6rem);
+    flex: 0 0 auto !important;
+    order: 10 !important;
+    overflow: hidden;
+    width: 100% !important;
+  }
+
+  .tabs-wrapper.brxe-block > .tab-img-block > .brxe-image {
+    display: block;
+    height: 100% !important;
+    object-fit: cover;
+    width: 100% !important;
+  }
+
+  .tabs-wrapper.brxe-block .tab-content-block.brxe-block {
+    order: 20 !important;
+    padding-left: 0 !important;
+    row-gap: var(--space-24, 2.4rem) !important;
+    width: 100% !important;
+  }
+
+  .tabs-wrapper.brxe-block .tab-content.brxe-block {
+    align-items: flex-start !important;
+    box-sizing: border-box;
+    column-gap: var(--space-16, 1.6rem) !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    padding: var(--space-32, 3.2rem) !important;
+    width: 100% !important;
+  }
+
+  .tabs-wrapper.brxe-block .tab-content.brxe-block > .dot {
+    align-self: flex-start !important;
+    flex: 0 0 var(--space-6, 0.6rem) !important;
+    height: var(--space-6, 0.6rem) !important;
+    margin-top: 0.9rem;
+    max-height: var(--space-6, 0.6rem) !important;
+    max-width: var(--space-6, 0.6rem) !important;
+    min-height: var(--space-6, 0.6rem) !important;
+    min-width: var(--space-6, 0.6rem) !important;
+    width: var(--space-6, 0.6rem) !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .tab-options.brxe-block::before {
     transition: none;
