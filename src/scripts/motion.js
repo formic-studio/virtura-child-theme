@@ -61,9 +61,8 @@ const OPTION_MEDIA_MIN_AREA = 12000;
 const OPTION_TEXT_REVEAL_START = 'top 86%';
 const OPTION_TEXT_REVEAL_DURATION = 1.24;
 const OPTION_TEXT_REVEAL_STAGGER = 0.08;
-const OPTION_BUTTON_REVEAL_DURATION = 1.05;
+const OPTION_BUTTON_REVEAL_DURATION = 0.85;
 const OPTION_BUTTON_REVEAL_START = 'top 92%';
-const OPTION_BUTTON_START_BUFFER = 48;
 const OPTION_MEDIA_PARALLAX_DISTANCE = 3.4;
 const OPTION_MEDIA_PARALLAX_X = 1.15;
 const OPTION_MEDIA_SCALE_FROM = 1.075;
@@ -293,6 +292,8 @@ const resetOptionMotionElements = () => {
 
   document.querySelectorAll(`.${OPTION_BUTTON_CLASS}`).forEach((element) => {
     element.classList.remove(OPTION_BUTTON_CLASS);
+    element.style.removeProperty('-webkit-clip-path');
+    element.style.removeProperty('clip-path');
     element.style.removeProperty('opacity');
     element.style.removeProperty('transform');
     element.style.removeProperty('visibility');
@@ -476,19 +477,8 @@ const initOptionTextReveal = (gsap, SplitText, block) => {
   storeAnimation(timeline);
 };
 
-const getOptionElementStartX = (element, block) => {
-  const elementRect = element.getBoundingClientRect();
-  const blockRect = block.getBoundingClientRect();
-  const distanceToBlockEdge = blockRect.right - elementRect.left;
-
-  return Math.max(distanceToBlockEdge, elementRect.width)
-    + elementRect.width
-    + OPTION_BUTTON_START_BUFFER;
-};
-
 const initOptionButtonReveal = (gsap, block) => {
   const button = getOptionButton(block);
-  const card = block.closest(OPTION_CARD_SELECTOR) || block;
 
   if (!button) {
     return;
@@ -501,9 +491,12 @@ const initOptionButtonReveal = (gsap, block) => {
       button,
       {
         autoAlpha: 1,
-        x: () => getOptionElementStartX(button, card),
+        clipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)',
+        webkitClipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)',
       },
       {
+        autoAlpha: 1,
+        clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
         duration: OPTION_BUTTON_REVEAL_DURATION,
         ease: 'power3.out',
         scrollTrigger: {
@@ -512,7 +505,7 @@ const initOptionButtonReveal = (gsap, block) => {
           toggleActions: 'play none none reverse',
           trigger: button,
         },
-        x: 0,
+        webkitClipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
       },
     ),
   );

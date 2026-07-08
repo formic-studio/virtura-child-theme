@@ -1039,7 +1039,7 @@ body {
 }
 
 .virtura-option-button {
-  will-change: transform;
+  will-change: clip-path;
 }
 
 .virtura-option-media-frame {
