@@ -14,10 +14,11 @@ const ANIMATION_DURATION = 0.92;
 const ANIMATION_EASE = 'power3.out';
 const IMAGE_REVEAL_DURATION = 0.96;
 const IMAGE_REVEAL_EASE = 'power4.out';
-const IMAGE_REVEAL_HIDDEN_CLIP = 'inset(0 100% 0 0)';
+const IMAGE_NEXT_HIDDEN_CLIP = 'inset(0 100% 0 0)';
+const IMAGE_PREV_HIDDEN_CLIP = 'inset(0 0 0 100%)';
 const IMAGE_REVEAL_VISIBLE_CLIP = 'inset(0 0% 0 0)';
 const IMAGE_ENTER_SCALE = 1.025;
-const IMAGE_ENTER_X = '-1.2rem';
+const IMAGE_ENTER_OFFSET = '1.2rem';
 const IMAGE_OUTGOING_SCALE = 0.985;
 const TEXT_WORD_DELAY = 0.38;
 const TEXT_WORD_DURATION = 0.8;
@@ -86,6 +87,14 @@ const splitTextWords = (SplitText, item) => {
   return split;
 };
 
+const getImageHiddenClip = (direction) => (
+  direction < 0 ? IMAGE_PREV_HIDDEN_CLIP : IMAGE_NEXT_HIDDEN_CLIP
+);
+
+const getImageEnterX = (direction) => (
+  direction < 0 ? IMAGE_ENTER_OFFSET : `-${IMAGE_ENTER_OFFSET}`
+);
+
 const setActiveState = (items, index) => {
   items.forEach((item, itemIndex) => {
     const isActive = itemIndex === index;
@@ -98,6 +107,9 @@ const setActiveState = (items, index) => {
 const setImageState = (items, index, previousIndex, { animate = true } = {}) => {
   const incoming = items[index];
   const outgoing = items[previousIndex];
+  const direction = index < previousIndex ? -1 : 1;
+  const hiddenClip = getImageHiddenClip(direction);
+  const enterX = getImageEnterX(direction);
 
   setActiveState(items, index);
 
@@ -126,10 +138,10 @@ const setImageState = (items, index, previousIndex, { animate = true } = {}) => 
   });
 
   if (incoming) {
-    incoming.style.clipPath = IMAGE_REVEAL_HIDDEN_CLIP;
+    incoming.style.clipPath = hiddenClip;
     incoming.style.filter = 'brightness(1.06)';
     incoming.style.opacity = '1';
-    incoming.style.transform = `translate3d(${IMAGE_ENTER_X}, 0, 0) scale(${IMAGE_ENTER_SCALE})`;
+    incoming.style.transform = `translate3d(${enterX}, 0, 0) scale(${IMAGE_ENTER_SCALE})`;
     incoming.style.zIndex = '3';
   }
 
@@ -159,11 +171,11 @@ const setImageState = (items, index, previousIndex, { animate = true } = {}) => 
 
       if (incoming) {
         gsap.set(incoming, {
-          clipPath: IMAGE_REVEAL_HIDDEN_CLIP,
+          clipPath: hiddenClip,
           filter: 'brightness(1.06)',
           opacity: 1,
           scale: IMAGE_ENTER_SCALE,
-          x: IMAGE_ENTER_X,
+          x: enterX,
           zIndex: 3,
         });
       }
@@ -206,10 +218,10 @@ const setImageState = (items, index, previousIndex, { animate = true } = {}) => 
         timeline.fromTo(
           incoming,
           {
-            clipPath: IMAGE_REVEAL_HIDDEN_CLIP,
+            clipPath: hiddenClip,
             filter: 'brightness(1.06)',
             scale: IMAGE_ENTER_SCALE,
-            x: IMAGE_ENTER_X,
+            x: enterX,
           },
           {
             clipPath: IMAGE_REVEAL_VISIBLE_CLIP,
