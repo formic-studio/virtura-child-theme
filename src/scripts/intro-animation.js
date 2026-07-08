@@ -17,6 +17,18 @@ const LOGO_MARK_CENTER_OFFSET = LOGO_WIDTH / 2 - LOGO_MARK_WIDTH / 2;
 const INTRO_CENTER_SCALE = 2.2;
 const INTRO_PRIME_CLASS = 'virtura-intro-prime';
 const INTRO_FAILSAFE_TIMEOUT = 15000;
+const SCROLL_LOCK_KEYS = new Set([
+  ' ',
+  'ArrowDown',
+  'ArrowLeft',
+  'ArrowRight',
+  'ArrowUp',
+  'End',
+  'Home',
+  'PageDown',
+  'PageUp',
+  'Spacebar',
+]);
 
 const ICON_SVG = `
   <svg xmlns="http://www.w3.org/2000/svg" width="42" height="38" viewBox="0 0 42 38" fill="none" aria-hidden="true" focusable="false">
@@ -49,6 +61,67 @@ const isBricksBuilder = () => (
   document.body.classList.contains('bricks-is-builder') ||
   document.documentElement.classList.contains('bricks-is-builder')
 );
+
+const isEditableTarget = (target) => (
+  target instanceof HTMLElement &&
+  !!target.closest('input, textarea, select, [contenteditable="true"]')
+);
+
+const createIntroScrollLock = () => {
+  const lockedScrollX = window.scrollX;
+  const lockedScrollY = window.scrollY;
+  let isRestoringScroll = false;
+
+  const restoreScrollPosition = () => {
+    if (
+      isRestoringScroll ||
+      (
+        Math.abs(window.scrollX - lockedScrollX) < 1 &&
+        Math.abs(window.scrollY - lockedScrollY) < 1
+      )
+    ) {
+      return;
+    }
+
+    isRestoringScroll = true;
+    window.scrollTo(lockedScrollX, lockedScrollY);
+    window.requestAnimationFrame(() => {
+      isRestoringScroll = false;
+    });
+  };
+
+  const preventScrollEvent = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation?.();
+    restoreScrollPosition();
+  };
+
+  const preventScrollKey = (event) => {
+    if (isEditableTarget(event.target) || !SCROLL_LOCK_KEYS.has(event.key)) {
+      return;
+    }
+
+    preventScrollEvent(event);
+  };
+
+  const blockingOptions = { capture: true, passive: false };
+  const passiveCaptureOptions = { capture: true, passive: true };
+  const keyOptions = { capture: true };
+
+  window.addEventListener('wheel', preventScrollEvent, blockingOptions);
+  window.addEventListener('touchmove', preventScrollEvent, blockingOptions);
+  window.addEventListener('keydown', preventScrollKey, keyOptions);
+  window.addEventListener('scroll', restoreScrollPosition, passiveCaptureOptions);
+
+  return () => {
+    window.removeEventListener('wheel', preventScrollEvent, blockingOptions);
+    window.removeEventListener('touchmove', preventScrollEvent, blockingOptions);
+    window.removeEventListener('keydown', preventScrollKey, keyOptions);
+    window.removeEventListener('scroll', restoreScrollPosition, passiveCaptureOptions);
+    window.scrollTo(lockedScrollX, lockedScrollY);
+  };
+};
 
 const getNormalizedPath = () => {
   const path = window.location.pathname || '/';
@@ -323,7 +396,15 @@ export const initIntroAnimation = async () => {
   const navLogo = getNavLogoTarget();
   const overlay = createIntroOverlay();
   const imageReadyPromise = waitForImage(heroNativeImage);
+  const unlockIntroScroll = createIntroScrollLock();
+  let introStateCleanedUp = false;
   const cleanupIntroState = () => {
+    if (introStateCleanedUp) {
+      return;
+    }
+
+    introStateCleanedUp = true;
+    unlockIntroScroll();
     root.classList.remove(INTRO_PRIME_CLASS);
     root.classList.remove('virtura-intro-running');
     root.classList.remove('virtura-intro-revealing');
@@ -463,10 +544,7 @@ export const initIntroAnimation = async () => {
     },
     onComplete: () => {
       window.clearTimeout(introFailsafeTimer);
-      root.classList.remove(INTRO_PRIME_CLASS);
-      root.classList.remove('virtura-intro-running');
-      root.classList.remove('virtura-intro-revealing');
-      overlay.remove();
+      cleanupIntroState();
 
       if (headerSurface) {
         gsap.set(headerSurface, {

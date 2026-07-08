@@ -832,7 +832,9 @@ body {
 .virtura-intro-running body,
 .virtura-intro-revealing,
 .virtura-intro-revealing body {
+  overscroll-behavior: none;
   overflow: hidden;
+  touch-action: none;
 }
 
 .virtura-intro-running #brx-header.header-scroll-ready .header-overlay,

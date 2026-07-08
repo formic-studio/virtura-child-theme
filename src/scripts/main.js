@@ -12,7 +12,6 @@ import { initSmoothScroll } from './smooth-scroll.js';
 import { initTrainingTabs } from './training-tabs.js';
 
 const initTheme = () => {
-  void initSmoothScroll();
   initHeaderTheme();
   initHeaderScroll();
   initGigaMenu();
@@ -25,6 +24,7 @@ const initTheme = () => {
   void introReady
     .catch(() => {})
     .finally(() => {
+      void initSmoothScroll();
       void initMotion();
     });
 };
