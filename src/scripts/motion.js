@@ -40,6 +40,7 @@ const OPTION_TEXT_EXCLUDE_SELECTOR = [
   'figure',
   'svg',
 ].join(', ');
+const OPTION_DOT_SELECTOR = ':scope .brxe-list .icon, :scope .brxe-list .dot';
 const OPTION_MEDIA_SELECTOR = 'img, video';
 const OPTION_MEDIA_EXCLUDE_SELECTOR = [
   '.btn',
@@ -50,7 +51,9 @@ const OPTION_MEDIA_EXCLUDE_SELECTOR = [
 ].join(', ');
 const OPTION_LINE_READY_CLASS = 'virtura-option-line-ready';
 const OPTION_LINE_CLASS = 'virtura-option-line';
+const OPTION_DOT_CLASS = 'virtura-option-dot';
 const OPTION_MEDIA_FRAME_CLASS = 'virtura-option-media-frame';
+const OPTION_GENERATED_MEDIA_FRAME_CLASS = 'virtura-option-media-frame-generated';
 const OPTION_MEDIA_RADIUS_ATTR = 'data-virtura-option-media-radius';
 const OPTION_MEDIA_TARGET_CLASS = 'virtura-option-media-target';
 const OPTION_MEDIA_MIN_AREA = 12000;
@@ -277,6 +280,23 @@ const resetOptionMotionElements = () => {
     element.classList.remove(OPTION_LINE_READY_CLASS);
   });
 
+  document.querySelectorAll(`.${OPTION_DOT_CLASS}`).forEach((element) => {
+    element.classList.remove(OPTION_DOT_CLASS);
+    element.style.removeProperty('opacity');
+    element.style.removeProperty('transform');
+    element.style.removeProperty('visibility');
+  });
+
+  document.querySelectorAll(`.${OPTION_GENERATED_MEDIA_FRAME_CLASS}`).forEach((frame) => {
+    const media = frame.querySelector(OPTION_MEDIA_SELECTOR);
+
+    if (media && frame.parentElement) {
+      frame.parentElement.insertBefore(media, frame);
+    }
+
+    frame.remove();
+  });
+
   document.querySelectorAll(`.${OPTION_MEDIA_FRAME_CLASS}`).forEach((element) => {
     element.classList.remove(OPTION_MEDIA_FRAME_CLASS);
 
@@ -306,6 +326,9 @@ const getOptionTextElements = (block) => Array.from(block.querySelectorAll(OPTIO
     return !element.closest(OPTION_TEXT_EXCLUDE_SELECTOR);
   });
 
+const getOptionDotElements = (block) => Array.from(block.querySelectorAll(OPTION_DOT_SELECTOR))
+  .filter((element) => !element.closest(OPTION_TEXT_EXCLUDE_SELECTOR));
+
 const getMediaArea = (media) => {
   const rect = media.getBoundingClientRect();
   const width = media.naturalWidth || media.videoWidth || rect.width;
@@ -331,7 +354,27 @@ const getOptionMedia = (block) => {
   return externalMedia || candidates[0] || null;
 };
 
+const createOptionMediaFrame = (media) => {
+  const parent = media.parentElement;
+
+  if (!parent || parent === document.body) {
+    return null;
+  }
+
+  const frame = document.createElement('div');
+
+  frame.className = `${OPTION_MEDIA_FRAME_CLASS} ${OPTION_GENERATED_MEDIA_FRAME_CLASS}`;
+  parent.insertBefore(frame, media);
+  frame.appendChild(media);
+
+  return frame;
+};
+
 const getOptionMediaFrame = (media) => {
+  if (media.parentElement?.classList.contains(OPTION_GENERATED_MEDIA_FRAME_CLASS)) {
+    return media.parentElement;
+  }
+
   const wrapper = media.closest('picture, figure, .brxe-video');
 
   if (wrapper && wrapper !== media) {
@@ -352,7 +395,7 @@ const getOptionMediaFrame = (media) => {
     return parent;
   }
 
-  return null;
+  return createOptionMediaFrame(media);
 };
 
 const applyOptionMediaFrameRadius = (frame, media) => {
@@ -392,15 +435,29 @@ const splitOptionTextLines = (SplitText, element) => {
   return split.lines || [];
 };
 
+const sortElementsByDocumentOrder = (elements) => elements.sort((first, second) => {
+  if (first === second) {
+    return 0;
+  }
+
+  return first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_PRECEDING
+    ? 1
+    : -1;
+});
+
 const initOptionTextReveal = (gsap, SplitText, block) => {
   const lines = getOptionTextElements(block)
     .flatMap((element) => splitOptionTextLines(SplitText, element));
+  const dots = getOptionDotElements(block);
+  const revealItems = sortElementsByDocumentOrder([...lines, ...dots]);
 
-  if (!lines.length) {
+  if (!revealItems.length) {
     return;
   }
 
-  gsap.set(lines, {
+  dots.forEach((dot) => dot.classList.add(OPTION_DOT_CLASS));
+
+  gsap.set(revealItems, {
     autoAlpha: 0,
     yPercent: 112,
   });
@@ -414,7 +471,7 @@ const initOptionTextReveal = (gsap, SplitText, block) => {
     },
   });
 
-  timeline.to(lines, {
+  timeline.to(revealItems, {
     autoAlpha: 1,
     duration: OPTION_TEXT_REVEAL_DURATION,
     ease: 'power4.out',
