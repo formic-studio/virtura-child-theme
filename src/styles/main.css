@@ -741,13 +741,17 @@ body {
 }
 
 #brx-header .giga-menu-items {
+  box-sizing: border-box;
   display: grid;
+  flex: 0 1 var(--giga-menu-items-width, auto);
   gap: var(--giga-menu-row-gap) var(--giga-menu-column-gap);
   grid-template-columns: repeat(
     var(--giga-menu-columns, 4),
     minmax(var(--giga-menu-column-min), max-content)
   );
   justify-content: space-between;
+  min-width: 0;
+  width: var(--giga-menu-items-width, auto);
 }
 
 #brx-header .giga-menu-column {

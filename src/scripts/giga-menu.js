@@ -14,6 +14,43 @@ const NAV_ACTIVE_CLASS = 'header-nav-active';
 const ROOT_OPEN_CLASS = 'giga-menu-open';
 const PANEL_OPEN_CLASS = 'is-open';
 const TRIGGER_OPEN_CLASS = 'is-giga-menu-open';
+const ITEMS_WIDTH_PROPERTY = '--giga-menu-items-width';
+
+const getNumber = (value) => {
+  const number = Number.parseFloat(value);
+
+  return Number.isFinite(number) ? number : 0;
+};
+
+const getTriggerControl = (trigger) =>
+  trigger.querySelector(TRIGGER_CONTROL_SELECTOR) || trigger;
+
+const alignItemsTarget = (panel, trigger) => {
+  const target = panel.querySelector(ITEMS_TARGET_SELECTOR);
+
+  if (!target) {
+    return;
+  }
+
+  target.style.removeProperty(ITEMS_WIDTH_PROPERTY);
+
+  const panelRect = panel.getBoundingClientRect();
+  const triggerRect = getTriggerControl(trigger).getBoundingClientRect();
+
+  if (!panelRect.width || !triggerRect.width) {
+    return;
+  }
+
+  const panelStyle = window.getComputedStyle(panel);
+  const contentRight = panelRect.right - getNumber(panelStyle.paddingRight);
+  const contentLeft = panelRect.left + getNumber(panelStyle.paddingLeft);
+  const targetLeft = Math.max(contentLeft, Math.min(triggerRect.left, contentRight));
+  const targetWidth = Math.max(0, contentRight - targetLeft);
+
+  if (targetWidth > 0) {
+    target.style.setProperty(ITEMS_WIDTH_PROPERTY, `${targetWidth}px`);
+  }
+};
 
 const setExpanded = (trigger, isExpanded) => {
   trigger
@@ -151,6 +188,22 @@ const initNavRoot = (root) => {
 
   let isOpen = false;
   let isBuilderForcedOpen = root.classList.contains(BUILDER_OPEN_CLASS);
+  let alignFrame = null;
+
+  const scheduleItemsAlignment = () => {
+    if (!panel || !trigger || !isOpen) {
+      return;
+    }
+
+    if (alignFrame !== null) {
+      window.cancelAnimationFrame(alignFrame);
+    }
+
+    alignFrame = window.requestAnimationFrame(() => {
+      alignFrame = null;
+      alignItemsTarget(panel, trigger);
+    });
+  };
 
   const activateNav = () => {
     header.classList.add(NAV_ACTIVE_CLASS);
@@ -170,6 +223,8 @@ const initNavRoot = (root) => {
     panel.hidden = false;
     panel.setAttribute('aria-hidden', 'false');
     setExpanded(trigger, true);
+    alignItemsTarget(panel, trigger);
+    scheduleItemsAlignment();
   };
 
   const releaseNav = () => {
@@ -275,6 +330,20 @@ const initNavRoot = (root) => {
       trigger.querySelector('a, button')?.focus();
     }
   });
+
+  window.addEventListener('resize', scheduleItemsAlignment, { passive: true });
+
+  if ('ResizeObserver' in window) {
+    const resizeObserver = new ResizeObserver(scheduleItemsAlignment);
+
+    resizeObserver.observe(navWrapper);
+    resizeObserver.observe(panel);
+    resizeObserver.observe(trigger);
+  }
+
+  if (document.fonts?.ready) {
+    document.fonts.ready.then(scheduleItemsAlignment).catch(() => {});
+  }
 };
 
 export const initGigaMenu = () => {
