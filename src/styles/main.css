@@ -1026,9 +1026,39 @@ body {
   pointer-events: none;
 }
 
+.testimonials-slider.virtura-testimonials-slider-ready .slider-wrapper {
+  display: flex;
+  overflow: hidden;
+}
+
+.testimonials-slider.virtura-testimonials-slider-ready .slider-item {
+  flex: 0 0 100%;
+  max-width: 100%;
+  will-change: transform;
+}
+
+.testimonials-slider.virtura-testimonials-slider-ready .svg-arrow-block {
+  cursor: pointer;
+  transition:
+    filter 0.22s ease,
+    opacity 0.22s ease;
+  user-select: none;
+}
+
+.testimonials-slider.virtura-testimonials-slider-ready .svg-arrow-block.is-disabled {
+  cursor: default;
+  filter: grayscale(1);
+  opacity: 0.34;
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .about-slider.virtura-about-slider-ready
     :is(.slider-img-item, .slider-text-block) {
+    transition: none;
+  }
+
+  .testimonials-slider.virtura-testimonials-slider-ready .slider-item {
     transition: none;
   }
 }

@@ -10,6 +10,7 @@ import { initIntroAnimation } from './intro-animation.js';
 import { initMediaSwitch } from './media-switch.js';
 import { initMotion } from './motion.js';
 import { initSmoothScroll } from './smooth-scroll.js';
+import { initTestimonialsSlider } from './testimonials-slider.js';
 import { initTrainingTabs } from './training-tabs.js';
 
 const initTheme = () => {
@@ -22,6 +23,7 @@ const initTheme = () => {
   initTrainingTabs();
   initArchiveFilters();
   initAboutSlider();
+  initTestimonialsSlider();
   initMediaSwitch();
   void introReady
     .catch(() => {})
