@@ -41,6 +41,7 @@ const OPTION_TEXT_EXCLUDE_SELECTOR = [
   'svg',
 ].join(', ');
 const OPTION_DOT_SELECTOR = ':scope .brxe-list .icon, :scope .brxe-list .dot';
+const OPTION_BUTTON_SELECTOR = '.btn';
 const OPTION_MEDIA_SELECTOR = 'img, video';
 const OPTION_MEDIA_EXCLUDE_SELECTOR = [
   '.btn',
@@ -52,14 +53,17 @@ const OPTION_MEDIA_EXCLUDE_SELECTOR = [
 const OPTION_LINE_READY_CLASS = 'virtura-option-line-ready';
 const OPTION_LINE_CLASS = 'virtura-option-line';
 const OPTION_DOT_CLASS = 'virtura-option-dot';
+const OPTION_BUTTON_CLASS = 'virtura-option-button';
 const OPTION_MEDIA_FRAME_CLASS = 'virtura-option-media-frame';
-const OPTION_GENERATED_MEDIA_FRAME_CLASS = 'virtura-option-media-frame-generated';
 const OPTION_MEDIA_RADIUS_ATTR = 'data-virtura-option-media-radius';
 const OPTION_MEDIA_TARGET_CLASS = 'virtura-option-media-target';
 const OPTION_MEDIA_MIN_AREA = 12000;
 const OPTION_TEXT_REVEAL_START = 'top 86%';
-const OPTION_TEXT_REVEAL_DURATION = 0.92;
-const OPTION_TEXT_REVEAL_STAGGER = 0.055;
+const OPTION_TEXT_REVEAL_DURATION = 1.24;
+const OPTION_TEXT_REVEAL_STAGGER = 0.08;
+const OPTION_BUTTON_REVEAL_DURATION = 1.05;
+const OPTION_BUTTON_REVEAL_START = 'top 92%';
+const OPTION_BUTTON_START_BUFFER = 48;
 const OPTION_MEDIA_PARALLAX_DISTANCE = 3.4;
 const OPTION_MEDIA_PARALLAX_X = 1.15;
 const OPTION_MEDIA_SCALE_FROM = 1.075;
@@ -287,14 +291,11 @@ const resetOptionMotionElements = () => {
     element.style.removeProperty('visibility');
   });
 
-  document.querySelectorAll(`.${OPTION_GENERATED_MEDIA_FRAME_CLASS}`).forEach((frame) => {
-    const media = frame.querySelector(OPTION_MEDIA_SELECTOR);
-
-    if (media && frame.parentElement) {
-      frame.parentElement.insertBefore(media, frame);
-    }
-
-    frame.remove();
+  document.querySelectorAll(`.${OPTION_BUTTON_CLASS}`).forEach((element) => {
+    element.classList.remove(OPTION_BUTTON_CLASS);
+    element.style.removeProperty('opacity');
+    element.style.removeProperty('transform');
+    element.style.removeProperty('visibility');
   });
 
   document.querySelectorAll(`.${OPTION_MEDIA_FRAME_CLASS}`).forEach((element) => {
@@ -329,6 +330,19 @@ const getOptionTextElements = (block) => Array.from(block.querySelectorAll(OPTIO
 const getOptionDotElements = (block) => Array.from(block.querySelectorAll(OPTION_DOT_SELECTOR))
   .filter((element) => !element.closest(OPTION_TEXT_EXCLUDE_SELECTOR));
 
+const getOptionButton = (block) => {
+  const contentBlock = block.parentElement;
+  const card = block.closest(OPTION_CARD_SELECTOR);
+  const searchRoot = contentBlock || card;
+
+  if (!searchRoot) {
+    return null;
+  }
+
+  return Array.from(searchRoot.querySelectorAll(OPTION_BUTTON_SELECTOR))
+    .find((button) => !block.contains(button)) || null;
+};
+
 const getMediaArea = (media) => {
   const rect = media.getBoundingClientRect();
   const width = media.naturalWidth || media.videoWidth || rect.width;
@@ -354,27 +368,7 @@ const getOptionMedia = (block) => {
   return externalMedia || candidates[0] || null;
 };
 
-const createOptionMediaFrame = (media) => {
-  const parent = media.parentElement;
-
-  if (!parent || parent === document.body) {
-    return null;
-  }
-
-  const frame = document.createElement('div');
-
-  frame.className = `${OPTION_MEDIA_FRAME_CLASS} ${OPTION_GENERATED_MEDIA_FRAME_CLASS}`;
-  parent.insertBefore(frame, media);
-  frame.appendChild(media);
-
-  return frame;
-};
-
 const getOptionMediaFrame = (media) => {
-  if (media.parentElement?.classList.contains(OPTION_GENERATED_MEDIA_FRAME_CLASS)) {
-    return media.parentElement;
-  }
-
   const wrapper = media.closest('picture, figure, .brxe-video');
 
   if (wrapper && wrapper !== media) {
@@ -383,7 +377,7 @@ const getOptionMediaFrame = (media) => {
 
   const parent = media.parentElement;
 
-  if (!parent || parent === document.body) {
+  if (!parent || parent === document.body || parent.matches(OPTION_CARD_SELECTOR)) {
     return null;
   }
 
@@ -395,7 +389,7 @@ const getOptionMediaFrame = (media) => {
     return parent;
   }
 
-  return createOptionMediaFrame(media);
+  return null;
 };
 
 const applyOptionMediaFrameRadius = (frame, media) => {
@@ -482,6 +476,48 @@ const initOptionTextReveal = (gsap, SplitText, block) => {
   storeAnimation(timeline);
 };
 
+const getOptionElementStartX = (element, block) => {
+  const elementRect = element.getBoundingClientRect();
+  const blockRect = block.getBoundingClientRect();
+  const distanceToBlockEdge = blockRect.right - elementRect.left;
+
+  return Math.max(distanceToBlockEdge, elementRect.width)
+    + elementRect.width
+    + OPTION_BUTTON_START_BUFFER;
+};
+
+const initOptionButtonReveal = (gsap, block) => {
+  const button = getOptionButton(block);
+  const card = block.closest(OPTION_CARD_SELECTOR) || block;
+
+  if (!button) {
+    return;
+  }
+
+  button.classList.add(OPTION_BUTTON_CLASS);
+
+  storeAnimation(
+    gsap.fromTo(
+      button,
+      {
+        autoAlpha: 1,
+        x: () => getOptionElementStartX(button, card),
+      },
+      {
+        duration: OPTION_BUTTON_REVEAL_DURATION,
+        ease: 'power3.out',
+        scrollTrigger: {
+          invalidateOnRefresh: true,
+          start: OPTION_BUTTON_REVEAL_START,
+          toggleActions: 'play none none reverse',
+          trigger: button,
+        },
+        x: 0,
+      },
+    ),
+  );
+};
+
 const initOptionMediaMotion = (gsap, block, index) => {
   const media = getOptionMedia(block);
 
@@ -537,6 +573,7 @@ const initOptionBlockMotion = async (gsap, optionBlocks) => {
 
   optionBlocks.forEach((block, index) => {
     initOptionTextReveal(gsap, SplitText, block);
+    initOptionButtonReveal(gsap, block);
     initOptionMediaMotion(gsap, block, index);
   });
 };

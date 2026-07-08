@@ -1038,19 +1038,12 @@ body {
   will-change: opacity, transform;
 }
 
+.virtura-option-button {
+  will-change: transform;
+}
+
 .virtura-option-media-frame {
   overflow: hidden;
-}
-
-.virtura-option-media-frame-generated {
-  display: block;
-  flex: 0 1 auto;
-  line-height: 0;
-  max-width: 100%;
-}
-
-.virtura-option-media-frame-generated > .virtura-option-media-target {
-  max-width: 100%;
 }
 
 .virtura-option-media-target {
@@ -1582,6 +1575,7 @@ body {
 
   .virtura-option-line,
   .virtura-option-dot,
+  .virtura-option-button,
   .virtura-option-media-target {
     opacity: 1 !important;
     transform: none !important;
