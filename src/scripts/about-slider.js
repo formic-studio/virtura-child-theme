@@ -12,13 +12,13 @@ const PREV_LABEL = 'Poprzedni slajd';
 const NEXT_LABEL = 'Następny slajd';
 const ANIMATION_DURATION = 0.92;
 const ANIMATION_EASE = 'power3.out';
-const IMAGE_REVEAL_DURATION = 0.86;
-const IMAGE_REVEAL_EASE = 'expo.out';
-const IMAGE_REVEAL_OFFSET = '18%';
-const IMAGE_ENTER_SCALE = 1.055;
-const IMAGE_ENTER_OPACITY = 0.72;
+const IMAGE_REVEAL_DURATION = 0.96;
+const IMAGE_REVEAL_EASE = 'power4.out';
+const IMAGE_REVEAL_HIDDEN_CLIP = 'inset(0 100% 0 0)';
+const IMAGE_REVEAL_VISIBLE_CLIP = 'inset(0 0% 0 0)';
+const IMAGE_ENTER_SCALE = 1.025;
+const IMAGE_ENTER_X = '-1.2rem';
 const IMAGE_OUTGOING_SCALE = 0.985;
-const IMAGE_OUTGOING_OPACITY = 0.88;
 const TEXT_WORD_DELAY = 0.38;
 const TEXT_WORD_DURATION = 0.8;
 const TEXT_WORD_EASE = 'sine.out';
@@ -86,12 +86,6 @@ const splitTextWords = (SplitText, item) => {
   return split;
 };
 
-const getImageRevealClip = (direction) => (
-  direction < 0
-    ? `inset(0 ${IMAGE_REVEAL_OFFSET} 0 0)`
-    : `inset(0 0 0 ${IMAGE_REVEAL_OFFSET})`
-);
-
 const setActiveState = (items, index) => {
   items.forEach((item, itemIndex) => {
     const isActive = itemIndex === index;
@@ -102,61 +96,108 @@ const setActiveState = (items, index) => {
 };
 
 const setImageState = (items, index, previousIndex, { animate = true } = {}) => {
-  const xPercent = index * -100;
-  const direction = index > previousIndex ? 1 : -1;
+  const incoming = items[index];
+  const outgoing = items[previousIndex];
 
   setActiveState(items, index);
 
   if (!animate || reducedMotionMedia.matches) {
-    items.forEach((item) => {
-      item.style.clipPath = 'inset(0 0 0 0)';
-      item.style.opacity = '1';
-      item.style.transform = `translate3d(${xPercent}%, 0, 0)`;
+    items.forEach((item, itemIndex) => {
+      const isActive = itemIndex === index;
+
+      item.style.clipPath = IMAGE_REVEAL_VISIBLE_CLIP;
+      item.style.filter = 'none';
+      item.style.opacity = isActive ? '1' : '0';
+      item.style.transform = 'translate3d(0, 0, 0)';
+      item.style.zIndex = isActive ? '2' : '1';
     });
 
     return;
   }
 
+  items.forEach((item, itemIndex) => {
+    const isOutgoing = itemIndex === previousIndex;
+
+    item.style.clipPath = IMAGE_REVEAL_VISIBLE_CLIP;
+    item.style.filter = 'none';
+    item.style.opacity = isOutgoing ? '1' : '0';
+    item.style.transform = 'translate3d(0, 0, 0)';
+    item.style.zIndex = isOutgoing ? '2' : '1';
+  });
+
+  if (incoming) {
+    incoming.style.clipPath = IMAGE_REVEAL_HIDDEN_CLIP;
+    incoming.style.filter = 'brightness(1.06)';
+    incoming.style.opacity = '1';
+    incoming.style.transform = `translate3d(${IMAGE_ENTER_X}, 0, 0) scale(${IMAGE_ENTER_SCALE})`;
+    incoming.style.zIndex = '3';
+  }
+
   void loadGsap()
     .then(({ gsap }) => {
       const slider = items[0]?.closest(SLIDER_SELECTOR);
-      const incoming = items[index];
-      const outgoing = items[previousIndex];
-      const revealClip = getImageRevealClip(direction);
 
       slider?.classList.add(GSAP_CLASS);
       gsap.killTweensOf(items);
       gsap.set(items, {
-        clipPath: 'inset(0 0 0 0)',
-        opacity: 1,
+        clipPath: IMAGE_REVEAL_VISIBLE_CLIP,
+        filter: 'none',
+        opacity: 0,
         scale: 1,
         transformOrigin: 'center center',
+        x: 0,
+        xPercent: 0,
+        zIndex: 1,
       });
+
+      if (outgoing && outgoing !== incoming) {
+        gsap.set(outgoing, {
+          opacity: 1,
+          zIndex: 2,
+        });
+      }
+
+      if (incoming) {
+        gsap.set(incoming, {
+          clipPath: IMAGE_REVEAL_HIDDEN_CLIP,
+          filter: 'brightness(1.06)',
+          opacity: 1,
+          scale: IMAGE_ENTER_SCALE,
+          x: IMAGE_ENTER_X,
+          zIndex: 3,
+        });
+      }
 
       const timeline = gsap.timeline({
         onComplete: () => {
           if (outgoing && outgoing !== incoming) {
             gsap.set(outgoing, {
-              clipPath: 'inset(0 0 0 0)',
+              filter: 'none',
+              opacity: 0,
+              scale: 1,
+              x: 0,
+              zIndex: 1,
+            });
+          }
+
+          if (incoming) {
+            gsap.set(incoming, {
+              clipPath: IMAGE_REVEAL_VISIBLE_CLIP,
+              filter: 'none',
               opacity: 1,
               scale: 1,
+              x: 0,
+              zIndex: 2,
             });
           }
         },
       });
 
-      timeline.to(items, {
-        duration: ANIMATION_DURATION,
-        ease: ANIMATION_EASE,
-        force3D: true,
-        xPercent,
-      }, 0);
-
       if (outgoing && outgoing !== incoming) {
         timeline.to(outgoing, {
-          duration: 0.42,
+          duration: 0.68,
           ease: 'power2.out',
-          opacity: IMAGE_OUTGOING_OPACITY,
+          filter: 'brightness(0.92)',
           scale: IMAGE_OUTGOING_SCALE,
         }, 0);
       }
@@ -165,26 +206,32 @@ const setImageState = (items, index, previousIndex, { animate = true } = {}) => 
         timeline.fromTo(
           incoming,
           {
-            clipPath: revealClip,
-            opacity: IMAGE_ENTER_OPACITY,
+            clipPath: IMAGE_REVEAL_HIDDEN_CLIP,
+            filter: 'brightness(1.06)',
             scale: IMAGE_ENTER_SCALE,
+            x: IMAGE_ENTER_X,
           },
           {
-            clipPath: 'inset(0 0 0 0)',
+            clipPath: IMAGE_REVEAL_VISIBLE_CLIP,
             duration: IMAGE_REVEAL_DURATION,
             ease: IMAGE_REVEAL_EASE,
-            opacity: 1,
+            filter: 'brightness(1)',
             scale: 1,
+            x: 0,
           },
-          0.06,
+          0,
         );
       }
     })
     .catch(() => {
-      items.forEach((item) => {
-        item.style.clipPath = 'inset(0 0 0 0)';
-        item.style.opacity = '1';
-        item.style.transform = `translate3d(${xPercent}%, 0, 0)`;
+      items.forEach((item, itemIndex) => {
+        const isActive = itemIndex === index;
+
+        item.style.clipPath = IMAGE_REVEAL_VISIBLE_CLIP;
+        item.style.filter = 'none';
+        item.style.opacity = isActive ? '1' : '0';
+        item.style.transform = 'translate3d(0, 0, 0)';
+        item.style.zIndex = isActive ? '2' : '1';
       });
     });
 };
