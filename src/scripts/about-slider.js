@@ -3,21 +3,71 @@ const IMAGE_SELECTOR = '.slider-img-item';
 const TEXT_SELECTOR = '.slider-text-block';
 const CONTROLS_SELECTOR = '.slider-paggination .svg-arrow-block';
 const ACTIVE_CLASS = 'is-active';
+const DISABLED_CLASS = 'is-disabled';
 const READY_CLASS = 'virtura-about-slider-ready';
+const GSAP_CLASS = 'virtura-about-slider-gsap';
 const PREV_LABEL = 'Poprzedni slajd';
 const NEXT_LABEL = 'Następny slajd';
+const ANIMATION_DURATION = 0.92;
+const ANIMATION_EASE = 'power3.out';
 const SWIPE_THRESHOLD = 40;
 
-const normalizeIndex = (index, length) => ((index % length) + length) % length;
+const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-const setSlideState = (items, index) => {
+let gsapPromise;
+
+const loadSliderGsap = async () => {
+  if (!gsapPromise) {
+    gsapPromise = import('gsap').then((gsapModule) => gsapModule.gsap || gsapModule.default);
+  }
+
+  return gsapPromise;
+};
+
+const clampIndex = (index, length) => Math.min(Math.max(index, 0), length - 1);
+
+const setSlideState = (items, index, { animate = true } = {}) => {
+  const xPercent = index * -100;
+
   items.forEach((item, itemIndex) => {
     const isActive = itemIndex === index;
 
     item.classList.toggle(ACTIVE_CLASS, isActive);
     item.setAttribute('aria-hidden', String(!isActive));
-    item.style.transform = `translate3d(${index * -100}%, 0, 0)`;
   });
+
+  if (!animate || reducedMotionMedia.matches) {
+    items.forEach((item) => {
+      item.style.transform = `translate3d(${xPercent}%, 0, 0)`;
+    });
+
+    return;
+  }
+
+  void loadSliderGsap()
+    .then((gsap) => {
+      const slider = items[0]?.closest(SLIDER_SELECTOR);
+
+      slider?.classList.add(GSAP_CLASS);
+      gsap.to(items, {
+        duration: ANIMATION_DURATION,
+        ease: ANIMATION_EASE,
+        force3D: true,
+        overwrite: 'auto',
+        xPercent,
+      });
+    })
+    .catch(() => {
+      items.forEach((item) => {
+        item.style.transform = `translate3d(${xPercent}%, 0, 0)`;
+      });
+    });
+};
+
+const setControlState = (control, isDisabled) => {
+  control.classList.toggle(DISABLED_CLASS, isDisabled);
+  control.setAttribute('aria-disabled', String(isDisabled));
+  control.setAttribute('tabindex', isDisabled ? '-1' : '0');
 };
 
 const setupControl = (control, label, onClick) => {
@@ -27,6 +77,10 @@ const setupControl = (control, label, onClick) => {
 
   control.addEventListener('click', onClick);
   control.addEventListener('keydown', (event) => {
+    if (control.getAttribute('aria-disabled') === 'true') {
+      return;
+    }
+
     if (event.key !== 'Enter' && event.key !== ' ') {
       return;
     }
@@ -34,6 +88,11 @@ const setupControl = (control, label, onClick) => {
     event.preventDefault();
     onClick();
   });
+};
+
+const updateControls = (controls, activeIndex, slideCount) => {
+  setControlState(controls[0], activeIndex === 0);
+  setControlState(controls[1], activeIndex === slideCount - 1);
 };
 
 const initSlider = (slider) => {
@@ -54,14 +113,30 @@ const initSlider = (slider) => {
   let activeIndex = 0;
   let touchStartX = null;
 
-  const goTo = (nextIndex) => {
-    activeIndex = normalizeIndex(nextIndex, slideCount);
-    slides.forEach((items) => setSlideState(items, activeIndex));
+  const goTo = (nextIndex, options) => {
+    const clampedIndex = clampIndex(nextIndex, slideCount);
+
+    if (clampedIndex === activeIndex && options?.force !== true) {
+      return;
+    }
+
+    activeIndex = clampedIndex;
+    slides.forEach((items) => setSlideState(items, activeIndex, options));
+    updateControls(controls, activeIndex, slideCount);
     slider.dataset.activeSlide = String(activeIndex + 1);
   };
 
-  setupControl(controls[0], PREV_LABEL, () => goTo(activeIndex - 1));
-  setupControl(controls[1], NEXT_LABEL, () => goTo(activeIndex + 1));
+  setupControl(controls[0], PREV_LABEL, () => {
+    if (activeIndex > 0) {
+      goTo(activeIndex - 1);
+    }
+  });
+
+  setupControl(controls[1], NEXT_LABEL, () => {
+    if (activeIndex < slideCount - 1) {
+      goTo(activeIndex + 1);
+    }
+  });
 
   slider.addEventListener('touchstart', (event) => {
     touchStartX = event.touches[0]?.clientX ?? null;
@@ -86,7 +161,7 @@ const initSlider = (slider) => {
 
   slider.classList.add(READY_CLASS);
   slider.setAttribute('aria-roledescription', 'carousel');
-  goTo(0);
+  goTo(0, { animate: false, force: true });
 };
 
 export const initAboutSlider = () => {
