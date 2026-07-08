@@ -12,15 +12,72 @@ const PREV_LABEL = 'Poprzedni slajd';
 const NEXT_LABEL = 'Następny slajd';
 const ANIMATION_DURATION = 0.92;
 const ANIMATION_EASE = 'power3.out';
-const TEXT_FADE_DELAY = 0.14;
-const TEXT_FADE_DURATION = 0.54;
+const TEXT_WORD_DELAY = 0.38;
+const TEXT_WORD_DURATION = 0.78;
+const TEXT_WORD_EASE = 'sine.out';
+const TEXT_WORD_STAGGER = 0.045;
 const TEXT_FADE_OUT_DURATION = 0.22;
-const TEXT_FADE_EASE = 'power2.out';
 const SWIPE_THRESHOLD = 40;
 
 const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
+const textSplitInstances = new WeakMap();
+const textTransitionTokens = new WeakMap();
+
+let sliderAnimationPromise;
+let fontsReadyPromise;
+
+const waitForFonts = () => {
+  if (!fontsReadyPromise) {
+    fontsReadyPromise = document.fonts?.ready?.catch(() => {}) || Promise.resolve();
+  }
+
+  return fontsReadyPromise;
+};
+
+const loadSliderAnimation = async () => {
+  if (!sliderAnimationPromise) {
+    sliderAnimationPromise = Promise.all([
+      loadGsap(),
+      import('gsap/SplitText'),
+      waitForFonts(),
+    ]).then(([{ gsap }, splitTextModule]) => {
+      const SplitText = splitTextModule.SplitText || splitTextModule.default;
+
+      gsap.registerPlugin(SplitText);
+
+      return { gsap, SplitText };
+    });
+  }
+
+  return sliderAnimationPromise;
+};
 
 const clampIndex = (index, length) => Math.min(Math.max(index, 0), length - 1);
+
+const revertTextSplit = (item) => {
+  const split = textSplitInstances.get(item);
+
+  if (!split) {
+    return;
+  }
+
+  split.revert();
+  textSplitInstances.delete(item);
+};
+
+const splitTextWords = (SplitText, item) => {
+  revertTextSplit(item);
+
+  const split = SplitText.create(item, {
+    aria: 'auto',
+    type: 'words',
+    wordsClass: 'virtura-slider-word',
+  });
+
+  textSplitInstances.set(item, split);
+
+  return split;
+};
 
 const setActiveState = (items, index) => {
   items.forEach((item, itemIndex) => {
@@ -66,11 +123,15 @@ const setTrackState = (items, index, { animate = true } = {}) => {
 
 const setTextState = (items, index, previousIndex, { animate = true } = {}) => {
   const xPercent = index * -100;
+  const slider = items[0]?.closest(SLIDER_SELECTOR);
+  const transitionToken = {};
 
   setActiveState(items, index);
+  slider && textTransitionTokens.set(slider, transitionToken);
 
   if (!animate || reducedMotionMedia.matches) {
     items.forEach((item, itemIndex) => {
+      revertTextSplit(item);
       item.style.opacity = itemIndex === index ? '1' : '0';
       item.style.transform = `translate3d(${xPercent}%, 0, 0)`;
     });
@@ -79,14 +140,17 @@ const setTextState = (items, index, previousIndex, { animate = true } = {}) => {
   }
 
   items.forEach((item, itemIndex) => {
-    if (itemIndex !== previousIndex) {
+    if (itemIndex !== previousIndex || itemIndex === index) {
       item.style.opacity = '0';
     }
   });
 
-  void loadGsap()
-    .then(({ gsap }) => {
-      const slider = items[0]?.closest(SLIDER_SELECTOR);
+  void loadSliderAnimation()
+    .then(({ gsap, SplitText }) => {
+      if (slider && textTransitionTokens.get(slider) !== transitionToken) {
+        return;
+      }
+
       const incoming = items[index];
       const outgoing = items[previousIndex];
 
@@ -111,21 +175,23 @@ const setTextState = (items, index, previousIndex, { animate = true } = {}) => {
       }
 
       if (incoming) {
-        gsap.fromTo(
-          incoming,
-          { opacity: 0 },
-          {
-            delay: TEXT_FADE_DELAY,
-            duration: TEXT_FADE_DURATION,
-            ease: TEXT_FADE_EASE,
-            opacity: 1,
-            overwrite: 'auto',
-          },
-        );
+        const split = splitTextWords(SplitText, incoming);
+
+        gsap.set(incoming, { opacity: 1 });
+        gsap.set(split.words, { opacity: 0 });
+        gsap.to(split.words, {
+          delay: TEXT_WORD_DELAY,
+          duration: TEXT_WORD_DURATION,
+          ease: TEXT_WORD_EASE,
+          opacity: 1,
+          overwrite: 'auto',
+          stagger: TEXT_WORD_STAGGER,
+        });
       }
     })
     .catch(() => {
       items.forEach((item, itemIndex) => {
+        revertTextSplit(item);
         item.style.opacity = itemIndex === index ? '1' : '0';
         item.style.transform = `translate3d(${xPercent}%, 0, 0)`;
       });

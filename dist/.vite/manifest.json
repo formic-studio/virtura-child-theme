@@ -5,6 +5,12 @@
     "src": "node_modules/gsap/ScrollTrigger.js",
     "isDynamicEntry": true
   },
+  "node_modules/gsap/SplitText.js": {
+    "file": "assets/SplitText-Bz_5hqgE.js",
+    "name": "SplitText",
+    "src": "node_modules/gsap/SplitText.js",
+    "isDynamicEntry": true
+  },
   "node_modules/gsap/index.js": {
     "file": "assets/index-D4-8ALNT.js",
     "name": "index",
@@ -12,13 +18,14 @@
     "isDynamicEntry": true
   },
   "src/scripts/main.js": {
-    "file": "assets/main-CxBApCn5.js",
+    "file": "assets/main-1GmsX7Cr.js",
     "name": "main",
     "src": "src/scripts/main.js",
     "isEntry": true,
     "dynamicImports": [
       "node_modules/gsap/index.js",
-      "node_modules/gsap/ScrollTrigger.js"
+      "node_modules/gsap/ScrollTrigger.js",
+      "node_modules/gsap/SplitText.js"
     ],
     "css": [
       "assets/main-Bvi3BnOR.css"
