@@ -20,7 +20,6 @@ const MOBILE_NAV_SELECTOR = '.brxe-nav-menu';
 const MOBILE_MENU_WRAPPER_SELECTOR = '.bricks-mobile-menu-wrapper';
 const MOBILE_MENU_CLASS = 'virtura-mobile-giga-menu';
 const MOBILE_OPEN_CLASS = 'mobile-giga-menu-open';
-const DOCUMENT_MOBILE_OPEN_CLASS = 'virtura-mobile-giga-menu-open';
 const MOBILE_CATEGORY_ORDER = ['detailing', 'design', 'selection', 'tuning'];
 
 let mobileMenuInstanceCount = 0;
@@ -326,8 +325,6 @@ const syncMobileMenuState = (root, header, navMenu, entries, mediaQuery) => {
 
   header.classList.toggle(MOBILE_OPEN_CLASS, isOpen);
   root.classList.toggle(MOBILE_OPEN_CLASS, isOpen);
-  document.documentElement.classList.toggle(DOCUMENT_MOBILE_OPEN_CLASS, isOpen);
-  document.body?.classList.toggle(DOCUMENT_MOBILE_OPEN_CLASS, isOpen);
 
   if (!isOpen) {
     entries.forEach((entry) => setMobileAccordionOpen(entry, false));
