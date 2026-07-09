@@ -5,9 +5,11 @@ const HIDE_DISTANCE = 24;
 const INTENT_TTL = 2000;
 const SHOW_DISTANCE = 28;
 const TOUCH_DELTA = 8;
+const MOBILE_NAV_QUERY = '(max-width: 991px)';
 
 const DOWN_KEYS = new Set(['ArrowDown', 'End', 'PageDown', 'Space']);
 const UP_KEYS = new Set(['ArrowUp', 'Home', 'PageUp']);
+const mobileNavMedia = window.matchMedia(MOBILE_NAV_QUERY);
 
 const getHideOffset = (header) => {
   const value = Number.parseFloat(header.getAttribute('data-header-hide-offset'));
@@ -66,7 +68,14 @@ export const initHeaderScroll = () => {
     const measuredDirection =
       Math.abs(delta) >= DIRECTION_DELTA ? (delta > 0 ? 'down' : 'up') : null;
     const direction = recentIntent || measuredDirection;
-    const hasHeaderFocus = header.contains(document.activeElement);
+    const activeElement = document.activeElement;
+    const hasClosedMobileNavFocus =
+      mobileNavMedia.matches &&
+      activeElement instanceof Element &&
+      Boolean(activeElement.closest('#brx-header .brxe-nav-menu')) &&
+      !activeElement.closest('#brx-header .brxe-nav-menu.show-mobile-menu');
+    const hasHeaderFocus =
+      header.contains(activeElement) && !hasClosedMobileNavFocus;
     const hasVisibleNavActivity =
       !isHidden && header.classList.contains('header-nav-active');
     const shouldKeepVisible =

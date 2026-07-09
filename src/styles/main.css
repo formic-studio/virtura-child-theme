@@ -810,11 +810,19 @@ body {
 }
 
 @media (max-width: 991px) {
-  #brx-header,
-  #brx-header.header-theme-light,
-  #brx-header.header-theme-dark,
-  #brx-header.header-nav-active,
   #brx-header.mobile-giga-menu-open {
+    --header-fg: var(--color-black, #000);
+    --header-cta-bg: var(--color-black, #000);
+    --header-cta-fg: var(--color-white, #fff);
+  }
+
+  #brx-header.header-theme-light.header-nav-active:not(.mobile-giga-menu-open) {
+    --header-fg: var(--color-white, #fff);
+    --header-cta-bg: var(--color-white, #fff);
+    --header-cta-fg: var(--color-black, #000);
+  }
+
+  #brx-header.header-theme-dark.header-nav-active:not(.mobile-giga-menu-open) {
     --header-fg: var(--color-black, #000);
     --header-cta-bg: var(--color-black, #000);
     --header-cta-fg: var(--color-white, #fff);
@@ -822,9 +830,16 @@ body {
 
   #brx-header .nav-wrapper {
     align-items: center !important;
-    background-color: var(--color-white, #fff);
     overflow: visible;
     position: relative;
+  }
+
+  #brx-header.header-nav-active:not(.mobile-giga-menu-open) .nav-wrapper {
+    background-color: transparent;
+  }
+
+  #brx-header.mobile-giga-menu-open .nav-wrapper {
+    background-color: var(--color-white, #fff);
   }
 
   #brx-header.mobile-giga-menu-open .nav-wrapper {
@@ -848,7 +863,7 @@ body {
     appearance: none;
     background: transparent;
     border: 0;
-    color: var(--color-black, #000) !important;
+    color: var(--header-fg) !important;
     display: inline-flex !important;
     flex: 0 0 2.4rem;
     flex-direction: column;
@@ -1021,22 +1036,24 @@ body {
   }
 
   #brx-header .virtura-mobile-giga-menu__panel {
-    max-height: 0;
+    height: 0;
     opacity: 0;
     overflow: hidden;
-    padding: var(--space-8, 0.8rem) 0 var(--space-24, 2.4rem);
+    padding: 0;
     transform: translateY(-0.6rem);
     transition:
-      max-height 0.3s var(--virtura-motion-ease, ease),
+      height 0.28s var(--virtura-motion-ease, ease),
       opacity 0.22s ease,
+      padding 0.28s var(--virtura-motion-ease, ease),
       transform 0.3s var(--virtura-motion-ease, ease);
-    will-change: max-height, opacity, transform;
+    will-change: height, opacity, transform;
   }
 
   #brx-header
     .virtura-mobile-giga-menu__item.is-open
     .virtura-mobile-giga-menu__panel {
     opacity: 1;
+    padding: var(--space-8, 0.8rem) 0 var(--space-24, 2.4rem);
     transform: translateY(0);
   }
 

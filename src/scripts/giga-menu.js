@@ -160,31 +160,63 @@ const createLink = (sourceLink, className) => {
 };
 
 const setPanelHeight = (panel, height) => {
-  panel.style.maxHeight =
+  panel.style.height =
     typeof height === 'number' ? `${Math.max(0, height)}px` : height;
 };
 
-const setMobileAccordionOpen = (item, isOpen) => {
+const setMobileAccordionOpen = (item, isOpen, { immediate = false } = {}) => {
   if (!item.button || !item.panel) {
     return;
   }
 
   window.clearTimeout(item.closeTimer);
-  item.element.classList.toggle('is-open', isOpen);
   item.button.setAttribute('aria-expanded', String(isOpen));
+
+  if (immediate) {
+    item.element.classList.toggle('is-open', isOpen);
+    item.panel.hidden = !isOpen;
+    setPanelHeight(item.panel, isOpen ? 'auto' : 0);
+    return;
+  }
 
   if (isOpen) {
     item.panel.hidden = false;
+    item.element.classList.add('is-open');
     setPanelHeight(item.panel, 0);
 
     window.requestAnimationFrame(() => {
       setPanelHeight(item.panel, item.panel.scrollHeight);
     });
 
+    const finishOpen = (event) => {
+      if (event.target !== item.panel || event.propertyName !== 'height') {
+        return;
+      }
+
+      item.panel.removeEventListener('transitionend', finishOpen);
+
+      if (item.button?.getAttribute('aria-expanded') === 'true') {
+        setPanelHeight(item.panel, 'auto');
+      }
+    };
+
+    item.panel.addEventListener('transitionend', finishOpen);
+
     return;
   }
 
-  setPanelHeight(item.panel, item.panel.scrollHeight);
+  if (item.panel.hidden) {
+    item.element.classList.remove('is-open');
+    setPanelHeight(item.panel, 0);
+    return;
+  }
+
+  setPanelHeight(
+    item.panel,
+    item.panel.getBoundingClientRect().height || item.panel.scrollHeight
+  );
+  item.panel.offsetHeight;
+  item.element.classList.remove('is-open');
 
   window.requestAnimationFrame(() => {
     setPanelHeight(item.panel, 0);
@@ -357,7 +389,11 @@ const syncMobileMenuState = (root, header, navMenu, entries, mediaQuery) => {
   root.classList.toggle(MOBILE_OPEN_CLASS, isOpen);
 
   if (!isOpen) {
-    entries.forEach((entry) => setMobileAccordionOpen(entry, false));
+    header.classList.remove(NAV_ACTIVE_CLASS);
+    root.classList.remove(NAV_ACTIVE_CLASS);
+    entries.forEach((entry) =>
+      setMobileAccordionOpen(entry, false, { immediate: true })
+    );
   }
 };
 
