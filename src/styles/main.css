@@ -966,9 +966,11 @@ body {
   #brx-header .virtura-mobile-giga-menu__category,
   #brx-header .virtura-mobile-giga-menu__category-link {
     align-items: center;
-    background: transparent;
+    -webkit-tap-highlight-color: transparent;
+    appearance: none;
+    background: transparent !important;
     border: 0;
-    box-shadow: none;
+    box-shadow: none !important;
     color: var(--color-black, #000);
     display: flex;
     font: inherit;
@@ -980,6 +982,17 @@ body {
     text-align: left;
     text-decoration: none;
     width: 100%;
+  }
+
+  #brx-header .virtura-mobile-giga-menu__category:hover,
+  #brx-header .virtura-mobile-giga-menu__category:focus,
+  #brx-header .virtura-mobile-giga-menu__category:active,
+  #brx-header .virtura-mobile-giga-menu__category-link:hover,
+  #brx-header .virtura-mobile-giga-menu__category-link:focus,
+  #brx-header .virtura-mobile-giga-menu__category-link:active {
+    background: transparent !important;
+    box-shadow: none !important;
+    color: var(--color-black, #000);
   }
 
   #brx-header .virtura-mobile-giga-menu__category:focus-visible,
@@ -1008,7 +1021,23 @@ body {
   }
 
   #brx-header .virtura-mobile-giga-menu__panel {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
     padding: var(--space-8, 0.8rem) 0 var(--space-24, 2.4rem);
+    transform: translateY(-0.6rem);
+    transition:
+      max-height 0.3s var(--virtura-motion-ease, ease),
+      opacity 0.22s ease,
+      transform 0.3s var(--virtura-motion-ease, ease);
+    will-change: max-height, opacity, transform;
+  }
+
+  #brx-header
+    .virtura-mobile-giga-menu__item.is-open
+    .virtura-mobile-giga-menu__panel {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   #brx-header .virtura-mobile-giga-menu__links {
@@ -1156,7 +1185,8 @@ body {
 @media (prefers-reduced-motion: reduce) {
   #brx-header .bricks-mobile-menu-toggle span,
   #brx-header .nav-wrapper .bricks-mobile-menu-wrapper,
-  #brx-header .virtura-mobile-giga-menu__category-icon {
+  #brx-header .virtura-mobile-giga-menu__category-icon,
+  #brx-header .virtura-mobile-giga-menu__panel {
     transition: none;
   }
 }

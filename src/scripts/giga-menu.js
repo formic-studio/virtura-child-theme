@@ -159,14 +159,42 @@ const createLink = (sourceLink, className) => {
   return link;
 };
 
+const setPanelHeight = (panel, height) => {
+  panel.style.maxHeight =
+    typeof height === 'number' ? `${Math.max(0, height)}px` : height;
+};
+
 const setMobileAccordionOpen = (item, isOpen) => {
   if (!item.button || !item.panel) {
     return;
   }
 
+  window.clearTimeout(item.closeTimer);
   item.element.classList.toggle('is-open', isOpen);
   item.button.setAttribute('aria-expanded', String(isOpen));
-  item.panel.hidden = !isOpen;
+
+  if (isOpen) {
+    item.panel.hidden = false;
+    setPanelHeight(item.panel, 0);
+
+    window.requestAnimationFrame(() => {
+      setPanelHeight(item.panel, item.panel.scrollHeight);
+    });
+
+    return;
+  }
+
+  setPanelHeight(item.panel, item.panel.scrollHeight);
+
+  window.requestAnimationFrame(() => {
+    setPanelHeight(item.panel, 0);
+  });
+
+  item.closeTimer = window.setTimeout(() => {
+    if (item.button?.getAttribute('aria-expanded') !== 'true') {
+      item.panel.hidden = true;
+    }
+  }, 320);
 };
 
 const createMobileAccordionItem = (sourceItem, index, instanceId) => {
@@ -188,6 +216,7 @@ const createMobileAccordionItem = (sourceItem, index, instanceId) => {
 
     return {
       button: null,
+      closeTimer: 0,
       element,
       panel: null,
     };
@@ -242,6 +271,7 @@ const createMobileAccordionItem = (sourceItem, index, instanceId) => {
 
   return {
     button,
+    closeTimer: 0,
     element,
     panel,
   };
