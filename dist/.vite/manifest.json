@@ -18,7 +18,7 @@
     "isDynamicEntry": true
   },
   "src/scripts/main.js": {
-    "file": "assets/main-CC1hIqzD.js",
+    "file": "assets/main-BdaYmUAy.js",
     "name": "main",
     "src": "src/scripts/main.js",
     "isEntry": true,
@@ -28,7 +28,7 @@
       "node_modules/gsap/SplitText.js"
     ],
     "css": [
-      "assets/main-JsysQHqo.css"
+      "assets/main-C5xCrGwO.css"
     ]
   }
 }

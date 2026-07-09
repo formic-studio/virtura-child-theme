@@ -809,6 +809,298 @@ body {
   color: var(--color-black, #000);
 }
 
+@media (max-width: 991px) {
+  #brx-header,
+  #brx-header.header-theme-light,
+  #brx-header.header-theme-dark,
+  #brx-header.header-nav-active,
+  #brx-header.mobile-giga-menu-open {
+    --header-fg: var(--color-black, #000);
+    --header-cta-bg: var(--color-black, #000);
+    --header-cta-fg: var(--color-white, #fff);
+  }
+
+  #brx-header .nav-wrapper {
+    background-color: var(--color-white, #fff);
+    overflow: visible;
+    position: relative;
+  }
+
+  #brx-header.mobile-giga-menu-open .nav-wrapper {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+
+  #brx-header .nav-text.brxe-nav-menu {
+    position: static !important;
+  }
+
+  #brx-header .bricks-mobile-menu-toggle {
+    align-items: center;
+    color: var(--color-black, #000) !important;
+    display: inline-flex !important;
+    flex-direction: column;
+    gap: 0.4rem;
+    height: 2.4rem;
+    justify-content: center;
+    padding: 0;
+    width: 2.4rem;
+  }
+
+  #brx-header .bricks-mobile-menu-toggle span {
+    background-color: currentColor;
+    border-radius: 99rem;
+    display: block;
+    height: 0.2rem;
+    width: 2.4rem;
+  }
+
+  #brx-header .nav-wrapper .bricks-mobile-menu-wrapper {
+    background-color: var(--color-white, #fff);
+    border-radius: 0 0 var(--space-16, 1.6rem) var(--space-16, 1.6rem);
+    box-shadow: none;
+    box-sizing: border-box;
+    color: var(--color-black, #000);
+    display: none !important;
+    left: 0 !important;
+    max-height: calc(
+      100dvh - var(--wp-admin--admin-bar--height, 0px) - 8rem
+    );
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: var(--space-40, 4rem) var(--space-24, 2.4rem)
+      var(--space-24, 2.4rem);
+    position: absolute !important;
+    right: 0 !important;
+    top: 100% !important;
+    transform: none !important;
+    width: 100% !important;
+    z-index: 1000;
+  }
+
+  #brx-header .nav-wrapper .bricks-mobile-menu-wrapper::before,
+  #brx-header .bricks-mobile-menu-overlay,
+  #brx-header .bricks-mobile-menu-wrapper > .bricks-mobile-menu {
+    display: none !important;
+  }
+
+  #brx-header .nav-text.show-mobile-menu .bricks-mobile-menu-wrapper {
+    display: block !important;
+  }
+
+  #brx-header .virtura-mobile-giga-menu {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-24, 2.4rem);
+    width: 100%;
+  }
+
+  #brx-header .virtura-mobile-giga-menu__list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  #brx-header .virtura-mobile-giga-menu__item {
+    border-bottom: 1px solid var(--color-grey, #a5a5a5);
+  }
+
+  #brx-header .virtura-mobile-giga-menu__category,
+  #brx-header .virtura-mobile-giga-menu__category-link {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    color: var(--color-black, #000);
+    display: flex;
+    font: inherit;
+    font-size: var(--fs-h6, 2.4rem);
+    font-weight: 600;
+    justify-content: space-between;
+    line-height: 1;
+    padding: var(--space-16, 1.6rem) 0;
+    text-align: left;
+    text-decoration: none;
+    width: 100%;
+  }
+
+  #brx-header .virtura-mobile-giga-menu__category:focus-visible,
+  #brx-header .virtura-mobile-giga-menu__category-link:focus-visible,
+  #brx-header .virtura-mobile-giga-menu__link:focus-visible,
+  #brx-header .virtura-mobile-giga-menu__cta:focus-visible {
+    outline: 2px solid var(--color-black, #000);
+    outline-offset: var(--space-4, 0.4rem);
+  }
+
+  #brx-header .virtura-mobile-giga-menu__category-icon {
+    border-bottom: 0.4rem solid currentColor;
+    border-right: 0.4rem solid currentColor;
+    flex: 0 0 auto;
+    height: 1.4rem;
+    margin-right: 0.4rem;
+    transform: rotate(45deg) translate(-0.2rem, -0.2rem);
+    transition: transform 0.24s var(--virtura-motion-ease, ease);
+    width: 1.4rem;
+  }
+
+  #brx-header
+    .virtura-mobile-giga-menu__item.is-open
+    .virtura-mobile-giga-menu__category-icon {
+    transform: rotate(225deg) translate(-0.2rem, -0.2rem);
+  }
+
+  #brx-header .virtura-mobile-giga-menu__panel {
+    padding: var(--space-8, 0.8rem) 0 var(--space-24, 2.4rem);
+  }
+
+  #brx-header .virtura-mobile-giga-menu__links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-20, 2rem);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  #brx-header .virtura-mobile-giga-menu__link-item {
+    margin: 0;
+    padding: 0;
+  }
+
+  #brx-header .virtura-mobile-giga-menu__link {
+    color: var(--color-text-grey, #727272);
+    display: inline-block;
+    font-size: var(--fs-title-big, 2rem);
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+  }
+
+  #brx-header .virtura-mobile-giga-menu__link:hover,
+  #brx-header .virtura-mobile-giga-menu__link:focus-visible {
+    color: var(--color-black, #000);
+  }
+
+  #brx-header .virtura-mobile-giga-menu__featured,
+  #brx-header .virtura-mobile-giga-menu__featured-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16, 1.6rem);
+    width: 100%;
+  }
+
+  #brx-header .virtura-mobile-giga-menu__featured .font-size-label-small {
+    color: var(--color-grey, #a5a5a5);
+    font-size: var(--fs-label-small, 1.2rem);
+    font-weight: 600;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  #brx-header .virtura-mobile-giga-menu__featured .archive-block {
+    aspect-ratio: 1 / 0.94;
+    border-radius: var(--space-16, 1.6rem);
+    min-height: 0;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  #brx-header .virtura-mobile-giga-menu__featured .archive-block:nth-child(5n) {
+    aspect-ratio: 1 / 0.94;
+    grid-column: auto;
+  }
+
+  #brx-header .virtura-mobile-giga-menu__featured .tab-wrapper {
+    display: none !important;
+  }
+
+  #brx-header .virtura-mobile-giga-menu__featured .btn-wrapper {
+    bottom: var(--space-24, 2.4rem);
+    left: var(--space-32, 3.2rem);
+    right: var(--space-24, 2.4rem);
+  }
+
+  #brx-header .virtura-mobile-giga-menu__featured .btn-glass {
+    backdrop-filter: blur(1.6rem);
+    background-color: rgba(87, 87, 87, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: var(--space-16, 1.6rem);
+    color: var(--color-white, #fff);
+    min-width: 0;
+    padding: var(--space-20, 2rem) var(--space-24, 2.4rem);
+  }
+
+  #brx-header .virtura-mobile-giga-menu__featured .btn-glass * {
+    color: var(--color-white, #fff);
+  }
+
+  #brx-header .virtura-mobile-giga-menu__featured .btn-glass .brxe-text-basic {
+    font-size: var(--fs-title-big, 2rem);
+    line-height: 1.2;
+    min-width: 0;
+  }
+
+  #brx-header .virtura-mobile-giga-menu__featured .svg-arrow-block {
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.42);
+    border-radius: var(--space-8, 0.8rem);
+    display: inline-flex;
+    flex: 0 0 auto;
+    justify-content: center;
+    min-height: 4.4rem;
+    min-width: 4.4rem;
+    padding: 0;
+  }
+
+  #brx-header .virtura-mobile-giga-menu__cta {
+    background-color: var(--color-black, #000);
+    border-radius: var(--space-8, 0.8rem);
+    color: var(--color-white, #fff);
+    display: block;
+    font-size: var(--fs-title-big, 2rem);
+    font-weight: 600;
+    line-height: 1;
+    padding: var(--space-20, 2rem) var(--space-24, 2.4rem);
+    text-align: center;
+    text-decoration: none;
+    width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  #brx-header .nav-wrapper .bricks-mobile-menu-wrapper {
+    padding: var(--space-32, 3.2rem) var(--space-24, 2.4rem)
+      var(--space-20, 2rem);
+  }
+
+  #brx-header .virtura-mobile-giga-menu__featured .btn-wrapper {
+    bottom: var(--space-24, 2.4rem);
+    left: var(--space-32, 3.2rem);
+    right: var(--space-20, 2rem);
+  }
+}
+
+@media (max-width: 478px) {
+  #brx-header .nav-wrapper .bricks-mobile-menu-wrapper {
+    padding-inline: var(--space-16, 1.6rem);
+  }
+
+  #brx-header .virtura-mobile-giga-menu__featured .btn-wrapper {
+    left: var(--space-24, 2.4rem);
+    right: var(--space-16, 1.6rem);
+  }
+
+  #brx-header .virtura-mobile-giga-menu__featured .btn-glass {
+    padding: var(--space-16, 1.6rem) var(--space-20, 2rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #brx-header .virtura-mobile-giga-menu__category-icon {
+    transition: none;
+  }
+}
+
 #brx-header.header-overlay,
 .header-overlay {
   left: 0;

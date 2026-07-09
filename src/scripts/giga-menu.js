@@ -15,6 +15,14 @@ const ROOT_OPEN_CLASS = 'giga-menu-open';
 const PANEL_OPEN_CLASS = 'is-open';
 const TRIGGER_OPEN_CLASS = 'is-giga-menu-open';
 const ITEMS_WIDTH_PROPERTY = '--giga-menu-items-width';
+const MOBILE_BREAKPOINT_QUERY = '(max-width: 991px)';
+const MOBILE_NAV_SELECTOR = '.brxe-nav-menu';
+const MOBILE_MENU_WRAPPER_SELECTOR = '.bricks-mobile-menu-wrapper';
+const MOBILE_MENU_CLASS = 'virtura-mobile-giga-menu';
+const MOBILE_OPEN_CLASS = 'mobile-giga-menu-open';
+const MOBILE_CATEGORY_ORDER = ['detailing', 'design', 'selection', 'tuning'];
+
+let mobileMenuInstanceCount = 0;
 
 const getNumber = (value) => {
   const number = Number.parseFloat(value);
@@ -103,6 +111,32 @@ const getDirectSubmenuItems = (item) =>
 const getDirectLink = (item) =>
   item.querySelector(':scope > a, :scope > .brx-submenu-toggle > a');
 
+const normalizeText = (value = '') => value.replace(/\s+/g, ' ').trim();
+
+const getMobileCategoryLabel = (sourceLink) =>
+  normalizeText(sourceLink?.textContent || '').replace(/^VC\s+/i, '');
+
+const getMobileCategorySortIndex = (item) => {
+  const link = getDirectLink(item);
+  const label = getMobileCategoryLabel(link).toLowerCase();
+  const index = MOBILE_CATEGORY_ORDER.indexOf(label);
+
+  return index === -1 ? MOBILE_CATEGORY_ORDER.length : index;
+};
+
+const getMobileServiceItems = (trigger) =>
+  getDirectSubmenuItems(trigger)
+    .map((item, index) => ({ index, item }))
+    .sort((first, second) => {
+      const firstOrder = getMobileCategorySortIndex(first.item);
+      const secondOrder = getMobileCategorySortIndex(second.item);
+
+      return firstOrder === secondOrder
+        ? first.index - second.index
+        : firstOrder - secondOrder;
+    })
+    .map(({ item }) => item);
+
 const createLink = (sourceLink, className) => {
   const link = document.createElement('a');
 
@@ -123,6 +157,277 @@ const createLink = (sourceLink, className) => {
   }
 
   return link;
+};
+
+const setMobileAccordionOpen = (item, isOpen) => {
+  if (!item.button || !item.panel) {
+    return;
+  }
+
+  item.element.classList.toggle('is-open', isOpen);
+  item.button.setAttribute('aria-expanded', String(isOpen));
+  item.panel.hidden = !isOpen;
+};
+
+const createMobileAccordionItem = (sourceItem, index, instanceId) => {
+  const sourceLink = getDirectLink(sourceItem);
+
+  if (!sourceLink) {
+    return null;
+  }
+
+  const childItems = getDirectSubmenuItems(sourceItem);
+  const element = document.createElement('div');
+
+  element.className = 'virtura-mobile-giga-menu__item';
+
+  if (!childItems.length) {
+    element.append(
+      createLink(sourceLink, 'virtura-mobile-giga-menu__category-link')
+    );
+
+    return {
+      button: null,
+      element,
+      panel: null,
+    };
+  }
+
+  const button = document.createElement('button');
+  const label = document.createElement('span');
+  const icon = document.createElement('span');
+  const panel = document.createElement('div');
+  const list = document.createElement('ul');
+  const buttonId = `virtura-mobile-giga-menu-button-${instanceId}-${index}`;
+  const panelId = `virtura-mobile-giga-menu-panel-${instanceId}-${index}`;
+
+  button.className = 'virtura-mobile-giga-menu__category';
+  button.id = buttonId;
+  button.type = 'button';
+  button.setAttribute('aria-controls', panelId);
+  button.setAttribute('aria-expanded', 'false');
+
+  label.className = 'virtura-mobile-giga-menu__category-label';
+  label.textContent = getMobileCategoryLabel(sourceLink);
+
+  icon.className = 'virtura-mobile-giga-menu__category-icon';
+  icon.setAttribute('aria-hidden', 'true');
+
+  button.append(label, icon);
+
+  panel.className = 'virtura-mobile-giga-menu__panel';
+  panel.hidden = true;
+  panel.id = panelId;
+  panel.setAttribute('aria-labelledby', buttonId);
+  panel.setAttribute('role', 'region');
+
+  list.className = 'virtura-mobile-giga-menu__links';
+
+  childItems.forEach((childItem) => {
+    const childLink = getDirectLink(childItem);
+
+    if (!childLink) {
+      return;
+    }
+
+    const listItem = document.createElement('li');
+
+    listItem.className = 'virtura-mobile-giga-menu__link-item';
+    listItem.append(createLink(childLink, 'virtura-mobile-giga-menu__link'));
+    list.append(listItem);
+  });
+
+  panel.append(list);
+  element.append(button, panel);
+
+  return {
+    button,
+    element,
+    panel,
+  };
+};
+
+const sanitizeClonedMenuContent = (element) => {
+  element.removeAttribute('id');
+  element.removeAttribute('data-script-id');
+  element.removeAttribute('data-brx-loop-start');
+
+  element
+    .querySelectorAll('[id], [data-script-id], [data-brx-loop-start]')
+    .forEach((node) => {
+      node.removeAttribute('id');
+      node.removeAttribute('data-script-id');
+      node.removeAttribute('data-brx-loop-start');
+    });
+
+  element.querySelectorAll('.brx-query-trail').forEach((node) => node.remove());
+
+  element.querySelectorAll('video').forEach((video) => {
+    video.removeAttribute('autoplay');
+    video.preload = 'metadata';
+  });
+};
+
+const createMobileFeaturedSection = (panel) => {
+  const source =
+    panel.querySelector(':scope > .brxe-block:not(.giga-menu-items)') ||
+    panel.firstElementChild;
+
+  if (!source) {
+    return null;
+  }
+
+  const section = document.createElement('div');
+  const clone = source.cloneNode(true);
+
+  section.className = 'virtura-mobile-giga-menu__featured';
+  clone.classList.add('virtura-mobile-giga-menu__featured-content');
+  sanitizeClonedMenuContent(clone);
+  section.append(clone);
+
+  return section;
+};
+
+const findMenuUrlByLabel = (root, label) => {
+  const normalizedLabel = label.toLowerCase();
+  const links = Array.from(
+    root.querySelectorAll('.bricks-nav-menu a[href], .bricks-mobile-menu a[href]')
+  );
+  const match = links.find(
+    (link) => normalizeText(link.textContent).toLowerCase() === normalizedLabel
+  );
+
+  return match?.href || '';
+};
+
+const createMobileCta = (root) => {
+  const source = root.querySelector('.nav-btn, .nav-cta');
+  const sourceLink =
+    source?.matches('a[href]') ? source : source?.querySelector('a[href]');
+  const label = normalizeText(source?.textContent || '');
+
+  if (!label) {
+    return null;
+  }
+
+  const link = document.createElement('a');
+
+  link.className = 'virtura-mobile-giga-menu__cta';
+  link.href = sourceLink?.href || findMenuUrlByLabel(root, 'kontakt') || '#';
+  link.textContent = label;
+
+  return link;
+};
+
+const syncMobileMenuState = (root, header, navMenu, entries, mediaQuery) => {
+  const isOpen =
+    mediaQuery.matches && navMenu.classList.contains('show-mobile-menu');
+
+  header.classList.toggle(MOBILE_OPEN_CLASS, isOpen);
+  root.classList.toggle(MOBILE_OPEN_CLASS, isOpen);
+
+  if (!isOpen) {
+    entries.forEach((entry) => setMobileAccordionOpen(entry, false));
+  }
+};
+
+const initMobileGigaMenu = (root, header, panel, trigger) => {
+  const navMenu = root.querySelector(MOBILE_NAV_SELECTOR);
+  const wrapper = navMenu?.querySelector(MOBILE_MENU_WRAPPER_SELECTOR);
+
+  if (!navMenu || !wrapper || !trigger || navMenu.dataset.virturaMobileGigaMenu) {
+    return;
+  }
+
+  const serviceItems = getMobileServiceItems(trigger);
+
+  if (!serviceItems.length) {
+    return;
+  }
+
+  mobileMenuInstanceCount += 1;
+
+  const mediaQuery = window.matchMedia(MOBILE_BREAKPOINT_QUERY);
+  const menu = document.createElement('div');
+  const list = document.createElement('div');
+  const entries = [];
+
+  menu.className = MOBILE_MENU_CLASS;
+  list.className = 'virtura-mobile-giga-menu__list';
+
+  serviceItems.forEach((item, index) => {
+    const entry = createMobileAccordionItem(
+      item,
+      index,
+      mobileMenuInstanceCount
+    );
+
+    if (!entry) {
+      return;
+    }
+
+    entries.push(entry);
+    list.append(entry.element);
+  });
+
+  entries.forEach((entry) => {
+    if (!entry.button) {
+      return;
+    }
+
+    entry.button.addEventListener('click', () => {
+      const shouldOpen = entry.button.getAttribute('aria-expanded') !== 'true';
+
+      entries.forEach((otherEntry) =>
+        setMobileAccordionOpen(otherEntry, false)
+      );
+      setMobileAccordionOpen(entry, shouldOpen);
+    });
+  });
+
+  menu.append(list);
+
+  const featuredSection = createMobileFeaturedSection(panel);
+  const cta = createMobileCta(root);
+
+  if (featuredSection) {
+    menu.append(featuredSection);
+  }
+
+  if (cta) {
+    menu.append(cta);
+  }
+
+  wrapper.append(menu);
+  navMenu.dataset.virturaMobileGigaMenu = 'true';
+
+  const syncState = () =>
+    syncMobileMenuState(root, header, navMenu, entries, mediaQuery);
+  const classObserver = new MutationObserver(syncState);
+
+  classObserver.observe(navMenu, {
+    attributeFilter: ['class'],
+    attributes: true,
+  });
+
+  if (mediaQuery.addEventListener) {
+    mediaQuery.addEventListener('change', syncState);
+  } else {
+    mediaQuery.addListener(syncState);
+  }
+
+  navMenu.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !navMenu.classList.contains('show-mobile-menu')) {
+      return;
+    }
+
+    const toggle = navMenu.querySelector('.bricks-mobile-menu-toggle');
+
+    toggle?.click();
+    toggle?.focus();
+  });
+
+  syncState();
 };
 
 const renderGigaMenuItems = (panel, trigger) => {
@@ -282,6 +587,7 @@ const initNavRoot = (root) => {
   panel.hidden = true;
   panel.setAttribute('aria-hidden', 'true');
   renderGigaMenuItems(panel, trigger);
+  initMobileGigaMenu(root, header, panel, trigger);
 
   const syncBuilderOpenState = ({ force = false } = {}) => {
     const shouldForceOpen = root.classList.contains(BUILDER_OPEN_CLASS);

@@ -22,3 +22,6 @@
   wrapper, `media-switch-img` to the Image element, and `media-switch-video`
   to the Video element. The script detects the uploaded file type and hides
   the unused element.
+- Added tablet/mobile services menu rendering for the header. It reuses the
+  WordPress `Usługi` submenu as an accordion and clones the existing Bricks
+  "Polecane" realization card from the desktop giga menu.
