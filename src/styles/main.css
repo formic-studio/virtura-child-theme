@@ -860,12 +860,19 @@ body {
     position: relative;
   }
 
+  #brx-header:not(.mobile-giga-menu-open) .nav-wrapper,
+  #brx-header:not(.mobile-giga-menu-open) .nav-wrapper:hover,
+  #brx-header:not(.mobile-giga-menu-open) .nav-wrapper:focus,
+  #brx-header:not(.mobile-giga-menu-open) .nav-wrapper:focus-within,
   #brx-header.header-nav-active:not(.mobile-giga-menu-open) .nav-wrapper {
-    background-color: transparent;
+    background-color: transparent !important;
   }
 
-  #brx-header.mobile-giga-menu-open .nav-wrapper {
-    background-color: var(--color-white, #fff);
+  #brx-header.mobile-giga-menu-open .nav-wrapper,
+  #brx-header.mobile-giga-menu-open .nav-wrapper:hover,
+  #brx-header.mobile-giga-menu-open .nav-wrapper:focus,
+  #brx-header.mobile-giga-menu-open .nav-wrapper:focus-within {
+    background-color: var(--color-white, #fff) !important;
   }
 
   #brx-header.mobile-giga-menu-open .nav-wrapper {

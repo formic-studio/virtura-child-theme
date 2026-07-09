@@ -391,6 +391,12 @@ const syncMobileMenuState = (root, header, navMenu, entries, mediaQuery) => {
   if (!isOpen) {
     header.classList.remove(NAV_ACTIVE_CLASS);
     root.classList.remove(NAV_ACTIVE_CLASS);
+    if (
+      document.activeElement instanceof HTMLElement &&
+      navMenu.contains(document.activeElement)
+    ) {
+      document.activeElement.blur();
+    }
     entries.forEach((entry) =>
       setMobileAccordionOpen(entry, false, { immediate: true })
     );
