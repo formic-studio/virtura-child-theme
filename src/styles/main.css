@@ -858,6 +858,13 @@ body {
     align-items: center !important;
     overflow: visible;
     position: relative;
+    transition: none !important;
+  }
+
+  #brx-header .svg-link,
+  #brx-header .svg-link svg,
+  #brx-header .svg-link svg * {
+    transition: none !important;
   }
 
   #brx-header:not(.mobile-giga-menu-open) .nav-wrapper,
