@@ -20,6 +20,8 @@ const MOBILE_NAV_SELECTOR = '.brxe-nav-menu';
 const MOBILE_MENU_WRAPPER_SELECTOR = '.bricks-mobile-menu-wrapper';
 const MOBILE_MENU_CLASS = 'virtura-mobile-giga-menu';
 const MOBILE_OPEN_CLASS = 'mobile-giga-menu-open';
+const MOBILE_MENU_MAX_HEIGHT_PROPERTY = '--virtura-mobile-menu-max-height';
+const MOBILE_MENU_MIN_HEIGHT = 160;
 const MOBILE_CATEGORY_ORDER = ['detailing', 'design', 'selection', 'tuning'];
 
 let mobileMenuInstanceCount = 0;
@@ -381,6 +383,35 @@ const createMobileCta = (root) => {
   return link;
 };
 
+const syncMobileMenuBounds = (wrapper, mediaQuery) => {
+  if (!mediaQuery.matches) {
+    wrapper.style.removeProperty(MOBILE_MENU_MAX_HEIGHT_PROPERTY);
+    return;
+  }
+
+  const viewport = window.visualViewport;
+  const viewportHeight =
+    viewport?.height ||
+    window.innerHeight ||
+    document.documentElement.clientHeight;
+  const viewportTop = viewport?.offsetTop || 0;
+  const wrapperRect = wrapper.getBoundingClientRect();
+  const wrapperStyle = window.getComputedStyle(wrapper);
+  const bottomGap = Math.max(
+    getNumber(wrapperStyle.paddingBottom),
+    getNumber(wrapperStyle.borderBottomLeftRadius),
+    24
+  );
+  const availableHeight =
+    viewportTop + viewportHeight - wrapperRect.top - bottomGap;
+  const maxHeight = Math.max(MOBILE_MENU_MIN_HEIGHT, availableHeight);
+
+  wrapper.style.setProperty(
+    MOBILE_MENU_MAX_HEIGHT_PROPERTY,
+    `${Math.floor(maxHeight)}px`
+  );
+};
+
 const syncMobileMenuState = (root, header, navMenu, entries, mediaQuery) => {
   const isOpen =
     mediaQuery.matches && navMenu.classList.contains('show-mobile-menu');
@@ -473,8 +504,21 @@ const initMobileGigaMenu = (root, header, panel, trigger) => {
   wrapper.append(menu);
   navMenu.dataset.virturaMobileGigaMenu = 'true';
 
-  const syncState = () =>
+  let boundsFrame = null;
+  const scheduleMobileMenuBounds = () => {
+    if (boundsFrame !== null) {
+      window.cancelAnimationFrame(boundsFrame);
+    }
+
+    boundsFrame = window.requestAnimationFrame(() => {
+      boundsFrame = null;
+      syncMobileMenuBounds(wrapper, mediaQuery);
+    });
+  };
+  const syncState = () => {
     syncMobileMenuState(root, header, navMenu, entries, mediaQuery);
+    scheduleMobileMenuBounds();
+  };
   const classObserver = new MutationObserver(syncState);
 
   classObserver.observe(navMenu, {
@@ -486,6 +530,18 @@ const initMobileGigaMenu = (root, header, panel, trigger) => {
     mediaQuery.addEventListener('change', syncState);
   } else {
     mediaQuery.addListener(syncState);
+  }
+
+  window.addEventListener('resize', syncState, { passive: true });
+  window.addEventListener('orientationchange', syncState, { passive: true });
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', syncState, {
+      passive: true,
+    });
+    window.visualViewport.addEventListener('scroll', syncState, {
+      passive: true,
+    });
   }
 
   navMenu.addEventListener('keydown', (event) => {
