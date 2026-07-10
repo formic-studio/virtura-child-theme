@@ -274,6 +274,10 @@ body {
   pointer-events: none;
 }
 
+.virtura-mobile-menu-surface {
+  display: none;
+}
+
 @media (max-width: 991px) {
   .archive-grid,
   .archive-grid > .bricks-layout-wrapper {
@@ -831,6 +835,34 @@ body {
     visibility: visible;
   }
 
+  #brx-header .virtura-mobile-menu-surface {
+    background-color: var(--color-white, #fff);
+    border-radius: var(--space-16, 1.6rem);
+    display: block;
+    height: var(--virtura-mobile-menu-surface-closed-height, 100%);
+    inset: 0 0 auto;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    transition:
+      height 0.28s var(--virtura-motion-ease, ease),
+      opacity 0.12s ease 0.16s,
+      visibility 0s linear 0.28s;
+    visibility: hidden;
+    will-change: height, opacity;
+    z-index: 0;
+  }
+
+  #brx-header .virtura-mobile-menu-surface.is-open {
+    height: var(
+      --virtura-mobile-menu-surface-open-height,
+      var(--virtura-mobile-menu-surface-closed-height, 100%)
+    );
+    opacity: 1;
+    transition-delay: 0s;
+    visibility: visible;
+  }
+
   #brx-header.mobile-giga-menu-open {
     --header-fg: var(--color-black, #000);
     --header-cta-bg: var(--color-black, #000);
@@ -853,9 +885,10 @@ body {
 
   #brx-header .nav-wrapper {
     align-items: center !important;
+    isolation: isolate;
     overflow: visible;
     position: relative;
-    transition: background-color 0.24s ease !important;
+    transition: none !important;
   }
 
   #brx-header .svg-link,
@@ -881,16 +914,12 @@ body {
   #brx-header.mobile-giga-menu-open .nav-wrapper:hover,
   #brx-header.mobile-giga-menu-open .nav-wrapper:focus,
   #brx-header.mobile-giga-menu-open .nav-wrapper:focus-within {
-    background-color: var(--color-white, #fff) !important;
-  }
-
-  #brx-header.mobile-giga-menu-open .nav-wrapper {
-    border-bottom-left-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
+    background-color: transparent !important;
   }
 
   #brx-header .nav-wrapper > .brxe-block {
     align-items: center !important;
+    z-index: 1;
   }
 
   #brx-header .nav-text.brxe-nav-menu {
@@ -960,8 +989,8 @@ body {
 
   #brx-header .nav-wrapper .bricks-mobile-menu-wrapper {
     -webkit-clip-path: inset(0 0 100% 0);
-    background-color: var(--color-white, #fff);
-    border-radius: 0 0 var(--space-16, 1.6rem) var(--space-16, 1.6rem);
+    background-color: transparent;
+    border-radius: 0;
     box-shadow: none;
     box-sizing: border-box;
     color: var(--color-black, #000);
@@ -987,9 +1016,9 @@ body {
     transform: none !important;
     transform-origin: top center;
     transition:
-      -webkit-clip-path 0.34s var(--virtura-motion-ease, ease),
-      clip-path 0.34s var(--virtura-motion-ease, ease),
-      visibility 0s linear 0.34s;
+      -webkit-clip-path 0.28s var(--virtura-motion-ease, ease),
+      clip-path 0.28s var(--virtura-motion-ease, ease),
+      visibility 0s linear 0.28s;
     visibility: hidden;
     will-change: clip-path;
     width: 100% !important;
@@ -1018,15 +1047,15 @@ body {
     opacity: 0;
     transform: translateY(-0.8rem);
     transition:
-      opacity 0.24s ease,
-      transform 0.34s var(--virtura-motion-ease, ease);
+      opacity 0.18s ease,
+      transform 0.24s var(--virtura-motion-ease, ease);
     width: 100%;
   }
 
   #brx-header.mobile-giga-menu-panel-open .virtura-mobile-giga-menu {
     opacity: 1;
     transform: translateY(0);
-    transition-delay: 0.02s;
+    transition-delay: 0.04s;
   }
 
   #brx-header .virtura-mobile-giga-menu__list {
@@ -1293,6 +1322,7 @@ body {
   #brx-header .bricks-mobile-menu-toggle span,
   #brx-header .nav-wrapper .bricks-mobile-menu-wrapper,
   .virtura-mobile-menu-backdrop,
+  #brx-header .virtura-mobile-menu-surface,
   #brx-header .virtura-mobile-giga-menu,
   #brx-header .virtura-mobile-giga-menu__category-icon,
   #brx-header .virtura-mobile-giga-menu__panel {

@@ -20,12 +20,16 @@ const MOBILE_NAV_SELECTOR = '.brxe-nav-menu';
 const MOBILE_MENU_WRAPPER_SELECTOR = '.bricks-mobile-menu-wrapper';
 const MOBILE_MENU_CLASS = 'virtura-mobile-giga-menu';
 const MOBILE_BACKDROP_CLASS = 'virtura-mobile-menu-backdrop';
+const MOBILE_SURFACE_CLASS = 'virtura-mobile-menu-surface';
+const MOBILE_SURFACE_OPEN_CLASS = 'is-open';
 const MOBILE_OPEN_CLASS = 'mobile-giga-menu-open';
 const MOBILE_PANEL_OPEN_CLASS = 'mobile-giga-menu-panel-open';
 const MOBILE_MENU_MAX_HEIGHT_PROPERTY = '--virtura-mobile-menu-max-height';
+const MOBILE_SURFACE_CLOSED_HEIGHT_PROPERTY =
+  '--virtura-mobile-menu-surface-closed-height';
+const MOBILE_SURFACE_OPEN_HEIGHT_PROPERTY =
+  '--virtura-mobile-menu-surface-open-height';
 const MOBILE_MENU_MIN_HEIGHT = 160;
-const MOBILE_HEADER_REVEAL_DURATION = 80;
-const MOBILE_PANEL_HIDE_DURATION = 340;
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 const MOBILE_CATEGORY_ORDER = ['detailing', 'design', 'selection', 'tuning'];
 
@@ -438,9 +442,29 @@ const getMobileBackdrop = () => {
   return backdrop;
 };
 
-const syncMobileMenuBounds = (wrapper, mediaQuery) => {
+const getMobileSurface = (navWrapper) => {
+  const existingSurface = navWrapper.querySelector(
+    `:scope > .${MOBILE_SURFACE_CLASS}`
+  );
+
+  if (existingSurface) {
+    return existingSurface;
+  }
+
+  const surface = document.createElement('div');
+
+  surface.className = MOBILE_SURFACE_CLASS;
+  surface.setAttribute('aria-hidden', 'true');
+  navWrapper.prepend(surface);
+
+  return surface;
+};
+
+const syncMobileMenuBounds = (navWrapper, wrapper, mediaQuery) => {
   if (!mediaQuery.matches) {
     wrapper.style.removeProperty(MOBILE_MENU_MAX_HEIGHT_PROPERTY);
+    navWrapper.style.removeProperty(MOBILE_SURFACE_CLOSED_HEIGHT_PROPERTY);
+    navWrapper.style.removeProperty(MOBILE_SURFACE_OPEN_HEIGHT_PROPERTY);
     return;
   }
 
@@ -465,13 +489,32 @@ const syncMobileMenuBounds = (wrapper, mediaQuery) => {
     MOBILE_MENU_MAX_HEIGHT_PROPERTY,
     `${Math.floor(maxHeight)}px`
   );
+
+  const navHeight = Math.ceil(navWrapper.getBoundingClientRect().height);
+  const panelHeight = Math.ceil(Math.min(wrapper.scrollHeight, maxHeight));
+
+  navWrapper.style.setProperty(
+    MOBILE_SURFACE_CLOSED_HEIGHT_PROPERTY,
+    `${navHeight}px`
+  );
+  navWrapper.style.setProperty(
+    MOBILE_SURFACE_OPEN_HEIGHT_PROPERTY,
+    `${navHeight + panelHeight}px`
+  );
 };
 
 const initMobileGigaMenu = (root, header, panel, trigger) => {
+  const navWrapper = root.querySelector(NAV_WRAPPER_SELECTOR);
   const navMenu = root.querySelector(MOBILE_NAV_SELECTOR);
   const wrapper = navMenu?.querySelector(MOBILE_MENU_WRAPPER_SELECTOR);
 
-  if (!navMenu || !wrapper || !trigger || navMenu.dataset.virturaMobileGigaMenu) {
+  if (
+    !navWrapper ||
+    !navMenu ||
+    !wrapper ||
+    !trigger ||
+    navMenu.dataset.virturaMobileGigaMenu
+  ) {
     return;
   }
 
@@ -486,6 +529,7 @@ const initMobileGigaMenu = (root, header, panel, trigger) => {
 
   const mediaQuery = window.matchMedia(MOBILE_BREAKPOINT_QUERY);
   const backdrop = getMobileBackdrop();
+  const surface = getMobileSurface(navWrapper);
   const menu = document.createElement('div');
   const list = document.createElement('div');
   const entries = [];
@@ -551,8 +595,6 @@ const initMobileGigaMenu = (root, header, panel, trigger) => {
   navMenu.dataset.virturaMobileGigaMenu = 'true';
 
   let boundsFrame = null;
-  let chromeCloseTimer = null;
-  let panelOpenTimer = null;
   let mobileMenuOpen = null;
   const reducedMotionMedia = window.matchMedia(REDUCED_MOTION_QUERY);
   const scheduleMobileMenuBounds = () => {
@@ -562,8 +604,22 @@ const initMobileGigaMenu = (root, header, panel, trigger) => {
 
     boundsFrame = window.requestAnimationFrame(() => {
       boundsFrame = null;
-      syncMobileMenuBounds(wrapper, mediaQuery);
+      syncMobileMenuBounds(navWrapper, wrapper, mediaQuery);
     });
+  };
+  const finishMobileMenuClose = () => {
+    if (
+      mediaQuery.matches &&
+      navMenu.classList.contains('show-mobile-menu')
+    ) {
+      return;
+    }
+
+    header.classList.remove(MOBILE_OPEN_CLASS);
+    root.classList.remove(MOBILE_OPEN_CLASS);
+    entries.forEach((entry) =>
+      setMobileAccordionOpen(entry, false, { immediate: true })
+    );
   };
   const syncState = () => {
     const shouldOpen =
@@ -572,45 +628,17 @@ const initMobileGigaMenu = (root, header, panel, trigger) => {
     if (shouldOpen !== mobileMenuOpen) {
       mobileMenuOpen = shouldOpen;
 
-      if (panelOpenTimer !== null) {
-        window.clearTimeout(panelOpenTimer);
-        panelOpenTimer = null;
-      }
-
-      if (chromeCloseTimer !== null) {
-        window.clearTimeout(chromeCloseTimer);
-        chromeCloseTimer = null;
-      }
-
       if (shouldOpen) {
-        const chromeAlreadyOpen = header.classList.contains(MOBILE_OPEN_CLASS);
-        const revealDelay =
-          reducedMotionMedia.matches || chromeAlreadyOpen
-            ? 0
-            : MOBILE_HEADER_REVEAL_DURATION;
-
         header.classList.add(MOBILE_OPEN_CLASS);
+        header.classList.add(MOBILE_PANEL_OPEN_CLASS);
         root.classList.add(MOBILE_OPEN_CLASS);
+        root.classList.add(MOBILE_PANEL_OPEN_CLASS);
+        surface.classList.add(MOBILE_SURFACE_OPEN_CLASS);
         backdrop.classList.add('is-open');
-
-        panelOpenTimer = window.setTimeout(() => {
-          panelOpenTimer = null;
-
-          if (
-            mediaQuery.matches &&
-            navMenu.classList.contains('show-mobile-menu')
-          ) {
-            header.classList.add(MOBILE_PANEL_OPEN_CLASS);
-            root.classList.add(MOBILE_PANEL_OPEN_CLASS);
-          }
-        }, revealDelay);
       } else {
-        const hideDuration = reducedMotionMedia.matches
-          ? 0
-          : MOBILE_PANEL_HIDE_DURATION;
-
         header.classList.remove(MOBILE_PANEL_OPEN_CLASS, NAV_ACTIVE_CLASS);
         root.classList.remove(MOBILE_PANEL_OPEN_CLASS, NAV_ACTIVE_CLASS);
+        surface.classList.remove(MOBILE_SURFACE_OPEN_CLASS);
         backdrop.classList.remove('is-open');
 
         if (
@@ -620,26 +648,33 @@ const initMobileGigaMenu = (root, header, panel, trigger) => {
           document.activeElement.blur();
         }
 
-        chromeCloseTimer = window.setTimeout(() => {
-          chromeCloseTimer = null;
+        const surfaceOpacity = getNumber(
+          window.getComputedStyle(surface).opacity
+        );
 
-          if (
-            !mediaQuery.matches ||
-            !navMenu.classList.contains('show-mobile-menu')
-          ) {
-            header.classList.remove(MOBILE_OPEN_CLASS);
-            root.classList.remove(MOBILE_OPEN_CLASS);
-            entries.forEach((entry) =>
-              setMobileAccordionOpen(entry, false, { immediate: true })
-            );
-          }
-        }, hideDuration);
+        if (
+          !mediaQuery.matches ||
+          reducedMotionMedia.matches ||
+          surfaceOpacity <= 0.01
+        ) {
+          finishMobileMenuClose();
+        }
       }
     }
 
     scheduleMobileMenuBounds();
   };
   const classObserver = new MutationObserver(syncState);
+
+  surface.addEventListener('transitionend', (event) => {
+    if (
+      event.target === surface &&
+      event.propertyName === 'opacity' &&
+      !surface.classList.contains(MOBILE_SURFACE_OPEN_CLASS)
+    ) {
+      finishMobileMenuClose();
+    }
+  });
 
   classObserver.observe(navMenu, {
     attributeFilter: ['class'],
@@ -662,6 +697,13 @@ const initMobileGigaMenu = (root, header, panel, trigger) => {
     window.visualViewport.addEventListener('scroll', syncState, {
       passive: true,
     });
+  }
+
+  if ('ResizeObserver' in window) {
+    const resizeObserver = new ResizeObserver(scheduleMobileMenuBounds);
+
+    resizeObserver.observe(navWrapper);
+    resizeObserver.observe(wrapper);
   }
 
   navMenu.addEventListener('keydown', (event) => {
