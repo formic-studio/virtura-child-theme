@@ -819,10 +819,10 @@ body {
     pointer-events: none;
     position: fixed;
     transition:
-      opacity 0.24s ease,
-      -webkit-backdrop-filter 0.3s var(--virtura-motion-ease, ease),
-      backdrop-filter 0.3s var(--virtura-motion-ease, ease),
-      visibility 0s linear 0.3s;
+      opacity 0.32s ease,
+      -webkit-backdrop-filter 0.42s var(--virtura-motion-ease, ease),
+      backdrop-filter 0.42s var(--virtura-motion-ease, ease),
+      visibility 0s linear 0.42s;
     visibility: hidden;
     z-index: 998;
   }
@@ -859,13 +859,20 @@ body {
     align-items: center !important;
     overflow: visible;
     position: relative;
-    transition: none !important;
+    transition:
+      background-color 0.32s ease,
+      border-radius 0.42s var(--virtura-motion-ease, ease) !important;
   }
 
   #brx-header .svg-link,
-  #brx-header .svg-link svg,
+  #brx-header .svg-link svg {
+    transition: color 0.28s ease !important;
+  }
+
   #brx-header .svg-link svg * {
-    transition: none !important;
+    transition:
+      fill 0.28s ease,
+      stroke 0.28s ease !important;
   }
 
   #brx-header:not(.mobile-giga-menu-open) .nav-wrapper,
@@ -982,13 +989,14 @@ body {
     position: absolute !important;
     right: 0 !important;
     top: 100% !important;
-    transform: translateY(-0.8rem) scaleY(0.98) !important;
+    transform: translateY(-1.6rem) !important;
     transform-origin: top center;
     transition:
-      opacity 0.22s ease,
-      transform 0.3s var(--virtura-motion-ease, ease),
-      visibility 0s linear 0.3s;
+      opacity 0.28s ease,
+      transform 0.46s var(--virtura-motion-ease, ease),
+      visibility 0s linear 0.46s;
     visibility: hidden;
+    will-change: opacity, transform;
     width: 100% !important;
     z-index: 1000;
     -webkit-overflow-scrolling: touch;
@@ -1000,10 +1008,10 @@ body {
     display: none !important;
   }
 
-  #brx-header .nav-text.show-mobile-menu .bricks-mobile-menu-wrapper {
+  #brx-header.mobile-giga-menu-open .bricks-mobile-menu-wrapper {
     opacity: 1;
     pointer-events: auto;
-    transform: translateY(0) scaleY(1) !important;
+    transform: translateY(0) !important;
     transition-delay: 0s;
     visibility: visible;
   }
@@ -1012,7 +1020,18 @@ body {
     display: flex;
     flex-direction: column;
     gap: var(--space-24, 2.4rem);
+    opacity: 0;
+    transform: translateY(-0.8rem);
+    transition:
+      opacity 0.24s ease,
+      transform 0.42s var(--virtura-motion-ease, ease);
     width: 100%;
+  }
+
+  #brx-header.mobile-giga-menu-open .virtura-mobile-giga-menu {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.06s;
   }
 
   #brx-header .virtura-mobile-giga-menu__list {
@@ -1275,9 +1294,11 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  #brx-header .nav-wrapper,
   #brx-header .bricks-mobile-menu-toggle span,
   #brx-header .nav-wrapper .bricks-mobile-menu-wrapper,
   .virtura-mobile-menu-backdrop,
+  #brx-header .virtura-mobile-giga-menu,
   #brx-header .virtura-mobile-giga-menu__category-icon,
   #brx-header .virtura-mobile-giga-menu__panel {
     transition: none;
