@@ -139,6 +139,11 @@ const getMobileServiceItems = (trigger) =>
     })
     .map(({ item }) => item);
 
+const getMobileTopLevelItems = (root, trigger) =>
+  Array.from(root.querySelectorAll('.bricks-nav-menu > .menu-item')).filter(
+    (item) => item !== trigger && getDirectLink(item)?.href
+  );
+
 const createLink = (sourceLink, className) => {
   const link = document.createElement('a');
 
@@ -318,6 +323,28 @@ const createMobileAccordionItem = (sourceItem, index, instanceId) => {
   };
 };
 
+const createMobileLinkItem = (sourceItem) => {
+  const sourceLink = getDirectLink(sourceItem);
+
+  if (!sourceLink) {
+    return null;
+  }
+
+  const element = document.createElement('div');
+
+  element.className = 'virtura-mobile-giga-menu__item';
+  element.append(
+    createLink(sourceLink, 'virtura-mobile-giga-menu__category-link')
+  );
+
+  return {
+    button: null,
+    closeTimer: 0,
+    element,
+    panel: null,
+  };
+};
+
 const sanitizeClonedMenuContent = (element) => {
   element.removeAttribute('id');
   element.removeAttribute('data-script-id');
@@ -450,8 +477,9 @@ const initMobileGigaMenu = (root, header, panel, trigger) => {
   }
 
   const serviceItems = getMobileServiceItems(trigger);
+  const topLevelItems = getMobileTopLevelItems(root, trigger);
 
-  if (!serviceItems.length) {
+  if (!serviceItems.length && !topLevelItems.length) {
     return;
   }
 
@@ -471,6 +499,17 @@ const initMobileGigaMenu = (root, header, panel, trigger) => {
       index,
       mobileMenuInstanceCount
     );
+
+    if (!entry) {
+      return;
+    }
+
+    entries.push(entry);
+    list.append(entry.element);
+  });
+
+  topLevelItems.forEach((item) => {
+    const entry = createMobileLinkItem(item);
 
     if (!entry) {
       return;
