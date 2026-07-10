@@ -19,6 +19,7 @@ const MOBILE_BREAKPOINT_QUERY = '(max-width: 991px)';
 const MOBILE_NAV_SELECTOR = '.brxe-nav-menu';
 const MOBILE_MENU_WRAPPER_SELECTOR = '.bricks-mobile-menu-wrapper';
 const MOBILE_MENU_CLASS = 'virtura-mobile-giga-menu';
+const MOBILE_BACKDROP_CLASS = 'virtura-mobile-menu-backdrop';
 const MOBILE_OPEN_CLASS = 'mobile-giga-menu-open';
 const MOBILE_MENU_MAX_HEIGHT_PROPERTY = '--virtura-mobile-menu-max-height';
 const MOBILE_MENU_MIN_HEIGHT = 160;
@@ -417,6 +418,22 @@ const createMobileCta = (root) => {
   return link;
 };
 
+const getMobileBackdrop = () => {
+  const existingBackdrop = document.querySelector(`.${MOBILE_BACKDROP_CLASS}`);
+
+  if (existingBackdrop) {
+    return existingBackdrop;
+  }
+
+  const backdrop = document.createElement('div');
+
+  backdrop.className = MOBILE_BACKDROP_CLASS;
+  backdrop.setAttribute('aria-hidden', 'true');
+  document.body.append(backdrop);
+
+  return backdrop;
+};
+
 const syncMobileMenuBounds = (wrapper, mediaQuery) => {
   if (!mediaQuery.matches) {
     wrapper.style.removeProperty(MOBILE_MENU_MAX_HEIGHT_PROPERTY);
@@ -446,12 +463,20 @@ const syncMobileMenuBounds = (wrapper, mediaQuery) => {
   );
 };
 
-const syncMobileMenuState = (root, header, navMenu, entries, mediaQuery) => {
+const syncMobileMenuState = (
+  root,
+  header,
+  navMenu,
+  backdrop,
+  entries,
+  mediaQuery
+) => {
   const isOpen =
     mediaQuery.matches && navMenu.classList.contains('show-mobile-menu');
 
   header.classList.toggle(MOBILE_OPEN_CLASS, isOpen);
   root.classList.toggle(MOBILE_OPEN_CLASS, isOpen);
+  backdrop.classList.toggle('is-open', isOpen);
 
   if (!isOpen) {
     header.classList.remove(NAV_ACTIVE_CLASS);
@@ -486,6 +511,7 @@ const initMobileGigaMenu = (root, header, panel, trigger) => {
   mobileMenuInstanceCount += 1;
 
   const mediaQuery = window.matchMedia(MOBILE_BREAKPOINT_QUERY);
+  const backdrop = getMobileBackdrop();
   const menu = document.createElement('div');
   const list = document.createElement('div');
   const entries = [];
@@ -562,7 +588,14 @@ const initMobileGigaMenu = (root, header, panel, trigger) => {
     });
   };
   const syncState = () => {
-    syncMobileMenuState(root, header, navMenu, entries, mediaQuery);
+    syncMobileMenuState(
+      root,
+      header,
+      navMenu,
+      backdrop,
+      entries,
+      mediaQuery
+    );
     scheduleMobileMenuBounds();
   };
   const classObserver = new MutationObserver(syncState);
