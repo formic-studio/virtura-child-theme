@@ -240,6 +240,7 @@ const createMobileAccordionItem = (sourceItem, index, instanceId) => {
 
   const childItems = getDirectSubmenuItems(sourceItem);
   const element = document.createElement('div');
+  const categoryLabel = getMobileCategoryLabel(sourceLink);
 
   element.className = 'virtura-mobile-giga-menu__item';
 
@@ -256,32 +257,38 @@ const createMobileAccordionItem = (sourceItem, index, instanceId) => {
     };
   }
 
+  const category = document.createElement('div');
+  const link = createLink(sourceLink, 'virtura-mobile-giga-menu__category-link');
   const button = document.createElement('button');
-  const label = document.createElement('span');
   const icon = document.createElement('span');
   const panel = document.createElement('div');
   const list = document.createElement('ul');
   const buttonId = `virtura-mobile-giga-menu-button-${instanceId}-${index}`;
+  const labelId = `virtura-mobile-giga-menu-label-${instanceId}-${index}`;
   const panelId = `virtura-mobile-giga-menu-panel-${instanceId}-${index}`;
 
-  button.className = 'virtura-mobile-giga-menu__category';
+  category.className = 'virtura-mobile-giga-menu__category';
+
+  link.id = labelId;
+  link.textContent = categoryLabel;
+
+  button.className = 'virtura-mobile-giga-menu__category-toggle';
   button.id = buttonId;
   button.type = 'button';
+  button.setAttribute('aria-label', `Pokaż podkategorie: ${categoryLabel}`);
   button.setAttribute('aria-controls', panelId);
   button.setAttribute('aria-expanded', 'false');
-
-  label.className = 'virtura-mobile-giga-menu__category-label';
-  label.textContent = getMobileCategoryLabel(sourceLink);
 
   icon.className = 'virtura-mobile-giga-menu__category-icon';
   icon.setAttribute('aria-hidden', 'true');
 
-  button.append(label, icon);
+  button.append(icon);
+  category.append(link, button);
 
   panel.className = 'virtura-mobile-giga-menu__panel';
   panel.hidden = true;
   panel.id = panelId;
-  panel.setAttribute('aria-labelledby', buttonId);
+  panel.setAttribute('aria-labelledby', labelId);
   panel.setAttribute('role', 'region');
 
   list.className = 'virtura-mobile-giga-menu__links';
@@ -301,7 +308,7 @@ const createMobileAccordionItem = (sourceItem, index, instanceId) => {
   });
 
   panel.append(list);
-  element.append(button, panel);
+  element.append(category, panel);
 
   return {
     button,

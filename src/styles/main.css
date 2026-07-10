@@ -1024,9 +1024,16 @@ body {
     border-bottom: 1px solid var(--color-grey, #a5a5a5);
   }
 
-  #brx-header .virtura-mobile-giga-menu__category,
-  #brx-header .virtura-mobile-giga-menu__category-link {
+  #brx-header .virtura-mobile-giga-menu__category {
     align-items: center;
+    display: flex;
+    gap: var(--space-16, 1.6rem);
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  #brx-header .virtura-mobile-giga-menu__category-link,
+  #brx-header .virtura-mobile-giga-menu__category-toggle {
     -webkit-tap-highlight-color: transparent;
     appearance: none;
     background: transparent !important;
@@ -1035,29 +1042,50 @@ body {
     color: var(--color-black, #000);
     display: flex;
     font: inherit;
+    text-decoration: none;
+  }
+
+  #brx-header .virtura-mobile-giga-menu__category-link {
+    align-items: center;
+    flex: 1 1 auto;
     font-size: var(--fs-h6, 2.4rem);
     font-weight: 600;
-    justify-content: space-between;
     line-height: 1;
     padding: var(--space-16, 1.6rem) 0;
     text-align: left;
-    text-decoration: none;
+    min-width: 0;
     width: 100%;
   }
 
-  #brx-header .virtura-mobile-giga-menu__category:hover,
-  #brx-header .virtura-mobile-giga-menu__category:focus,
-  #brx-header .virtura-mobile-giga-menu__category:active,
+  #brx-header
+    .virtura-mobile-giga-menu__category
+    > .virtura-mobile-giga-menu__category-link {
+    width: auto;
+  }
+
+  #brx-header .virtura-mobile-giga-menu__category-toggle {
+    align-items: center;
+    cursor: pointer;
+    flex: 0 0 auto;
+    justify-content: center;
+    min-height: 4.4rem;
+    min-width: 4.4rem;
+    padding: 0;
+  }
+
   #brx-header .virtura-mobile-giga-menu__category-link:hover,
   #brx-header .virtura-mobile-giga-menu__category-link:focus,
-  #brx-header .virtura-mobile-giga-menu__category-link:active {
+  #brx-header .virtura-mobile-giga-menu__category-link:active,
+  #brx-header .virtura-mobile-giga-menu__category-toggle:hover,
+  #brx-header .virtura-mobile-giga-menu__category-toggle:focus,
+  #brx-header .virtura-mobile-giga-menu__category-toggle:active {
     background: transparent !important;
     box-shadow: none !important;
     color: var(--color-black, #000);
   }
 
-  #brx-header .virtura-mobile-giga-menu__category:focus-visible,
   #brx-header .virtura-mobile-giga-menu__category-link:focus-visible,
+  #brx-header .virtura-mobile-giga-menu__category-toggle:focus-visible,
   #brx-header .virtura-mobile-giga-menu__link:focus-visible,
   #brx-header .virtura-mobile-giga-menu__cta:focus-visible {
     outline: 2px solid var(--color-black, #000);
@@ -1069,7 +1097,7 @@ body {
     border-right: 0.4rem solid currentColor;
     flex: 0 0 auto;
     height: 1.4rem;
-    margin-right: 0.4rem;
+    margin-right: 0;
     transform: rotate(45deg) translate(-0.2rem, -0.2rem);
     transition: transform 0.24s var(--virtura-motion-ease, ease);
     width: 1.4rem;
