@@ -839,6 +839,8 @@ body {
     --header-fg: var(--color-black, #000);
     --header-cta-bg: var(--color-black, #000);
     --header-cta-fg: var(--color-white, #fff);
+    isolation: isolate;
+    z-index: 999 !important;
   }
 
   #brx-header.header-theme-light.header-nav-active:not(.mobile-giga-menu-open) {
