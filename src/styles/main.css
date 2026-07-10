@@ -819,10 +819,10 @@ body {
     pointer-events: none;
     position: fixed;
     transition:
-      opacity 0.32s ease,
-      -webkit-backdrop-filter 0.42s var(--virtura-motion-ease, ease),
-      backdrop-filter 0.42s var(--virtura-motion-ease, ease),
-      visibility 0s linear 0.42s;
+      opacity 0.24s ease,
+      -webkit-backdrop-filter 0.34s var(--virtura-motion-ease, ease),
+      backdrop-filter 0.34s var(--virtura-motion-ease, ease),
+      visibility 0s linear 0.34s;
     visibility: hidden;
     z-index: 998;
   }
@@ -860,19 +860,19 @@ body {
     overflow: visible;
     position: relative;
     transition:
-      background-color 0.32s ease,
-      border-radius 0.32s var(--virtura-motion-ease, ease) !important;
+      background-color 0.24s ease,
+      border-radius 0.24s var(--virtura-motion-ease, ease) !important;
   }
 
   #brx-header .svg-link,
   #brx-header .svg-link svg {
-    transition: color 0.28s ease !important;
+    transition: color 0.24s ease !important;
   }
 
   #brx-header .svg-link svg * {
     transition:
-      fill 0.28s ease,
-      stroke 0.28s ease !important;
+      fill 0.24s ease,
+      stroke 0.24s ease !important;
   }
 
   #brx-header:not(.mobile-giga-menu-open) .nav-wrapper,
@@ -993,9 +993,9 @@ body {
     transform: none !important;
     transform-origin: top center;
     transition:
-      -webkit-clip-path 0.46s var(--virtura-motion-ease, ease),
-      clip-path 0.46s var(--virtura-motion-ease, ease),
-      visibility 0s linear 0.46s;
+      -webkit-clip-path 0.34s var(--virtura-motion-ease, ease),
+      clip-path 0.34s var(--virtura-motion-ease, ease),
+      visibility 0s linear 0.34s;
     visibility: hidden;
     will-change: clip-path;
     width: 100% !important;
@@ -1025,14 +1025,14 @@ body {
     transform: translateY(-0.8rem);
     transition:
       opacity 0.24s ease,
-      transform 0.42s var(--virtura-motion-ease, ease);
+      transform 0.34s var(--virtura-motion-ease, ease);
     width: 100%;
   }
 
   #brx-header.mobile-giga-menu-panel-open .virtura-mobile-giga-menu {
     opacity: 1;
     transform: translateY(0);
-    transition-delay: 0.06s;
+    transition-delay: 0.04s;
   }
 
   #brx-header .virtura-mobile-giga-menu__list {
