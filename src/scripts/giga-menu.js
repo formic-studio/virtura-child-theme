@@ -21,8 +21,12 @@ const MOBILE_MENU_WRAPPER_SELECTOR = '.bricks-mobile-menu-wrapper';
 const MOBILE_MENU_CLASS = 'virtura-mobile-giga-menu';
 const MOBILE_BACKDROP_CLASS = 'virtura-mobile-menu-backdrop';
 const MOBILE_OPEN_CLASS = 'mobile-giga-menu-open';
+const MOBILE_PANEL_OPEN_CLASS = 'mobile-giga-menu-panel-open';
 const MOBILE_MENU_MAX_HEIGHT_PROPERTY = '--virtura-mobile-menu-max-height';
 const MOBILE_MENU_MIN_HEIGHT = 160;
+const MOBILE_HEADER_REVEAL_DURATION = 320;
+const MOBILE_PANEL_HIDE_DURATION = 460;
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 const MOBILE_CATEGORY_ORDER = ['detailing', 'design', 'selection', 'tuning'];
 
 let mobileMenuInstanceCount = 0;
@@ -463,36 +467,6 @@ const syncMobileMenuBounds = (wrapper, mediaQuery) => {
   );
 };
 
-const syncMobileMenuState = (
-  root,
-  header,
-  navMenu,
-  backdrop,
-  entries,
-  mediaQuery
-) => {
-  const isOpen =
-    mediaQuery.matches && navMenu.classList.contains('show-mobile-menu');
-
-  header.classList.toggle(MOBILE_OPEN_CLASS, isOpen);
-  root.classList.toggle(MOBILE_OPEN_CLASS, isOpen);
-  backdrop.classList.toggle('is-open', isOpen);
-
-  if (!isOpen) {
-    header.classList.remove(NAV_ACTIVE_CLASS);
-    root.classList.remove(NAV_ACTIVE_CLASS);
-    if (
-      document.activeElement instanceof HTMLElement &&
-      navMenu.contains(document.activeElement)
-    ) {
-      document.activeElement.blur();
-    }
-    entries.forEach((entry) =>
-      setMobileAccordionOpen(entry, false, { immediate: true })
-    );
-  }
-};
-
 const initMobileGigaMenu = (root, header, panel, trigger) => {
   const navMenu = root.querySelector(MOBILE_NAV_SELECTOR);
   const wrapper = navMenu?.querySelector(MOBILE_MENU_WRAPPER_SELECTOR);
@@ -577,6 +551,10 @@ const initMobileGigaMenu = (root, header, panel, trigger) => {
   navMenu.dataset.virturaMobileGigaMenu = 'true';
 
   let boundsFrame = null;
+  let chromeCloseTimer = null;
+  let panelOpenTimer = null;
+  let mobileMenuOpen = null;
+  const reducedMotionMedia = window.matchMedia(REDUCED_MOTION_QUERY);
   const scheduleMobileMenuBounds = () => {
     if (boundsFrame !== null) {
       window.cancelAnimationFrame(boundsFrame);
@@ -588,14 +566,77 @@ const initMobileGigaMenu = (root, header, panel, trigger) => {
     });
   };
   const syncState = () => {
-    syncMobileMenuState(
-      root,
-      header,
-      navMenu,
-      backdrop,
-      entries,
-      mediaQuery
-    );
+    const shouldOpen =
+      mediaQuery.matches && navMenu.classList.contains('show-mobile-menu');
+
+    if (shouldOpen !== mobileMenuOpen) {
+      mobileMenuOpen = shouldOpen;
+
+      if (panelOpenTimer !== null) {
+        window.clearTimeout(panelOpenTimer);
+        panelOpenTimer = null;
+      }
+
+      if (chromeCloseTimer !== null) {
+        window.clearTimeout(chromeCloseTimer);
+        chromeCloseTimer = null;
+      }
+
+      if (shouldOpen) {
+        const chromeAlreadyOpen = header.classList.contains(MOBILE_OPEN_CLASS);
+        const revealDelay =
+          reducedMotionMedia.matches || chromeAlreadyOpen
+            ? 0
+            : MOBILE_HEADER_REVEAL_DURATION;
+
+        header.classList.add(MOBILE_OPEN_CLASS);
+        root.classList.add(MOBILE_OPEN_CLASS);
+        backdrop.classList.add('is-open');
+
+        panelOpenTimer = window.setTimeout(() => {
+          panelOpenTimer = null;
+
+          if (
+            mediaQuery.matches &&
+            navMenu.classList.contains('show-mobile-menu')
+          ) {
+            header.classList.add(MOBILE_PANEL_OPEN_CLASS);
+            root.classList.add(MOBILE_PANEL_OPEN_CLASS);
+          }
+        }, revealDelay);
+      } else {
+        const hideDuration = reducedMotionMedia.matches
+          ? 0
+          : MOBILE_PANEL_HIDE_DURATION;
+
+        header.classList.remove(MOBILE_PANEL_OPEN_CLASS, NAV_ACTIVE_CLASS);
+        root.classList.remove(MOBILE_PANEL_OPEN_CLASS, NAV_ACTIVE_CLASS);
+        backdrop.classList.remove('is-open');
+
+        if (
+          document.activeElement instanceof HTMLElement &&
+          navMenu.contains(document.activeElement)
+        ) {
+          document.activeElement.blur();
+        }
+
+        chromeCloseTimer = window.setTimeout(() => {
+          chromeCloseTimer = null;
+
+          if (
+            !mediaQuery.matches ||
+            !navMenu.classList.contains('show-mobile-menu')
+          ) {
+            header.classList.remove(MOBILE_OPEN_CLASS);
+            root.classList.remove(MOBILE_OPEN_CLASS);
+            entries.forEach((entry) =>
+              setMobileAccordionOpen(entry, false, { immediate: true })
+            );
+          }
+        }, hideDuration);
+      }
+    }
+
     scheduleMobileMenuBounds();
   };
   const classObserver = new MutationObserver(syncState);
