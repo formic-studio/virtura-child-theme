@@ -2,6 +2,7 @@ import '../styles/main.css';
 import { initAboutSlider } from './about-slider.js';
 import { initArchiveFilters } from './archive-filters.js';
 import { initCategoryStack } from './category-stack.js';
+import { initFaqAccordion } from './faq-accordion.js';
 import { initFitText } from './fit-text.js';
 import { initGigaMenu } from './giga-menu.js';
 import { initHeaderScroll } from './header-scroll.js';
@@ -22,6 +23,7 @@ const initTheme = () => {
   initCategoryStack();
   initTrainingTabs();
   initArchiveFilters();
+  initFaqAccordion();
   initAboutSlider();
   initTestimonialsSlider();
   initMediaSwitch();

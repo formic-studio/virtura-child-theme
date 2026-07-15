@@ -9,6 +9,62 @@ body {
   color: var(--color-black, #000);
 }
 
+.faq-block.virtura-faq-ready.brxe-block,
+:is(html, body).bricks-is-builder .faq-block.brxe-block {
+  row-gap: 0 !important;
+}
+
+.faq-block.virtura-faq-ready > .faq-heading {
+  cursor: pointer;
+}
+
+.faq-block.virtura-faq-ready > .faq-heading:focus {
+  outline: none;
+}
+
+.faq-block.virtura-faq-ready > .faq-heading:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: var(--space-8, 0.8rem);
+}
+
+.faq-block > .faq-heading > svg {
+  flex: 0 0 auto;
+  transform: rotate(0deg);
+  transform-origin: center;
+  transition: transform 0.42s var(--virtura-motion-ease);
+}
+
+.faq-block.is-open > .faq-heading > svg {
+  transform: rotate(180deg);
+}
+
+.faq-block.virtura-faq-ready > :is(.faq-content, .faq-conent),
+:is(html, body).bricks-is-builder
+  .faq-block:not(.is-open)
+  > :is(.faq-content, .faq-conent) {
+  height: 0;
+  margin-top: 0;
+  opacity: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+.faq-block.virtura-faq-ready.is-open > :is(.faq-content, .faq-conent),
+:is(html, body).bricks-is-builder
+  .faq-block.is-open
+  > :is(.faq-content, .faq-conent) {
+  height: auto;
+  margin-top: var(--space-24, 2.4rem);
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-block > .faq-heading > svg {
+    transition: none;
+  }
+}
+
 :is(
   a[href],
   button,

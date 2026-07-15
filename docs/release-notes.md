@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Added an accessible animated FAQ accordion for Bricks structures using
+  `.faq-block`, `.faq-heading` and `.faq-content` (the existing typo
+  `.faq-conent` remains supported). Add `is-open` to the whole `.faq-block`
+  to expose its content while editing in Bricks or to make it initially open
+  on the frontend. Opening an item closes the other items in the same
+  `.faq-wrapper`.
 - Initial child theme setup for Bricks Builder.
 - Added Vite asset pipeline.
 - Added GSAP motion foundation with `prefers-reduced-motion` support.
