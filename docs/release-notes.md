@@ -9,6 +9,9 @@
   arrows, touch swipe and horizontal touchpad/Magic Mouse gestures only when
   the track actually overflows. Wheel handling reacts only to horizontal intent
   and advances once per gesture so vertical page scrolling remains unaffected.
+  A fresh gesture can re-arm the slider from a long momentum tail only after a
+  short guard period and a clear acceleration spike, avoiding both lock-ups and
+  accidental two-slide jumps.
   The track is
   moved with transforms and clipped without an overflow scroll container, so
   the existing sticky `.spec-top` headers keep following the viewport without

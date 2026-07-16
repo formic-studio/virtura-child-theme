@@ -19,6 +19,10 @@ const SWIPE_THRESHOLD = 40;
 const WHEEL_LINE_MULTIPLIER = 16;
 const WHEEL_GESTURE_IDLE = 180;
 const WHEEL_GESTURE_THRESHOLD = 28;
+const WHEEL_REARM_DELAY = ANIMATION_DURATION * 1000;
+const WHEEL_REARM_MIN_DELTA = 6;
+const WHEEL_REARM_MIN_INCREASE = 3;
+const WHEEL_REARM_RATIO = 1.65;
 
 const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -279,8 +283,55 @@ const initSlider = (slider) => {
   let touchStartX = null;
   let touchStartY = null;
   let wheelAccumulator = 0;
+  let wheelGestureHandledAt = 0;
   let wheelGestureHandled = false;
+  let wheelLastDelta = 0;
   let wheelResetTimer = null;
+
+  const resetWheelGesture = () => {
+    if (wheelResetTimer !== null) {
+      window.clearTimeout(wheelResetTimer);
+    }
+
+    wheelAccumulator = 0;
+    wheelGestureHandledAt = 0;
+    wheelGestureHandled = false;
+    wheelLastDelta = 0;
+    wheelResetTimer = null;
+  };
+
+  const scheduleWheelReset = () => {
+    if (wheelResetTimer !== null) {
+      window.clearTimeout(wheelResetTimer);
+    }
+
+    wheelResetTimer = window.setTimeout(
+      resetWheelGesture,
+      WHEEL_GESTURE_IDLE,
+    );
+  };
+
+  const isNewWheelImpulse = (delta, timestamp) => {
+    if (
+      !wheelGestureHandled ||
+      timestamp - wheelGestureHandledAt < WHEEL_REARM_DELAY
+    ) {
+      return false;
+    }
+
+    const magnitude = Math.abs(delta);
+    const previousMagnitude = Math.abs(wheelLastDelta);
+    const directionChanged =
+      Math.sign(delta) !== Math.sign(wheelLastDelta);
+    const accelerated =
+      magnitude >= previousMagnitude * WHEEL_REARM_RATIO &&
+      magnitude - previousMagnitude >= WHEEL_REARM_MIN_INCREASE;
+
+    return (
+      magnitude >= WHEEL_REARM_MIN_DELTA &&
+      (directionChanged || accelerated)
+    );
+  };
 
   const setTrackPosition = (position) => {
     const x = Math.max(0, position) * -1;
@@ -405,15 +456,15 @@ const initSlider = (slider) => {
 
       event.preventDefault();
 
-      if (wheelResetTimer !== null) {
-        window.clearTimeout(wheelResetTimer);
-      }
+      const timestamp = performance.now();
 
-      wheelResetTimer = window.setTimeout(() => {
+      if (isNewWheelImpulse(delta, timestamp)) {
         wheelAccumulator = 0;
         wheelGestureHandled = false;
-        wheelResetTimer = null;
-      }, WHEEL_GESTURE_IDLE);
+      }
+
+      wheelLastDelta = delta;
+      scheduleWheelReset();
 
       if (wheelGestureHandled) {
         return;
@@ -433,6 +484,7 @@ const initSlider = (slider) => {
       }
 
       wheelGestureHandled = true;
+      wheelGestureHandledAt = timestamp;
       goTo(activeIndex + (wheelAccumulator > 0 ? 1 : -1));
       wheelAccumulator = 0;
     },
