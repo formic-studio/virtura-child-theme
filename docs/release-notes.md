@@ -15,8 +15,9 @@
   covering the first data row. Package headers and corresponding `.spec-bottom`
   rows are height-synchronised whenever multiple packages are visible, keeping
   later parameters aligned even when one value has fewer or more text lines.
-  The sticky inset is `0` on every breakpoint, while mobile vertical header
-  padding scales with the viewport to keep `.spec-top` compact.
+  The sticky inset is `0` on every breakpoint. Header top padding scales from
+  `2.8–3.6rem` on mobile through `3.6–4.2rem` on tablet to a maximum of
+  `4.6rem` on desktop, while mobile bottom padding remains compact.
 - Added a global `.service-img-block` hover treatment without changing the
   Bricks structure: its inherited background image scales to `1.02` inside the
   clipped card over `1.2s`, while `.img-button` uses the violet shared fill

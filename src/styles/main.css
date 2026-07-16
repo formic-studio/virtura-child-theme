@@ -1728,11 +1728,13 @@ body {
 }
 
 .specs-slider .specs-wrapper .spec-top {
+  --virtura-spec-padding-top: clamp(4.2rem, 3vw, 4.6rem);
   --virtura-spec-sticky-cover: 0px;
 
   background-color: var(--color-white, #fff);
   isolation: isolate;
   overflow: visible;
+  padding-top: var(--virtura-spec-padding-top);
   top: 0;
 }
 
@@ -1753,10 +1755,17 @@ body {
   z-index: 0;
 }
 
+@media (max-width: 991px) {
+  .specs-slider .specs-wrapper .spec-top {
+    --virtura-spec-padding-top: clamp(3.6rem, 4.25vw, 4.2rem);
+  }
+}
+
 @media (max-width: 767px) {
   .specs-slider .specs-wrapper .spec-top {
+    --virtura-spec-padding-top: clamp(2.8rem, 9vw, 3.6rem);
+
     padding-bottom: clamp(2.4rem, 7vw, 3.2rem);
-    padding-top: clamp(2.8rem, 9vw, 4rem);
   }
 }
 
