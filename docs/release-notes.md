@@ -3,8 +3,9 @@
 ## Unreleased
 
 - Added a responsive `.specs-slider` for package comparison tables. It shows
-  up to four packages on desktop, two on tablet and one on mobile, hides
-  `.slider-paggination` whenever every package fits, and enables accessible
+  up to six packages on viewports from 1920px, four on regular desktop, two on
+  tablet and one on mobile. It hides `.slider-paggination` whenever every
+  package fits and enables accessible
   arrows plus touch swipe only when the track actually overflows. The track is
   moved with transforms and clipped without an overflow scroll container, so
   the existing sticky `.spec-top` headers keep following the viewport without

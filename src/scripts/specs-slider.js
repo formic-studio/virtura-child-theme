@@ -37,6 +37,10 @@ const clampIndex = (index, length) =>
   Math.min(Math.max(index, 0), Math.max(0, length - 1));
 
 const getItemsPerView = () => {
+  if (window.matchMedia('(min-width: 1920px)').matches) {
+    return 6;
+  }
+
   if (window.matchMedia('(max-width: 767px)').matches) {
     return 1;
   }
