@@ -2133,7 +2133,7 @@ body {
    * can overlap the following section. On mobile these cards are much taller,
    * and a section-level `overflow: hidden` clips their content because a
    * relative offset does not add space to the document flow. Keep every
-   * mobile glass card in normal flow, regardless of the page it is used on.
+   * mobile glass card fully visible while preserving the intended overlap.
    */
   .brxe-section:has(.glass-block),
   .brxe-section:has(.glass-block) > .brxe-container,
@@ -2144,11 +2144,13 @@ body {
   }
 
   .brxe-section:has(.glass-block) .glass-block.brxe-block {
-    bottom: auto !important;
+    bottom: -7rem !important;
     height: auto !important;
     max-height: none !important;
     min-height: 0 !important;
+    position: relative !important;
     transform: none !important;
+    z-index: 2;
   }
 }
 

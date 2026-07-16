@@ -3,9 +3,9 @@
 ## Unreleased
 
 - Fixed shared `.glass-block` cards being clipped by the following section on
-  mobile. Glass cards now return to normal document flow below `768px`, while
-  their section, container and padding wrapper expand to the card's full
-  content height; the existing desktop overlap remains unchanged.
+  mobile. Their section, container and padding wrapper now expose the full card
+  while the existing `7rem` overlap is preserved and layered above the next
+  section.
 - Added a responsive `.specs-slider` for package comparison tables. It shows
   up to six packages on viewports from 1920px, four on regular desktop, two on
   tablet and one on mobile. It hides `.slider-paggination` whenever every
