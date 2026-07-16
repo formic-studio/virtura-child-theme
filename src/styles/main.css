@@ -2127,6 +2127,29 @@ body {
     width: 100% !important;
     z-index: 2;
   }
+
+  /*
+   * Bricks offsets shared glass cards by `bottom: -7rem` on desktop so they
+   * can overlap the following section. On mobile these cards are much taller,
+   * and a section-level `overflow: hidden` clips their content because a
+   * relative offset does not add space to the document flow. Keep every
+   * mobile glass card in normal flow, regardless of the page it is used on.
+   */
+  .brxe-section:has(.glass-block),
+  .brxe-section:has(.glass-block) > .brxe-container,
+  .brxe-section:has(.glass-block) .padding-global {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .brxe-section:has(.glass-block) .glass-block.brxe-block {
+    bottom: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    transform: none !important;
+  }
 }
 
 .section_category
