@@ -487,10 +487,6 @@ body {
   --btn-hover-bg: var(--color-violet, #ad79fc);
 }
 
-.category-link:is(:hover, :focus-visible) {
-  color: var(--color-black, #000);
-}
-
 .nav-btn:is(:hover, :focus-visible) {
   color: var(--color-white, #fff);
 }
@@ -538,10 +534,7 @@ body {
   color: var(--color-white, #fff);
 }
 
-:is(.btn, .nav-btn, .footer-btn, .category-link):is(
-    :hover,
-    :focus-visible
-  )
+:is(.btn, .nav-btn, .footer-btn):is(:hover, :focus-visible)
   :where(a, button, span, .brxe-text-basic, .brxe-button-text) {
   color: inherit;
 }

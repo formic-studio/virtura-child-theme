@@ -3,7 +3,7 @@
 ## Unreleased
 
 - Added the shared button fill hover/focus treatment to `.category-link`
-  glass links, using `--color-violet` with black text for contrast.
+  glass links, using `--color-violet` without changing text colors.
 - Added a global CSS-only horizontal swipe carousel for direct
   `.category-link` groups on mobile. Cards keep their 80% width, scroll with
   touch momentum and snap one card at a time without a visible scrollbar. The
