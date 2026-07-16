@@ -17,8 +17,7 @@ const ANIMATION_EASE = 'power3.out';
 const OFFSET_EPSILON = 2;
 const SWIPE_THRESHOLD = 40;
 const WHEEL_LINE_MULTIPLIER = 16;
-const WHEEL_GESTURE_COOLDOWN = 520;
-const WHEEL_GESTURE_IDLE = 120;
+const WHEEL_GESTURE_IDLE = 180;
 const WHEEL_GESTURE_THRESHOLD = 28;
 
 const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -283,24 +282,6 @@ const initSlider = (slider) => {
   let wheelGestureHandled = false;
   let wheelResetTimer = null;
 
-  const resetWheelGesture = () => {
-    if (wheelResetTimer !== null) {
-      window.clearTimeout(wheelResetTimer);
-    }
-
-    wheelAccumulator = 0;
-    wheelGestureHandled = false;
-    wheelResetTimer = null;
-  };
-
-  const scheduleWheelReset = (delay) => {
-    if (wheelResetTimer !== null) {
-      window.clearTimeout(wheelResetTimer);
-    }
-
-    wheelResetTimer = window.setTimeout(resetWheelGesture, delay);
-  };
-
   const setTrackPosition = (position) => {
     const x = Math.max(0, position) * -1;
 
@@ -413,21 +394,26 @@ const initSlider = (slider) => {
     'wheel',
     (event) => {
       if (!hasOverflow) {
-        resetWheelGesture();
         return;
       }
 
       const delta = getHorizontalWheelDelta(event, track.clientWidth);
 
       if (!delta) {
-        if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
-          resetWheelGesture();
-        }
-
         return;
       }
 
       event.preventDefault();
+
+      if (wheelResetTimer !== null) {
+        window.clearTimeout(wheelResetTimer);
+      }
+
+      wheelResetTimer = window.setTimeout(() => {
+        wheelAccumulator = 0;
+        wheelGestureHandled = false;
+        wheelResetTimer = null;
+      }, WHEEL_GESTURE_IDLE);
 
       if (wheelGestureHandled) {
         return;
@@ -443,14 +429,12 @@ const initSlider = (slider) => {
       wheelAccumulator += delta;
 
       if (Math.abs(wheelAccumulator) < WHEEL_GESTURE_THRESHOLD) {
-        scheduleWheelReset(WHEEL_GESTURE_IDLE);
         return;
       }
 
       wheelGestureHandled = true;
       goTo(activeIndex + (wheelAccumulator > 0 ? 1 : -1));
       wheelAccumulator = 0;
-      scheduleWheelReset(WHEEL_GESTURE_COOLDOWN);
     },
     { passive: false },
   );
