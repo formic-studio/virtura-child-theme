@@ -125,10 +125,13 @@ body {
     .padding-global
     :is(.brxe-block, .brxe-container):has(> .category-link) {
     box-sizing: border-box;
-    margin-inline-end: calc(0px - var(--space-16, 1.6rem));
+    margin-inline: calc(0px - var(--space-16, 1.6rem));
     max-width: none;
-    padding-inline-end: var(--space-16, 1.6rem);
-    width: calc(100% + var(--space-16, 1.6rem));
+    padding-inline: var(--space-16, 1.6rem);
+    scroll-padding-inline: var(--space-16, 1.6rem);
+    width: calc(
+      100% + var(--space-16, 1.6rem) + var(--space-16, 1.6rem)
+    );
   }
 
   #brx-content
