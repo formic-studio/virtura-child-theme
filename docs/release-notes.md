@@ -17,9 +17,7 @@
   later parameters aligned even when one value has fewer or more text lines.
   The sticky inset is `0` on every breakpoint. Header top padding scales from
   `2.8–3.6rem` on mobile through `3.6–4.2rem` on tablet to a maximum of
-  `4.6rem` on desktop. Bottom padding keeps its original spacing while the
-  header is static, then contracts for the sticky state to a maximum of
-  `4.6rem` on desktop and proportionally smaller values on tablet and mobile.
+  `4.6rem` on desktop, while mobile bottom padding remains compact.
 - Added a global `.service-img-block` hover treatment without changing the
   Bricks structure: its inherited background image scales to `1.02` inside the
   clipped card over `1.2s`, while `.img-button` uses the violet shared fill
