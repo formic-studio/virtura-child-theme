@@ -114,12 +114,21 @@ body {
     max-width: 100%;
     min-width: 0;
     overflow-x: auto;
-    overflow-y: hidden;
     overscroll-behavior-inline: contain;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
     width: 100%;
     -webkit-overflow-scrolling: touch;
+  }
+
+  #brx-content
+    .padding-global
+    :is(.brxe-block, .brxe-container):has(> .category-link) {
+    box-sizing: border-box;
+    margin-inline-end: calc(0px - var(--space-16, 1.6rem));
+    max-width: none;
+    padding-inline-end: var(--space-16, 1.6rem);
+    width: calc(100% + var(--space-16, 1.6rem));
   }
 
   #brx-content
