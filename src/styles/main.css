@@ -459,7 +459,7 @@ body {
   }
 }
 
-:is(.btn, .nav-btn, .footer-btn) {
+:is(.btn, .nav-btn, .footer-btn, .category-link) {
   --btn-hover-bg: var(--color-darker-grey, #8f8f8f);
   --btn-hover-transition:
     background-size 0.62s var(--virtura-motion-ease), border-color 0.24s ease,
@@ -473,14 +473,22 @@ body {
   transition: var(--btn-hover-transition);
 }
 
-:is(.btn, .nav-btn, .footer-btn):hover,
-:is(.btn, .nav-btn, .footer-btn):focus-visible {
+:is(.btn, .nav-btn, .footer-btn, .category-link):hover,
+:is(.btn, .nav-btn, .footer-btn, .category-link):focus-visible {
   background-size: 100% 100%;
   transition: var(--btn-hover-transition);
 }
 
 .nav-btn {
   --btn-hover-bg: var(--color-darkest-grey, #363636);
+}
+
+.category-link {
+  --btn-hover-bg: var(--color-violet, #ad79fc);
+}
+
+.category-link:is(:hover, :focus-visible) {
+  color: var(--color-black, #000);
 }
 
 .nav-btn:is(:hover, :focus-visible) {
@@ -530,7 +538,10 @@ body {
   color: var(--color-white, #fff);
 }
 
-:is(.btn, .nav-btn, .footer-btn):is(:hover, :focus-visible)
+:is(.btn, .nav-btn, .footer-btn, .category-link):is(
+    :hover,
+    :focus-visible
+  )
   :where(a, button, span, .brxe-text-basic, .brxe-button-text) {
   color: inherit;
 }
@@ -559,7 +570,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :is(.btn, .nav-btn, .footer-btn) {
+  :is(.btn, .nav-btn, .footer-btn, .category-link) {
     transition: none;
   }
 }
