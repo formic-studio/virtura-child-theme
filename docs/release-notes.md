@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added a global CSS-only horizontal swipe carousel for direct
+  `.category-link` groups on mobile. Cards keep their 80% width, scroll with
+  touch momentum and snap one card at a time without a visible scrollbar.
 - Added an accessible animated FAQ accordion for Bricks structures using
   `.faq-block`, `.faq-heading` and `.faq-content` (the existing typo
   `.faq-conent` remains supported). Add `is-open` to the whole `.faq-block`
