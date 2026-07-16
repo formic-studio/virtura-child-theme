@@ -1698,6 +1698,10 @@ body {
   width: var(--virtura-spec-item-width, 100%) !important;
 }
 
+.specs-slider [data-virtura-spec-synced-height] {
+  min-height: var(--virtura-spec-synced-height);
+}
+
 .specs-slider .slider-paggination[hidden],
 .specs-slider.virtura-specs-slider-ready:not(.has-overflow)
   .slider-paggination {

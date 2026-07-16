@@ -8,7 +8,9 @@
   arrows plus touch swipe only when the track actually overflows. The track is
   moved with transforms and clipped without an overflow scroll container, so
   the existing sticky `.spec-top` headers keep following the viewport without
-  covering the first data row.
+  covering the first data row. Package headers and corresponding `.spec-bottom`
+  rows are height-synchronised whenever multiple packages are visible, keeping
+  later parameters aligned even when one value has fewer or more text lines.
 - Added a global `.service-img-block` hover treatment without changing the
   Bricks structure: its inherited background image scales to `1.02` inside the
   clipped card over `1.2s`, while `.img-button` uses the violet shared fill

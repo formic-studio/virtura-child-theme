@@ -8,6 +8,8 @@ const CONTROL_SELECTOR = '.svg-arrow-block';
 const READY_CLASS = 'virtura-specs-slider-ready';
 const OVERFLOW_CLASS = 'has-overflow';
 const DISABLED_CLASS = 'is-disabled';
+const SYNCED_HEIGHT_ATTRIBUTE = 'data-virtura-spec-synced-height';
+const SYNCED_HEIGHT_PROPERTY = '--virtura-spec-synced-height';
 const PREV_LABEL = 'Poprzednie pakiety';
 const NEXT_LABEL = 'Następne pakiety';
 const ANIMATION_DURATION = 0.72;
@@ -98,6 +100,79 @@ const getTrackPositions = (track, items) => {
   return positions.length ? positions : [0];
 };
 
+const getItemLayout = (item) => {
+  const top = Array.from(item.children).find(
+    (child) => child instanceof HTMLElement && child.classList.contains('spec-top'),
+  );
+  const bottom = Array.from(item.children).find(
+    (child) => child instanceof HTMLElement && child.classList.contains('spec-bottom'),
+  );
+
+  return {
+    rows:
+      bottom instanceof HTMLElement
+        ? Array.from(bottom.children).filter(
+            (child) => child instanceof HTMLElement,
+          )
+        : [],
+    top: top instanceof HTMLElement ? top : null,
+  };
+};
+
+const clearSyncedHeight = (element) => {
+  if (!(element instanceof HTMLElement)) {
+    return;
+  }
+
+  element.removeAttribute(SYNCED_HEIGHT_ATTRIBUTE);
+  element.style.removeProperty(SYNCED_HEIGHT_PROPERTY);
+};
+
+const setSyncedHeight = (elements) => {
+  const validElements = elements.filter(
+    (element) => element instanceof HTMLElement,
+  );
+
+  if (validElements.length < 2) {
+    return;
+  }
+
+  const height = Math.ceil(
+    Math.max(...validElements.map((element) => element.getBoundingClientRect().height)),
+  );
+
+  if (height <= 0) {
+    return;
+  }
+
+  validElements.forEach((element) => {
+    element.style.setProperty(SYNCED_HEIGHT_PROPERTY, `${height}px`);
+    element.setAttribute(SYNCED_HEIGHT_ATTRIBUTE, '');
+  });
+};
+
+const syncItemHeights = (itemLayouts) => {
+  itemLayouts.forEach(({ rows, top }) => {
+    clearSyncedHeight(top);
+    rows.forEach(clearSyncedHeight);
+  });
+
+  if (getItemsPerView() <= 1 || itemLayouts.length < 2) {
+    return;
+  }
+
+  setSyncedHeight(itemLayouts.map(({ top }) => top));
+
+  const rowCount = Math.max(
+    0,
+    ...itemLayouts.map(({ rows }) => rows.length),
+  );
+
+  for (let rowIndex = 0; rowIndex < rowCount; rowIndex += 1) {
+    setSyncedHeight(itemLayouts.map(({ rows }) => rows[rowIndex]));
+  }
+};
+
 const setControlState = (control, isDisabled) => {
   control.classList.toggle(DISABLED_CLASS, isDisabled);
   control.setAttribute('aria-disabled', String(isDisabled));
@@ -152,6 +227,7 @@ const initSlider = (slider) => {
         (control) => control instanceof HTMLElement,
       )
     : [];
+  const itemLayouts = items.map(getItemLayout);
 
   if (
     !(track instanceof HTMLElement) ||
@@ -202,11 +278,13 @@ const initSlider = (slider) => {
     gsapApi?.killTweensOf(track);
 
     if (!setItemWidth(track, items)) {
+      syncItemHeights(itemLayouts);
       setOverflowState(false);
       syncControls();
       return;
     }
 
+    syncItemHeights(itemLayouts);
     positions = getTrackPositions(track, items);
     setOverflowState(
       getMaxOffset(track) > OFFSET_EPSILON && positions.length > 1,
