@@ -8,6 +8,7 @@ const CONTROL_SELECTOR = '.svg-arrow-block';
 const READY_CLASS = 'virtura-specs-slider-ready';
 const OVERFLOW_CLASS = 'has-overflow';
 const DISABLED_CLASS = 'is-disabled';
+const STUCK_CLASS = 'is-spec-top-stuck';
 const SYNCED_HEIGHT_ATTRIBUTE = 'data-virtura-spec-synced-height';
 const SYNCED_HEIGHT_PROPERTY = '--virtura-spec-synced-height';
 const PREV_LABEL = 'Poprzednie pakiety';
@@ -15,6 +16,7 @@ const NEXT_LABEL = 'Następne pakiety';
 const ANIMATION_DURATION = 0.72;
 const ANIMATION_EASE = 'power3.out';
 const OFFSET_EPSILON = 2;
+const STICKY_EPSILON = 1;
 const SWIPE_THRESHOLD = 40;
 const WHEEL_LINE_MULTIPLIER = 16;
 const WHEEL_GESTURE_IDLE = 180;
@@ -276,6 +278,7 @@ const initSlider = (slider) => {
   let hasOverflow = false;
   let positions = [0];
   let resizeFrame = null;
+  let stickyFrame = null;
   let touchStartX = null;
   let touchStartY = null;
   let wheelAccumulator = 0;
@@ -345,6 +348,47 @@ const initSlider = (slider) => {
     }
 
     resizeFrame = window.requestAnimationFrame(refreshLayout);
+  };
+
+  const updateStickyState = () => {
+    stickyFrame = null;
+
+    const stickyTop = itemLayouts.find(({ top }) => top)?.top;
+    const item = stickyTop?.parentElement;
+
+    if (!(stickyTop instanceof HTMLElement) || !(item instanceof HTMLElement)) {
+      slider.classList.remove(STUCK_CLASS);
+      return;
+    }
+
+    const computedTop = Number.parseFloat(getComputedStyle(stickyTop).top);
+    const stickyOffset = Number.isFinite(computedTop) ? computedTop : 0;
+    const stickyRect = stickyTop.getBoundingClientRect();
+    const itemRect = item.getBoundingClientRect();
+    const isStuck =
+      stickyRect.top <= stickyOffset + STICKY_EPSILON &&
+      itemRect.bottom > stickyOffset + stickyRect.height + STICKY_EPSILON;
+    const wasStuck = slider.classList.contains(STUCK_CLASS);
+
+    if (wasStuck === isStuck) {
+      return;
+    }
+
+    slider.classList.toggle(STUCK_CLASS, isStuck);
+    scheduleRefresh();
+  };
+
+  const scheduleStickyState = () => {
+    if (stickyFrame !== null) {
+      return;
+    }
+
+    stickyFrame = window.requestAnimationFrame(updateStickyState);
+  };
+
+  const scheduleLayoutUpdate = () => {
+    scheduleRefresh();
+    scheduleStickyState();
   };
 
   const animateToPosition = (position) => {
@@ -485,16 +529,18 @@ const initSlider = (slider) => {
   });
 
   if ('ResizeObserver' in window) {
-    const resizeObserver = new ResizeObserver(scheduleRefresh);
+    const resizeObserver = new ResizeObserver(scheduleLayoutUpdate);
 
     resizeObserver.observe(track);
   }
 
-  window.addEventListener('resize', scheduleRefresh, { passive: true });
-  window.addEventListener('orientationchange', scheduleRefresh, { passive: true });
-  document.fonts?.ready?.then(scheduleRefresh).catch(() => {});
+  window.addEventListener('scroll', scheduleStickyState, { passive: true });
+  window.addEventListener('resize', scheduleLayoutUpdate, { passive: true });
+  window.addEventListener('orientationchange', scheduleLayoutUpdate, { passive: true });
+  document.fonts?.ready?.then(scheduleLayoutUpdate).catch(() => {});
 
   refreshLayout();
+  updateStickyState();
 };
 
 export const initSpecsSlider = () => {

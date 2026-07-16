@@ -1728,14 +1728,21 @@ body {
 }
 
 .specs-slider .specs-wrapper .spec-top {
+  --virtura-spec-padding-bottom-rest: var(--space-64, 6.4rem);
+  --virtura-spec-padding-bottom-stuck: clamp(4.2rem, 3vw, 4.6rem);
   --virtura-spec-padding-top: clamp(4.2rem, 3vw, 4.6rem);
   --virtura-spec-sticky-cover: 0px;
 
   background-color: var(--color-white, #fff);
   isolation: isolate;
   overflow: visible;
+  padding-bottom: var(--virtura-spec-padding-bottom-rest);
   padding-top: var(--virtura-spec-padding-top);
   top: 0;
+}
+
+.specs-slider.is-spec-top-stuck .specs-wrapper .spec-top {
+  padding-bottom: var(--virtura-spec-padding-bottom-stuck);
 }
 
 .specs-wrapper .spec-top::before {
@@ -1757,15 +1764,16 @@ body {
 
 @media (max-width: 991px) {
   .specs-slider .specs-wrapper .spec-top {
+    --virtura-spec-padding-bottom-stuck: clamp(3.6rem, 4.25vw, 4.2rem);
     --virtura-spec-padding-top: clamp(3.6rem, 4.25vw, 4.2rem);
   }
 }
 
 @media (max-width: 767px) {
   .specs-slider .specs-wrapper .spec-top {
+    --virtura-spec-padding-bottom-rest: clamp(2.4rem, 7vw, 3.2rem);
+    --virtura-spec-padding-bottom-stuck: clamp(1.8rem, 5.5vw, 2.4rem);
     --virtura-spec-padding-top: clamp(2.8rem, 9vw, 3.6rem);
-
-    padding-bottom: clamp(2.4rem, 7vw, 3.2rem);
   }
 }
 
