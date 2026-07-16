@@ -11,6 +11,9 @@
   covering the first data row. Package headers and corresponding `.spec-bottom`
   rows are height-synchronised whenever multiple packages are visible, keeping
   later parameters aligned even when one value has fewer or more text lines.
+  On mobile, the sticky offset and vertical header padding now scale with the
+  viewport, making `.spec-top` shorter and delaying when it reaches its sticky
+  position without changing the tablet or desktop layout.
 - Added a global `.service-img-block` hover treatment without changing the
   Bricks structure: its inherited background image scales to `1.02` inside the
   clipped card over `1.2s`, while `.img-button` uses the violet shared fill
