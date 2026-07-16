@@ -12,7 +12,7 @@ const PREV_LABEL = 'Poprzednie pakiety';
 const NEXT_LABEL = 'Następne pakiety';
 const ANIMATION_DURATION = 0.72;
 const ANIMATION_EASE = 'power3.out';
-const SCROLL_EPSILON = 2;
+const OFFSET_EPSILON = 2;
 const SWIPE_THRESHOLD = 40;
 
 const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -75,24 +75,24 @@ const setItemWidth = (track, items) => {
   return true;
 };
 
-const getMaxScroll = (track) =>
+const getMaxOffset = (track) =>
   Math.max(0, track.scrollWidth - track.clientWidth);
 
 const getItemOffset = (track, item) => {
   const trackRect = track.getBoundingClientRect();
   const itemRect = item.getBoundingClientRect();
 
-  return itemRect.left - trackRect.left + track.scrollLeft;
+  return itemRect.left - trackRect.left;
 };
 
-const getScrollPositions = (track, items) => {
-  const maxScroll = getMaxScroll(track);
+const getTrackPositions = (track, items) => {
+  const maxOffset = getMaxOffset(track);
   const positions = items
-    .map((item) => Math.min(getItemOffset(track, item), maxScroll))
+    .map((item) => Math.min(getItemOffset(track, item), maxOffset))
     .filter(
       (position, index, allPositions) =>
         index === 0 ||
-        Math.abs(position - allPositions[index - 1]) > SCROLL_EPSILON,
+        Math.abs(position - allPositions[index - 1]) > OFFSET_EPSILON,
     );
 
   return positions.length ? positions : [0];
@@ -166,9 +166,19 @@ const initSlider = (slider) => {
   let hasOverflow = false;
   let positions = [0];
   let resizeFrame = null;
-  let scrollFrame = null;
   let touchStartX = null;
   let touchStartY = null;
+
+  const setTrackPosition = (position) => {
+    const x = Math.max(0, position) * -1;
+
+    if (gsapApi) {
+      gsapApi.set(track, { x });
+      return;
+    }
+
+    track.style.transform = `translate3d(${x}px, 0, 0)`;
+  };
 
   const syncControls = () => {
     const lastIndex = positions.length - 1;
@@ -187,41 +197,6 @@ const initSlider = (slider) => {
     controlsContainer.setAttribute('aria-hidden', String(!hasOverflow));
   };
 
-  const setActiveIndexFromScroll = () => {
-    scrollFrame = null;
-
-    if (!hasOverflow) {
-      return;
-    }
-
-    const currentScroll = track.scrollLeft;
-    let nearestIndex = 0;
-    let nearestDistance = Number.POSITIVE_INFINITY;
-
-    positions.forEach((position, index) => {
-      const distance = Math.abs(position - currentScroll);
-
-      if (distance < nearestDistance) {
-        nearestDistance = distance;
-        nearestIndex = index;
-      }
-    });
-
-    if (nearestIndex !== activeIndex) {
-      activeIndex = nearestIndex;
-      slider.dataset.activeSlide = String(activeIndex + 1);
-      syncControls();
-    }
-  };
-
-  const scheduleScrollSync = () => {
-    if (scrollFrame !== null) {
-      return;
-    }
-
-    scrollFrame = window.requestAnimationFrame(setActiveIndexFromScroll);
-  };
-
   const refreshLayout = () => {
     resizeFrame = null;
     gsapApi?.killTweensOf(track);
@@ -232,18 +207,18 @@ const initSlider = (slider) => {
       return;
     }
 
-    positions = getScrollPositions(track, items);
+    positions = getTrackPositions(track, items);
     setOverflowState(
-      getMaxScroll(track) > SCROLL_EPSILON && positions.length > 1,
+      getMaxOffset(track) > OFFSET_EPSILON && positions.length > 1,
     );
 
     if (!hasOverflow) {
       activeIndex = 0;
-      track.scrollLeft = 0;
     } else {
       activeIndex = clampIndex(activeIndex, positions.length);
-      track.scrollLeft = positions[activeIndex] || 0;
     }
+
+    setTrackPosition(positions[activeIndex] || 0);
 
     slider.dataset.activeSlide = String(activeIndex + 1);
     syncControls();
@@ -257,11 +232,11 @@ const initSlider = (slider) => {
     resizeFrame = window.requestAnimationFrame(refreshLayout);
   };
 
-  const scrollToPosition = (position) => {
+  const animateToPosition = (position) => {
     gsapApi?.killTweensOf(track);
 
     if (reducedMotionMedia.matches) {
-      track.scrollLeft = position;
+      setTrackPosition(position);
       return;
     }
 
@@ -272,11 +247,11 @@ const initSlider = (slider) => {
           duration: ANIMATION_DURATION,
           ease: ANIMATION_EASE,
           overwrite: 'auto',
-          scrollLeft: position,
+          x: Math.max(0, position) * -1,
         });
       })
       .catch(() => {
-        track.scrollTo({ left: position, behavior: 'smooth' });
+        setTrackPosition(position);
       });
   };
 
@@ -294,13 +269,12 @@ const initSlider = (slider) => {
     activeIndex = clampedIndex;
     slider.dataset.activeSlide = String(activeIndex + 1);
     syncControls();
-    scrollToPosition(positions[activeIndex] || 0);
+    animateToPosition(positions[activeIndex] || 0);
   };
 
   setupControl(controls[0], PREV_LABEL, () => goTo(activeIndex - 1));
   setupControl(controls[1], NEXT_LABEL, () => goTo(activeIndex + 1));
 
-  track.addEventListener('scroll', scheduleScrollSync, { passive: true });
   track.addEventListener(
     'touchstart',
     (event) => {

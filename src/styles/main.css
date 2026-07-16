@@ -1671,16 +1671,22 @@ body {
   position: relative;
 }
 
-.specs-slider.virtura-specs-slider-ready .specs-wrapper {
-  flex-wrap: nowrap !important;
-  overflow-x: hidden;
-  overscroll-behavior-inline: contain;
-  scrollbar-width: none;
-  touch-action: pan-y;
+/*
+ * `overflow: hidden/auto` would make this the scrolling ancestor of
+ * `.spec-top` and break its viewport-based sticky position. Clip only the
+ * inline axis without creating a scroll container; clip-path is the fallback.
+ */
+.specs-slider.slider.brxe-block {
+  -webkit-clip-path: inset(-100vmax 0);
+  clip-path: inset(-100vmax 0);
+  overflow: visible;
+  overflow-x: clip;
 }
 
-.specs-slider.virtura-specs-slider-ready .specs-wrapper::-webkit-scrollbar {
-  display: none;
+.specs-slider.virtura-specs-slider-ready .specs-wrapper {
+  flex-wrap: nowrap !important;
+  overflow: visible;
+  touch-action: pan-y;
 }
 
 .specs-slider.virtura-specs-slider-ready
