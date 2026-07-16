@@ -1727,12 +1727,13 @@ body {
   pointer-events: none;
 }
 
-.specs-wrapper .spec-top {
-  --virtura-spec-sticky-cover: var(--space-72, 7.2rem);
+.specs-slider .specs-wrapper .spec-top {
+  --virtura-spec-sticky-cover: 0px;
 
   background-color: var(--color-white, #fff);
   isolation: isolate;
   overflow: visible;
+  top: 0;
 }
 
 .specs-wrapper .spec-top::before {
@@ -1754,15 +1755,8 @@ body {
 
 @media (max-width: 767px) {
   .specs-slider .specs-wrapper .spec-top {
-    --virtura-spec-mobile-sticky-offset: clamp(1.6rem, 5vw, 2.8rem);
-    --virtura-spec-sticky-cover: calc(
-      var(--virtura-spec-mobile-sticky-offset) +
-        env(safe-area-inset-top, 0px)
-    );
-
     padding-bottom: clamp(2.4rem, 7vw, 3.2rem);
     padding-top: clamp(2.8rem, 9vw, 4rem);
-    top: var(--virtura-spec-sticky-cover);
   }
 }
 
