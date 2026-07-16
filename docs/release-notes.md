@@ -6,7 +6,10 @@
   up to six packages on viewports from 1920px, four on regular desktop, two on
   tablet and one on mobile. It hides `.slider-paggination` whenever every
   package fits and enables accessible
-  arrows plus touch swipe only when the track actually overflows. The track is
+  arrows, touch swipe and horizontal touchpad/Magic Mouse gestures only when
+  the track actually overflows. Wheel handling reacts only to horizontal intent
+  and advances once per gesture so vertical page scrolling remains unaffected.
+  The track is
   moved with transforms and clipped without an overflow scroll container, so
   the existing sticky `.spec-top` headers keep following the viewport without
   covering the first data row. Package headers and corresponding `.spec-bottom`

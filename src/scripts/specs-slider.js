@@ -16,6 +16,9 @@ const ANIMATION_DURATION = 0.72;
 const ANIMATION_EASE = 'power3.out';
 const OFFSET_EPSILON = 2;
 const SWIPE_THRESHOLD = 40;
+const WHEEL_LINE_MULTIPLIER = 16;
+const WHEEL_GESTURE_IDLE = 180;
+const WHEEL_GESTURE_THRESHOLD = 28;
 
 const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -102,6 +105,33 @@ const getTrackPositions = (track, items) => {
     );
 
   return positions.length ? positions : [0];
+};
+
+const getHorizontalWheelDelta = (event, pageSize) => {
+  if (event.ctrlKey) {
+    return 0;
+  }
+
+  const hasHorizontalIntent =
+    Math.abs(event.deltaX) > Math.abs(event.deltaY);
+  const usesShiftWheel =
+    event.shiftKey && Math.abs(event.deltaY) > Math.abs(event.deltaX);
+
+  if (!hasHorizontalIntent && !usesShiftWheel) {
+    return 0;
+  }
+
+  const rawDelta = hasHorizontalIntent ? event.deltaX : event.deltaY;
+
+  if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
+    return rawDelta * WHEEL_LINE_MULTIPLIER;
+  }
+
+  if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
+    return rawDelta * pageSize;
+  }
+
+  return rawDelta;
 };
 
 const getItemLayout = (item) => {
@@ -248,6 +278,9 @@ const initSlider = (slider) => {
   let resizeFrame = null;
   let touchStartX = null;
   let touchStartY = null;
+  let wheelAccumulator = 0;
+  let wheelGestureHandled = false;
+  let wheelResetTimer = null;
 
   const setTrackPosition = (position) => {
     const x = Math.max(0, position) * -1;
@@ -356,6 +389,55 @@ const initSlider = (slider) => {
 
   setupControl(controls[0], PREV_LABEL, () => goTo(activeIndex - 1));
   setupControl(controls[1], NEXT_LABEL, () => goTo(activeIndex + 1));
+
+  track.addEventListener(
+    'wheel',
+    (event) => {
+      if (!hasOverflow) {
+        return;
+      }
+
+      const delta = getHorizontalWheelDelta(event, track.clientWidth);
+
+      if (!delta) {
+        return;
+      }
+
+      event.preventDefault();
+
+      if (wheelResetTimer !== null) {
+        window.clearTimeout(wheelResetTimer);
+      }
+
+      wheelResetTimer = window.setTimeout(() => {
+        wheelAccumulator = 0;
+        wheelGestureHandled = false;
+        wheelResetTimer = null;
+      }, WHEEL_GESTURE_IDLE);
+
+      if (wheelGestureHandled) {
+        return;
+      }
+
+      if (
+        wheelAccumulator !== 0 &&
+        Math.sign(delta) !== Math.sign(wheelAccumulator)
+      ) {
+        wheelAccumulator = 0;
+      }
+
+      wheelAccumulator += delta;
+
+      if (Math.abs(wheelAccumulator) < WHEEL_GESTURE_THRESHOLD) {
+        return;
+      }
+
+      wheelGestureHandled = true;
+      goTo(activeIndex + (wheelAccumulator > 0 ? 1 : -1));
+      wheelAccumulator = 0;
+    },
+    { passive: false },
+  );
 
   track.addEventListener(
     'touchstart',
