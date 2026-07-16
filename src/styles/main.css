@@ -104,6 +104,13 @@ body {
 }
 
 @media (max-width: 767px) {
+  .blog-rich-text > .virtura-blog-mobile-insert {
+    margin-top: var(--space-80, 8rem) !important;
+    width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
   #brx-content
     :is(.brxe-block, .brxe-container):has(> .category-link) {
     align-items: stretch;

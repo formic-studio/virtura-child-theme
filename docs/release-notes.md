@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added responsive content placement for the blog post template. On mobile,
+  the first `.blog-grid-top` block containing violet text moves inside
+  `.blog-rich-text` immediately before its second direct `h2`; its original
+  desktop grid position is restored when the viewport grows again.
 - Fixed shared `.glass-block` cards being clipped by the following section on
   mobile. Their section, container and padding wrapper now expose the full card
   while the existing `7rem` overlap is preserved and layered above the next

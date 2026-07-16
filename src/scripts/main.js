@@ -1,6 +1,7 @@
 import '../styles/main.css';
 import { initAboutSlider } from './about-slider.js';
 import { initArchiveFilters } from './archive-filters.js';
+import { initBlogMobileContent } from './blog-mobile-content.js';
 import { initCategoryStack } from './category-stack.js';
 import { initFaqAccordion } from './faq-accordion.js';
 import { initFitText } from './fit-text.js';
@@ -24,6 +25,7 @@ const initTheme = () => {
   initCategoryStack();
   initTrainingTabs();
   initArchiveFilters();
+  initBlogMobileContent();
   initFaqAccordion();
   initAboutSlider();
   initSpecsSlider();
