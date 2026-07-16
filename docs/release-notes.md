@@ -4,7 +4,8 @@
 
 - Added a global `.service-img-block` hover treatment without changing the
   Bricks structure: its inherited background image scales to `1.02` inside the
-  clipped card, while `.img-button` uses the violet shared fill effect.
+  clipped card over `1.2s`, while `.img-button` uses the violet shared fill
+  effect.
 - Added the shared button fill hover/focus treatment to `.category-link`
   glass links, using `--color-violet` without changing text colors.
 - Added a global CSS-only horizontal swipe carousel for direct
