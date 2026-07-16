@@ -1671,6 +1671,52 @@ body {
   position: relative;
 }
 
+.specs-slider.virtura-specs-slider-ready .specs-wrapper {
+  flex-wrap: nowrap !important;
+  overflow-x: hidden;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+  touch-action: pan-y;
+}
+
+.specs-slider.virtura-specs-slider-ready .specs-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.specs-slider.virtura-specs-slider-ready
+  .specs-wrapper
+  > .spec-slider-item {
+  flex: 0 0 var(--virtura-spec-item-width, 100%) !important;
+  max-width: none !important;
+  min-width: 0;
+  width: var(--virtura-spec-item-width, 100%) !important;
+}
+
+.specs-slider .slider-paggination[hidden],
+.specs-slider.virtura-specs-slider-ready:not(.has-overflow)
+  .slider-paggination {
+  display: none !important;
+}
+
+.specs-slider.virtura-specs-slider-ready
+  .slider-paggination
+  .svg-arrow-block {
+  cursor: pointer;
+  transition:
+    filter 0.22s ease,
+    opacity 0.22s ease;
+  user-select: none;
+}
+
+.specs-slider.virtura-specs-slider-ready
+  .slider-paggination
+  .svg-arrow-block.is-disabled {
+  cursor: default;
+  filter: grayscale(1);
+  opacity: 0.34;
+  pointer-events: none;
+}
+
 .specs-wrapper .spec-top {
   --virtura-spec-sticky-cover: var(--space-72, 7.2rem);
 
@@ -1805,6 +1851,12 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .about-slider.virtura-about-slider-ready
     :is(.slider-img-item, .slider-text-block) {
+    transition: none;
+  }
+
+  .specs-slider.virtura-specs-slider-ready
+    .slider-paggination
+    .svg-arrow-block {
     transition: none;
   }
 }

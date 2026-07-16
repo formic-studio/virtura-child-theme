@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added a responsive `.specs-slider` for package comparison tables. It shows
+  up to four packages on desktop, two on tablet and one on mobile, hides
+  `.slider-paggination` whenever every package fits, and enables accessible
+  arrows plus touch swipe only when the track actually overflows.
 - Added a global `.service-img-block` hover treatment without changing the
   Bricks structure: its inherited background image scales to `1.02` inside the
   clipped card over `1.2s`, while `.img-button` uses the violet shared fill
