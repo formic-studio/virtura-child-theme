@@ -1988,7 +1988,7 @@ body {
     margin-left: auto !important;
   }
 
-  .section_category:has(.projects-block) .projects-block,
+  .projects-block,
   .brxe-section:has(.team-wrapper) .brxe-block:has(> .team-wrapper) {
     display: flex !important;
     flex-direction: column !important;
@@ -2003,15 +2003,12 @@ body {
     overflow: visible !important;
   }
 
-  .section_category:has(.projects-block)
-    .projects-block
-    > .brxe-block:has(> .btn),
+  .projects-block > .brxe-block:has(> .btn),
   .brxe-section:has(.team-wrapper) .brxe-block:has(> .btn) {
     display: contents !important;
   }
 
-  .section_category:has(.projects-block)
-    .projects-block
+  .projects-block
     > .brxe-block:has(> .btn)
     > :is(h1, h2, h3, h4, h5, h6, .brxe-heading),
   .brxe-section:has(.team-wrapper)
@@ -2020,9 +2017,7 @@ body {
     order: 0 !important;
   }
 
-  .section_category:has(.projects-block)
-    .projects-block
-    > .archive-grid.grid-2-item {
+  .projects-block > .archive-grid.grid-2-item {
     align-self: stretch !important;
     display: flex !important;
     flex-direction: column !important;
@@ -2034,8 +2029,7 @@ body {
     width: 100% !important;
   }
 
-  .section_category:has(.projects-block)
-    .projects-block
+  .projects-block
     > .archive-grid.grid-2-item
     > :is(.archive-block, .bricks-layout-item) {
     align-self: stretch !important;
@@ -2045,22 +2039,19 @@ body {
     width: 100% !important;
   }
 
-  .section_category:has(.projects-block)
-    .projects-block
+  .projects-block
     > .archive-grid.grid-2-item
     > :is(.archive-block, .bricks-layout-item):nth-child(-n + 2) {
     display: flex !important;
   }
 
-  .section_category:has(.projects-block)
-    .projects-block
+  .projects-block
     > .archive-grid.grid-2-item
     > :is(.archive-block, .bricks-layout-item):nth-child(n + 3) {
     display: none !important;
   }
 
-  .section_category:has(.projects-block)
-    .projects-block
+  .projects-block
     > .brxe-block:has(> .btn)
     > .btn,
   .brxe-section:has(.team-wrapper) .brxe-block:has(> .btn) > .btn {
@@ -2078,8 +2069,12 @@ body {
     width: 100% !important;
   }
 
-  .section_category:has(.projects-block)
-    .projects-block
+  /* 2.4rem parent gap + 0.8rem margin = 3.2rem below the project grid. */
+  .projects-block > .brxe-block:has(> .btn) > .btn {
+    margin-top: var(--space-8, 0.8rem) !important;
+  }
+
+  .projects-block
     > .brxe-block:has(> .btn)
     > .btn
     > :last-child,
