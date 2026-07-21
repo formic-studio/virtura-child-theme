@@ -1,7 +1,11 @@
 const HEADER_SELECTOR = '#brx-header';
+const CONTENT_SECTION_SELECTOR = '#brx-content .brxe-section';
 const DEFAULT_HIDE_OFFSET = 360;
 const DIRECTION_DELTA = 12;
 const HIDE_DISTANCE = 24;
+const HERO_IMAGE_SELECTOR = '.hero-img';
+const HERO_MOTION_QUERY = '(min-width: 768px)';
+const HERO_SECTION_SELECTOR = '.section_hero';
 const INTENT_TTL = 2000;
 const SHOW_DISTANCE = 28;
 const TOUCH_DELTA = 8;
@@ -9,12 +13,44 @@ const MOBILE_NAV_QUERY = '(max-width: 991px)';
 
 const DOWN_KEYS = new Set(['ArrowDown', 'End', 'PageDown', 'Space']);
 const UP_KEYS = new Set(['ArrowUp', 'Home', 'PageUp']);
+const heroMotionMedia = window.matchMedia(HERO_MOTION_QUERY);
 const mobileNavMedia = window.matchMedia(MOBILE_NAV_QUERY);
 
-const getHideOffset = (header) => {
+const getConfiguredHideOffset = (header) => {
   const value = Number.parseFloat(header.getAttribute('data-header-hide-offset'));
 
-  return Number.isFinite(value) && value >= 0 ? value : DEFAULT_HIDE_OFFSET;
+  return Number.isFinite(value) && value >= 0 ? value : null;
+};
+
+const getHeroExitTarget = () => {
+  const heroSection = document.querySelector(HERO_SECTION_SELECTOR);
+
+  if (!heroSection?.querySelector(HERO_IMAGE_SELECTOR)) {
+    return null;
+  }
+
+  const sections = Array.from(document.querySelectorAll(CONTENT_SECTION_SELECTOR));
+  const heroIndex = sections.indexOf(heroSection);
+
+  return heroIndex >= 0 ? sections[heroIndex + 1] || null : null;
+};
+
+const getHideOffset = (configuredOffset, heroExitTarget) => {
+  if (configuredOffset !== null) {
+    return configuredOffset;
+  }
+
+  if (heroMotionMedia.matches && heroExitTarget?.isConnected) {
+    // The GSAP pin spacer changes this position after header initialization.
+    const sectionStart =
+      heroExitTarget.getBoundingClientRect().top + window.scrollY;
+
+    if (Number.isFinite(sectionStart)) {
+      return Math.max(0, sectionStart - HIDE_DISTANCE);
+    }
+  }
+
+  return DEFAULT_HIDE_OFFSET;
 };
 
 const isEditableTarget = (target) => {
@@ -32,7 +68,8 @@ export const initHeaderScroll = () => {
     return;
   }
 
-  const hideOffset = getHideOffset(header);
+  const configuredHideOffset = getConfiguredHideOffset(header);
+  const heroExitTarget = getHeroExitTarget();
   let previousY = window.scrollY;
   let peakY = previousY;
   let frame = null;
@@ -62,6 +99,7 @@ export const initHeaderScroll = () => {
     frame = null;
 
     const currentY = Math.max(0, window.scrollY);
+    const hideOffset = getHideOffset(configuredHideOffset, heroExitTarget);
     const now = window.performance.now();
     const delta = currentY - previousY;
     const recentIntent = now - lastIntentAt <= INTENT_TTL ? lastIntent : null;
