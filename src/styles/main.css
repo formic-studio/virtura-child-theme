@@ -1655,6 +1655,7 @@ body {
 
 .btn-glass {
   background-image: none;
+  box-shadow: none;
 }
 
 .text-overview,
