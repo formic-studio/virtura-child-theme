@@ -1,4 +1,5 @@
 const HEADER_SELECTOR = '#brx-header';
+const HEADER_SOLID_CLASS = 'header-scroll-solid';
 const CONTENT_SECTION_SELECTOR = '#brx-content .brxe-section';
 const DEFAULT_HIDE_OFFSET = 360;
 const DIRECTION_DELTA = 12;
@@ -91,7 +92,7 @@ export const initHeaderScroll = () => {
   };
 
   const hideHeader = () => {
-    header.classList.add('header-scroll-hidden');
+    header.classList.add(HEADER_SOLID_CLASS, 'header-scroll-hidden');
     isHidden = true;
   };
 
@@ -100,6 +101,11 @@ export const initHeaderScroll = () => {
 
     const currentY = Math.max(0, window.scrollY);
     const hideOffset = getHideOffset(configuredHideOffset, heroExitTarget);
+
+    if (currentY <= HIDE_DISTANCE) {
+      header.classList.remove(HEADER_SOLID_CLASS);
+    }
+
     const now = window.performance.now();
     const delta = currentY - previousY;
     const recentIntent = now - lastIntentAt <= INTENT_TTL ? lastIntent : null;

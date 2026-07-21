@@ -689,13 +689,15 @@ body {
   --header-cta-fg: var(--color-white, #fff);
 }
 
-#brx-header.header-nav-active {
+#brx-header.header-nav-active,
+#brx-header.header-scroll-solid {
   --header-fg: var(--color-black, #000);
   --header-cta-bg: var(--color-black, #000);
   --header-cta-fg: var(--color-white, #fff);
 }
 
-#brx-header.header-nav-active .nav-wrapper {
+#brx-header.header-nav-active .nav-wrapper,
+#brx-header.header-scroll-solid .nav-wrapper {
   background-color: var(--color-white, #fff);
 }
 
@@ -1067,7 +1069,9 @@ body {
     z-index: 999 !important;
   }
 
-  #brx-header.header-theme-light.header-nav-active:not(.mobile-giga-menu-open) {
+  #brx-header.header-theme-light.header-nav-active:not(
+      .mobile-giga-menu-open
+    ):not(.header-scroll-solid) {
     --header-fg: var(--color-white, #fff);
     --header-cta-bg: var(--color-white, #fff);
     --header-cta-fg: var(--color-black, #000);
@@ -1111,6 +1115,10 @@ body {
   #brx-header.mobile-giga-menu-open .nav-wrapper:focus,
   #brx-header.mobile-giga-menu-open .nav-wrapper:focus-within {
     background-color: transparent !important;
+  }
+
+  #brx-header.header-scroll-solid:not(.mobile-giga-menu-open) .nav-wrapper {
+    background-color: var(--color-white, #fff) !important;
   }
 
   #brx-header .nav-wrapper > .brxe-block {
