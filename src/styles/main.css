@@ -546,8 +546,15 @@ body {
   color: var(--color-white, #fff) !important;
 }
 
+.footer-btn {
+  background-image: none;
+  transition: background-color 0.2s ease;
+}
+
 .footer-btn:is(:hover, :focus-visible) {
-  color: var(--color-white, #fff);
+  background-color: var(--color-white, #fff);
+  color: var(--color-black, #000);
+  transition: background-color 0.2s ease;
 }
 
 .btn:is(
