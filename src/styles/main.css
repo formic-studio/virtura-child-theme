@@ -1705,6 +1705,26 @@ body {
   box-shadow: none;
 }
 
+.video-about[data-virtura-video-controls="true"] {
+  --video-about-start-cursor: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M30%2060C46.5685%2060%2060%2046.5685%2060%2030C60%2013.4315%2046.5685%200%2030%200C13.4315%200%200%2013.4315%200%2030C0%2046.5685%2013.4315%2060%2030%2060Z%22%20fill%3D%22white%22%20fill-opacity%3D%220.7%22%2F%3E%3C%2Fsvg%3E") 30 30, pointer;
+  --video-about-stop-cursor: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M30%2060C46.5685%2060%2060%2046.5685%2060%2030C60%2013.4315%2046.5685%200%2030%200C13.4315%200%200%2013.4315%200%2030C0%2046.5685%2013.4315%2060%2030%2060Z%22%20fill%3D%22white%22%20fill-opacity%3D%220.7%22%2F%3E%3Crect%20x%3D%2222%22%20y%3D%2215%22%20width%3D%226%22%20height%3D%2230%22%20fill%3D%22%23848484%22%2F%3E%3Crect%20x%3D%2232%22%20y%3D%2215%22%20width%3D%226%22%20height%3D%2230%22%20fill%3D%22%23848484%22%2F%3E%3C%2Fsvg%3E") 30 30, pointer;
+
+  cursor: var(--video-about-start-cursor);
+}
+
+.video-about[data-virtura-video-controls="true"].is-video-playing {
+  cursor: var(--video-about-stop-cursor);
+}
+
+.video-about[data-virtura-video-controls="true"] video {
+  cursor: inherit;
+}
+
+.video-about[data-virtura-video-controls="true"]:focus-visible {
+  outline: 2px solid var(--color-violet, #ad79fc);
+  outline-offset: var(--space-4, 0.4rem);
+}
+
 .text-overview,
 .fit-text-to-box {
   display: block;

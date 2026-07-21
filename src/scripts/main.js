@@ -15,6 +15,7 @@ import { initSmoothScroll } from './smooth-scroll.js';
 import { initSpecsSlider } from './specs-slider.js';
 import { initTestimonialsSlider } from './testimonials-slider.js';
 import { initTrainingTabs } from './training-tabs.js';
+import { initVideoAboutControls } from './video-about-controls.js';
 
 const initTheme = () => {
   initHeaderTheme();
@@ -24,6 +25,7 @@ const initTheme = () => {
   initFitText();
   initCategoryStack();
   initTrainingTabs();
+  initVideoAboutControls();
   initArchiveFilters();
   initBlogMobileContent();
   initFaqAccordion();
