@@ -701,6 +701,10 @@ body {
   background-color: var(--color-white, #fff);
 }
 
+#brx-header.header-scroll-hidden.header-scroll-solid .nav-wrapper {
+  transition: none !important;
+}
+
 #brx-header.giga-menu-open .nav-wrapper {
   border-bottom-left-radius: 0 !important;
   border-bottom-right-radius: 0 !important;

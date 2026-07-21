@@ -74,6 +74,7 @@ export const initHeaderScroll = () => {
   let previousY = window.scrollY;
   let peakY = previousY;
   let frame = null;
+  let revealFrame = null;
   let isHidden = header.classList.contains('header-scroll-hidden');
   let lastIntent = null;
   let lastIntentAt = 0;
@@ -86,13 +87,33 @@ export const initHeaderScroll = () => {
     lastIntentAt = window.performance.now();
   };
 
-  const showHeader = () => {
+  const showHeader = (useSolidBackground = false) => {
+    if (revealFrame !== null) {
+      window.cancelAnimationFrame(revealFrame);
+      revealFrame = null;
+    }
+
+    if (useSolidBackground && isHidden) {
+      header.classList.add(HEADER_SOLID_CLASS);
+      isHidden = false;
+      revealFrame = window.requestAnimationFrame(() => {
+        revealFrame = null;
+        header.classList.remove('header-scroll-hidden');
+      });
+      return;
+    }
+
     header.classList.remove('header-scroll-hidden');
     isHidden = false;
   };
 
   const hideHeader = () => {
-    header.classList.add(HEADER_SOLID_CLASS, 'header-scroll-hidden');
+    if (revealFrame !== null) {
+      window.cancelAnimationFrame(revealFrame);
+      revealFrame = null;
+    }
+
+    header.classList.add('header-scroll-hidden');
     isHidden = true;
   };
 
@@ -129,7 +150,7 @@ export const initHeaderScroll = () => {
       hasVisibleNavActivity;
 
     if (shouldKeepVisible) {
-      showHeader();
+      showHeader(isHidden && currentY > HIDE_DISTANCE);
       previousY = currentY;
       peakY = currentY;
       return;
@@ -139,7 +160,7 @@ export const initHeaderScroll = () => {
       peakY = Math.max(peakY, currentY);
 
       if (direction === 'up' && peakY - currentY >= SHOW_DISTANCE) {
-        showHeader();
+        showHeader(true);
       }
     } else if (direction === 'down' && currentY >= hideOffset + HIDE_DISTANCE) {
       peakY = currentY;
