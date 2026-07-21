@@ -557,6 +557,30 @@ body {
   transition: background-color 0.2s ease;
 }
 
+#brx-content .btn-big {
+  background-image: none;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+#brx-content
+  .btn-big
+  :is(h1, h2, h3, h4, h5, h6, .brxe-heading, .brxe-text-basic) {
+  transition: color 0.2s ease;
+}
+
+#brx-content .btn-big:is(:hover, :focus-visible, :focus-within) {
+  background-color: var(--color-darker-grey, #8f8f8f);
+  color: var(--color-white, #fff);
+}
+
+#brx-content
+  .btn-big:is(:hover, :focus-visible, :focus-within)
+  :is(h1, h2, h3, h4, h5, h6, .brxe-heading, .brxe-text-basic) {
+  color: var(--color-white, #fff);
+}
+
 .btn:is(
   .btn-white,
   .btn--white,
@@ -621,6 +645,10 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   :is(.btn, .nav-btn, .footer-btn, .category-link, .img-button),
+  #brx-content .btn-big,
+  #brx-content
+    .btn-big
+    :is(h1, h2, h3, h4, h5, h6, .brxe-heading, .brxe-text-basic),
   .service-img-block::before {
     transition: none;
   }
