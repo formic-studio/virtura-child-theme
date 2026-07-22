@@ -702,7 +702,7 @@ body {
 
 .svg-arrow-block svg {
   translate: 0 0;
-  transition: translate 0.3s var(--virtura-motion-ease);
+  transition: translate 0.45s var(--virtura-motion-ease);
 }
 
 :is(
