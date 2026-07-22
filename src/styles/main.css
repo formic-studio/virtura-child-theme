@@ -667,24 +667,34 @@ body {
   color: inherit;
 }
 
-:is(.btn:not(.footer-btn), .nav-btn) svg,
-:is(.btn:not(.footer-btn), .nav-btn) svg * {
+:is(.btn:not(.footer-btn), .nav-btn):not(:has(.svg-arrow-block)) svg,
+:is(.btn:not(.footer-btn), .nav-btn):not(:has(.svg-arrow-block)) svg * {
   transition:
     fill 0.24s ease,
     stroke 0.24s ease;
 }
 
-:is(.btn:not(.footer-btn), .nav-btn):is(:hover, :focus-visible) svg {
+:is(.btn:not(.footer-btn), .nav-btn):not(:has(.svg-arrow-block)):is(
+    :hover,
+    :focus-visible
+  )
+  svg {
   color: currentColor;
 }
 
-:is(.btn:not(.footer-btn), .nav-btn):is(:hover, :focus-visible)
+:is(.btn:not(.footer-btn), .nav-btn):not(:has(.svg-arrow-block)):is(
+    :hover,
+    :focus-visible
+  )
   svg
   [fill]:not([fill="none"]) {
   fill: currentColor;
 }
 
-:is(.btn:not(.footer-btn), .nav-btn):is(:hover, :focus-visible)
+:is(.btn:not(.footer-btn), .nav-btn):not(:has(.svg-arrow-block)):is(
+    :hover,
+    :focus-visible
+  )
   svg
   [stroke]:not([stroke="none"]) {
   stroke: currentColor;
