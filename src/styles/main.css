@@ -5,6 +5,11 @@
   --virtura-underline-hover-duration: 0.52s;
 }
 
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
 body {
   color: var(--color-black, #000);
 }
