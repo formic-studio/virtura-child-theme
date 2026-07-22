@@ -705,6 +705,9 @@ body {
   transition: translate 0.45s var(--virtura-motion-ease);
 }
 
+a[href]:has(.svg-arrow-block):is(:hover, :focus-visible, :focus-within)
+  .svg-arrow-block
+  svg,
 :is(
     .btn,
     .nav-btn,
