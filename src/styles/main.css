@@ -706,8 +706,15 @@ body {
 }
 
 .svg-arrow-block svg {
+  --virtura-arrow-hover-translate-x: 0.2rem;
   translate: 0 0;
   transition: translate 0.45s var(--virtura-motion-ease);
+}
+
+.slider-paggination
+  .svg-arrow-block[aria-label="Poprzedni slajd"]
+  svg {
+  --virtura-arrow-hover-translate-x: -0.2rem;
 }
 
 a[href]:has(.svg-arrow-block):is(:hover, :focus-visible, :focus-within)
@@ -734,7 +741,7 @@ a[href]:has(.svg-arrow-block):is(:hover, :focus-visible, :focus-within)
     :focus-within
   )
   svg {
-  translate: 0.2rem 0;
+  translate: var(--virtura-arrow-hover-translate-x) 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
