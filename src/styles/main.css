@@ -558,7 +558,7 @@ body {
   transition: background-color 0.2s ease;
 }
 
-.footer-btn:not(:has(.svg-arrow-block)):is(:hover, :focus-visible) {
+.footer-btn:is(:hover, :focus-visible) {
   background-color: var(--color-white, #fff);
   color: var(--color-black, #000);
   transition: background-color 0.2s ease;
@@ -651,10 +651,12 @@ body {
   color: var(--color-white, #fff);
 }
 
-:is(.btn, .nav-btn, .footer-btn):not(:has(.svg-arrow-block)):is(
+:is(.btn, .nav-btn):not(:has(.svg-arrow-block)):is(
     :hover,
     :focus-visible
   )
+  :where(a, button, span, .brxe-text-basic, .brxe-button-text),
+.footer-btn:is(:hover, :focus-visible)
   :where(a, button, span, .brxe-text-basic, .brxe-button-text) {
   color: inherit;
 }
