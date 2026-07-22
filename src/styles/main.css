@@ -466,7 +466,9 @@ body {
   }
 }
 
-:is(.btn, .nav-btn, .footer-btn, .category-link, .img-button) {
+:is(.btn, .nav-btn, .footer-btn, .category-link, .img-button):not(
+  :has(.svg-arrow-block)
+) {
   --btn-hover-bg: var(--color-darker-grey, #8f8f8f);
   --btn-hover-transition:
     background-size 0.62s var(--virtura-motion-ease), border-color 0.24s ease,
@@ -480,8 +482,12 @@ body {
   transition: var(--btn-hover-transition);
 }
 
-:is(.btn, .nav-btn, .footer-btn, .category-link, .img-button):hover,
-:is(.btn, .nav-btn, .footer-btn, .category-link, .img-button):focus-visible {
+:is(.btn, .nav-btn, .footer-btn, .category-link, .img-button):not(
+    :has(.svg-arrow-block)
+  ):hover,
+:is(.btn, .nav-btn, .footer-btn, .category-link, .img-button):not(
+    :has(.svg-arrow-block)
+  ):focus-visible {
   background-size: 100% 100%;
   transition: var(--btn-hover-transition);
 }
@@ -532,16 +538,17 @@ body {
   transform: scale(1.02);
 }
 
-.service-img-block:is(:hover, :focus-within) > .img-button {
+.service-img-block:is(:hover, :focus-within)
+  > .img-button:not(:has(.svg-arrow-block)) {
   background-size: 100% 100%;
   border-color: var(--color-violet, #ad79fc);
 }
 
-.nav-btn:is(:hover, :focus-visible) {
+.nav-btn:not(:has(.svg-arrow-block)):is(:hover, :focus-visible) {
   color: var(--color-white, #fff);
 }
 
-.nav-btn:is(:hover, :focus-visible)
+.nav-btn:not(:has(.svg-arrow-block)):is(:hover, :focus-visible)
   :where(a, button, span, .brxe-text-basic, .brxe-button-text) {
   color: var(--color-white, #fff) !important;
 }
@@ -551,7 +558,7 @@ body {
   transition: background-color 0.2s ease;
 }
 
-.footer-btn:is(:hover, :focus-visible) {
+.footer-btn:not(:has(.svg-arrow-block)):is(:hover, :focus-visible) {
   background-color: var(--color-white, #fff);
   color: var(--color-black, #000);
   transition: background-color 0.2s ease;
@@ -590,13 +597,22 @@ body {
   transition: color 0.2s ease;
 }
 
-#brx-content .btn-big:is(:hover, :focus-visible, :focus-within) {
+#brx-content
+  .btn-big:not(:has(.svg-arrow-block)):is(
+    :hover,
+    :focus-visible,
+    :focus-within
+  ) {
   background-color: var(--color-darker-grey, #8f8f8f);
   color: var(--color-white, #fff);
 }
 
 #brx-content
-  .btn-big:is(:hover, :focus-visible, :focus-within)
+  .btn-big:not(:has(.svg-arrow-block)):is(
+    :hover,
+    :focus-visible,
+    :focus-within
+  )
   :is(h1, h2, h3, h4, h5, h6, .brxe-heading, .brxe-text-basic) {
   color: var(--color-white, #fff);
 }
@@ -629,38 +645,80 @@ body {
     [data-btn-variant="white"],
     [data-button-variant="white"],
     [data-theme="white"]
-  ):is(:hover, :focus-visible),
-.btn[class*="white"]:is(:hover, :focus-visible),
-.btn[class*="White"]:is(:hover, :focus-visible) {
+  ):not(:has(.svg-arrow-block)):is(:hover, :focus-visible),
+.btn[class*="white"]:not(:has(.svg-arrow-block)):is(:hover, :focus-visible),
+.btn[class*="White"]:not(:has(.svg-arrow-block)):is(:hover, :focus-visible) {
   color: var(--color-white, #fff);
 }
 
-:is(.btn, .nav-btn, .footer-btn):is(:hover, :focus-visible)
+:is(.btn, .nav-btn, .footer-btn):not(:has(.svg-arrow-block)):is(
+    :hover,
+    :focus-visible
+  )
   :where(a, button, span, .brxe-text-basic, .brxe-button-text) {
   color: inherit;
 }
 
-:is(.btn:not(.footer-btn), .nav-btn) svg,
-:is(.btn:not(.footer-btn), .nav-btn) svg * {
+:is(.btn:not(.footer-btn), .nav-btn):not(:has(.svg-arrow-block)) svg,
+:is(.btn:not(.footer-btn), .nav-btn):not(:has(.svg-arrow-block)) svg * {
   transition:
     fill 0.24s ease,
     stroke 0.24s ease;
 }
 
-:is(.btn:not(.footer-btn), .nav-btn):is(:hover, :focus-visible) svg {
+:is(.btn:not(.footer-btn), .nav-btn):not(:has(.svg-arrow-block)):is(
+    :hover,
+    :focus-visible
+  )
+  svg {
   color: currentColor;
 }
 
-:is(.btn:not(.footer-btn), .nav-btn):is(:hover, :focus-visible)
+:is(.btn:not(.footer-btn), .nav-btn):not(:has(.svg-arrow-block)):is(
+    :hover,
+    :focus-visible
+  )
   svg
   [fill]:not([fill="none"]) {
   fill: currentColor;
 }
 
-:is(.btn:not(.footer-btn), .nav-btn):is(:hover, :focus-visible)
+:is(.btn:not(.footer-btn), .nav-btn):not(:has(.svg-arrow-block)):is(
+    :hover,
+    :focus-visible
+  )
   svg
   [stroke]:not([stroke="none"]) {
   stroke: currentColor;
+}
+
+.svg-arrow-block svg {
+  translate: 0 0;
+  transition: translate 0.3s var(--virtura-motion-ease);
+}
+
+:is(
+    .btn,
+    .nav-btn,
+    .nav-cta,
+    .footer-btn,
+    .category-link,
+    .img-button,
+    .btn-big,
+    .btn-glass,
+    .btn-wrapper,
+    .bricks-button,
+    .brxe-button
+  ):is(:hover, :focus-visible, :focus-within)
+  .svg-arrow-block
+  svg,
+.svg-arrow-block:not(.is-disabled, [aria-disabled="true"]):is(
+    :hover,
+    :focus-visible,
+    :focus-within
+  )
+  svg {
+  translate: var(--space-8, 0.8rem) 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -674,6 +732,11 @@ body {
     .btn-big
     :is(h1, h2, h3, h4, h5, h6, .brxe-heading, .brxe-text-basic),
   .service-img-block::before {
+    transition: none;
+  }
+
+  .svg-arrow-block svg {
+    translate: 0 0 !important;
     transition: none;
   }
 
@@ -907,7 +970,15 @@ body {
   transition: var(--btn-hover-transition) !important;
 }
 
-#brx-header .nav-btn:is(:hover, :focus-visible) {
+#brx-header .nav-btn:has(.svg-arrow-block) {
+  background-image: none !important;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease !important;
+}
+
+#brx-header
+  .nav-btn:not(:has(.svg-arrow-block)):is(:hover, :focus-visible) {
   --header-cta-fg: var(--color-white, #fff);
   background-color: var(--header-cta-bg) !important;
   background-size: 100% 100% !important;
@@ -915,7 +986,9 @@ body {
   transition: var(--btn-hover-transition) !important;
 }
 
-#brx-header .nav-btn:is(:hover, :focus-visible) * {
+#brx-header
+  .nav-btn:not(:has(.svg-arrow-block)):is(:hover, :focus-visible)
+  * {
   color: var(--color-white, #fff) !important;
 }
 
