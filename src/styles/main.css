@@ -718,7 +718,7 @@ body {
     :focus-within
   )
   svg {
-  translate: var(--space-8, 0.8rem) 0;
+  translate: 0.2rem 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
