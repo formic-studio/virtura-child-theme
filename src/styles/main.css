@@ -466,7 +466,9 @@ body {
   }
 }
 
-:is(.btn, .nav-btn, .footer-btn, .category-link, .img-button):not(
+:is(.btn, .nav-btn, .category-link, .img-button):not(
+  .footer-btn
+):not(
   :has(.svg-arrow-block)
 ) {
   --btn-hover-bg: var(--color-darker-grey, #8f8f8f);
@@ -482,10 +484,14 @@ body {
   transition: var(--btn-hover-transition);
 }
 
-:is(.btn, .nav-btn, .footer-btn, .category-link, .img-button):not(
+:is(.btn, .nav-btn, .category-link, .img-button):not(
+    .footer-btn
+  ):not(
     :has(.svg-arrow-block)
   ):hover,
-:is(.btn, .nav-btn, .footer-btn, .category-link, .img-button):not(
+:is(.btn, .nav-btn, .category-link, .img-button):not(
+    .footer-btn
+  ):not(
     :has(.svg-arrow-block)
   ):focus-visible {
   background-size: 100% 100%;
