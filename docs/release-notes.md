@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added a `0.2s ease` grey hover and keyboard-focus state to Bricks contact
+  form submit buttons, matching the footer button timing.
 - Added responsive content placement for the blog post template. On mobile,
   the first `.blog-grid-top` block containing violet text moves inside
   `.blog-rich-text` immediately before its second direct `h2`; its original

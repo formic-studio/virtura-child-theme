@@ -557,6 +557,26 @@ body {
   transition: background-color 0.2s ease;
 }
 
+#brx-content
+  .brxe-form
+  .submit-button-wrapper
+  > button[type="submit"].bricks-button {
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+#brx-content
+  .brxe-form
+  .submit-button-wrapper
+  > button[type="submit"].bricks-button:not(
+    :disabled,
+    [aria-disabled="true"]
+  ):is(:hover, :focus-visible) {
+  background-color: var(--color-darker-grey, #8f8f8f);
+  color: var(--color-white, #fff);
+}
+
 #brx-content .btn-big {
   background-image: none;
   transition:
@@ -645,6 +665,10 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   :is(.btn, .nav-btn, .footer-btn, .category-link, .img-button),
+  #brx-content
+    .brxe-form
+    .submit-button-wrapper
+    > button[type="submit"].bricks-button,
   #brx-content .btn-big,
   #brx-content
     .btn-big
