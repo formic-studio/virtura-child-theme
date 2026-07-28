@@ -201,8 +201,10 @@ const createHeroImageClone = (image) => {
   const sizes = image.dataset.sizes || image.getAttribute('sizes');
 
   clone.className = HERO_CLONE_CLASS;
-  clone.alt = image.alt || '';
+  clone.alt = '';
+  clone.setAttribute('aria-hidden', 'true');
   clone.decoding = 'async';
+  clone.draggable = false;
 
   if (src) {
     clone.src = src;

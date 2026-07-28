@@ -2189,10 +2189,12 @@ body {
   object-fit: fill;
   object-position: center center;
   opacity: 0;
-  pointer-events: none;
+  pointer-events: auto;
   position: fixed;
   transform: translateZ(0);
+  user-select: none;
   visibility: hidden;
+  -webkit-user-drag: none;
   will-change: left, top, width, height, border-radius;
   z-index: 20;
 }
