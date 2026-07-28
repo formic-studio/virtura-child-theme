@@ -2,8 +2,18 @@ const ARROW_BLOCK_SELECTOR = '.svg-arrow-block';
 const READY_CLASS = 'virtura-arrow-motion-ready';
 const SOURCE_CLASS = 'virtura-arrow-source';
 const CLONE_CLASS = 'virtura-arrow-clone';
+const SHIFT_PROPERTY = '--virtura-arrow-shift';
 
 let arrowObserver;
+let arrowResizeObserver;
+
+const syncArrowShift = (block) => {
+  const width = block.getBoundingClientRect().width;
+
+  if (width > 0) {
+    block.style.setProperty(SHIFT_PROPERTY, `${width}px`);
+  }
+};
 
 const setupArrow = (block) => {
   if (block.classList.contains(READY_CLASS)) {
@@ -26,6 +36,8 @@ const setupArrow = (block) => {
 
   block.append(clone);
   block.classList.add(READY_CLASS);
+  syncArrowShift(block);
+  arrowResizeObserver?.observe(block);
 };
 
 const setupArrowsWithin = (root) => {
@@ -41,6 +53,12 @@ const setupArrowsWithin = (root) => {
 };
 
 export const initArrowMotion = () => {
+  if ('ResizeObserver' in window && !arrowResizeObserver) {
+    arrowResizeObserver = new ResizeObserver((entries) => {
+      entries.forEach(({ target }) => syncArrowShift(target));
+    });
+  }
+
   document.querySelectorAll(ARROW_BLOCK_SELECTOR).forEach(setupArrow);
 
   if (arrowObserver || !document.body) {

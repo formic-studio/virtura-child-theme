@@ -706,8 +706,9 @@ body {
 }
 
 .svg-arrow-block.virtura-arrow-motion-ready {
-  --virtura-arrow-enter-x: -100%;
-  --virtura-arrow-exit-x: 100%;
+  --virtura-arrow-shift: 100vw;
+  --virtura-arrow-enter-x: calc(0px - var(--virtura-arrow-shift));
+  --virtura-arrow-exit-x: var(--virtura-arrow-shift);
 
   overflow: hidden;
   position: relative;
@@ -719,8 +720,8 @@ body {
     [aria-label*="Poprzedni" i],
     [aria-label*="Previous" i]
   ) {
-  --virtura-arrow-enter-x: 100%;
-  --virtura-arrow-exit-x: -100%;
+  --virtura-arrow-enter-x: var(--virtura-arrow-shift);
+  --virtura-arrow-exit-x: calc(0px - var(--virtura-arrow-shift));
 }
 
 .svg-arrow-block.virtura-arrow-motion-ready
