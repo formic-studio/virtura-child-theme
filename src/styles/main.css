@@ -705,13 +705,30 @@ body {
   stroke: currentColor;
 }
 
+.svg-arrow-block.virtura-arrow-motion-ready,
+.skip.virtura-arrow-motion-ready {
+  overflow: hidden;
+  position: relative;
+}
+
 .svg-arrow-block.virtura-arrow-motion-ready {
   --virtura-arrow-shift: 100vw;
   --virtura-arrow-enter-x: calc(0px - var(--virtura-arrow-shift));
   --virtura-arrow-exit-x: var(--virtura-arrow-shift);
+}
 
-  overflow: hidden;
-  position: relative;
+.skip.virtura-arrow-motion-ready {
+  --virtura-arrow-shift: 100vh;
+  --virtura-arrow-enter-y: calc(0px - var(--virtura-arrow-shift));
+  --virtura-arrow-exit-y: var(--virtura-arrow-shift);
+
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.skip[data-virtura-hero-skip]:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: var(--space-4, 0.4rem);
 }
 
 .slider-paggination
@@ -724,18 +741,26 @@ body {
   --virtura-arrow-exit-x: calc(0px - var(--virtura-arrow-shift));
 }
 
-.svg-arrow-block.virtura-arrow-motion-ready
+:is(.svg-arrow-block, .skip).virtura-arrow-motion-ready
   :is(.virtura-arrow-source, .virtura-arrow-clone) {
   translate: 0 0;
   transition: translate 0.52s var(--virtura-motion-ease);
 }
 
-.svg-arrow-block.virtura-arrow-motion-ready .virtura-arrow-clone {
+:is(.svg-arrow-block, .skip).virtura-arrow-motion-ready
+  .virtura-arrow-clone {
   inset: 0;
   margin: auto;
   pointer-events: none;
   position: absolute;
+}
+
+.svg-arrow-block.virtura-arrow-motion-ready .virtura-arrow-clone {
   translate: var(--virtura-arrow-enter-x) 0;
+}
+
+.skip.virtura-arrow-motion-ready .virtura-arrow-clone {
+  translate: 0 var(--virtura-arrow-enter-y);
 }
 
 :is(
@@ -792,6 +817,24 @@ body {
   translate: 0 0;
 }
 
+.skip.virtura-arrow-motion-ready:not([aria-disabled="true"]):is(
+    :hover,
+    :focus-visible,
+    :focus-within
+  )
+  .virtura-arrow-source {
+  translate: 0 var(--virtura-arrow-exit-y);
+}
+
+.skip.virtura-arrow-motion-ready:not([aria-disabled="true"]):is(
+    :hover,
+    :focus-visible,
+    :focus-within
+  )
+  .virtura-arrow-clone {
+  translate: 0 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   :is(.btn, .nav-btn, .footer-btn, .category-link, .img-button),
   #brx-content
@@ -806,13 +849,14 @@ body {
     transition: none;
   }
 
-  .svg-arrow-block.virtura-arrow-motion-ready
+  :is(.svg-arrow-block, .skip).virtura-arrow-motion-ready
     :is(.virtura-arrow-source, .virtura-arrow-clone) {
     translate: 0 0 !important;
     transition: none;
   }
 
-  .svg-arrow-block.virtura-arrow-motion-ready .virtura-arrow-clone {
+  :is(.svg-arrow-block, .skip).virtura-arrow-motion-ready
+    .virtura-arrow-clone {
     display: none;
   }
 

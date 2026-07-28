@@ -1,5 +1,7 @@
-const ARROW_BLOCK_SELECTOR = '.svg-arrow-block';
+const SKIP_ARROW_SELECTOR = '.skip';
+const ARROW_BLOCK_SELECTOR = `.svg-arrow-block, ${SKIP_ARROW_SELECTOR}`;
 const READY_CLASS = 'virtura-arrow-motion-ready';
+const VERTICAL_CLASS = 'virtura-arrow-motion-vertical';
 const SOURCE_CLASS = 'virtura-arrow-source';
 const CLONE_CLASS = 'virtura-arrow-clone';
 const SHIFT_PROPERTY = '--virtura-arrow-shift';
@@ -36,10 +38,13 @@ let arrowObserver;
 let arrowResizeObserver;
 
 const syncArrowShift = (block) => {
-  const width = block.getBoundingClientRect().width;
+  const rect = block.getBoundingClientRect();
+  const distance = block.classList.contains(VERTICAL_CLASS)
+    ? rect.height
+    : rect.width;
 
-  if (width > 0) {
-    block.style.setProperty(SHIFT_PROPERTY, `${width}px`);
+  if (distance > 0) {
+    block.style.setProperty(SHIFT_PROPERTY, `${distance}px`);
   }
 };
 
@@ -87,6 +92,7 @@ const setupArrow = (block) => {
   clone.setAttribute('focusable', 'false');
   clone.removeAttribute('id');
 
+  block.classList.toggle(VERTICAL_CLASS, block.matches(SKIP_ARROW_SELECTOR));
   block.append(clone);
   block.classList.add(READY_CLASS);
   const syncPaint = () => syncArrowPaint(source, clone);

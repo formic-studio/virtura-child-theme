@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Added an accessible `.skip` control to the homepage hero. Its duplicated
+  arrow uses the shared push transition vertically, while activation quickly
+  scrolls to the exact end of the pinned hero image animation. The jump uses a
+  short Lenis transition, falls back to the following section when the desktop
+  ScrollTrigger is unavailable and becomes immediate for reduced motion.
 - Replaced the shared arrow hover movement with a global push transition. Each
   `.svg-arrow-block` now receives an accessibility-hidden duplicate that enters
   as the visible arrow exits; previous-slide controls move in the opposite

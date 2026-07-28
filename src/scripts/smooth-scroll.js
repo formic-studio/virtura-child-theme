@@ -3,6 +3,7 @@ import 'lenis/dist/lenis.css';
 import { loadGsap } from './motion.js';
 
 const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
+const fastScrollEasing = (progress) => 1 - Math.pow(1 - progress, 4);
 
 let smoothScrollInstance;
 let gsapTickerCallback;
@@ -24,6 +25,52 @@ const createLenis = () => new Lenis({
   touchMultiplier: 2,
   wheelMultiplier: 1,
 });
+
+export const scrollToPosition = (
+  target,
+  {
+    duration = 0.8,
+    immediate = reducedMotionMedia.matches,
+    onComplete,
+  } = {},
+) => {
+  if (!Number.isFinite(target)) {
+    return false;
+  }
+
+  const maxScroll = Math.max(
+    0,
+    document.documentElement.scrollHeight - window.innerHeight,
+  );
+  const destination = Math.min(Math.max(0, target), maxScroll);
+
+  if (immediate) {
+    window.scrollTo(0, destination);
+    onComplete?.();
+    return true;
+  }
+
+  if (smoothScrollInstance) {
+    smoothScrollInstance.resize();
+    smoothScrollInstance.scrollTo(destination, {
+      duration,
+      easing: fastScrollEasing,
+      force: true,
+      lock: true,
+      onComplete,
+    });
+    return true;
+  }
+
+  window.scrollTo({
+    behavior: 'smooth',
+    left: 0,
+    top: destination,
+  });
+  window.setTimeout(() => onComplete?.(), duration * 1000);
+
+  return true;
+};
 
 export const destroySmoothScroll = () => {
   if (gsapTickerCallback) {

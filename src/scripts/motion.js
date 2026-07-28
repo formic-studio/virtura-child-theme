@@ -71,6 +71,7 @@ let gsapApiPromise;
 let splitTextApiPromise;
 let fontsReadyPromise;
 let motionInitialized = false;
+let heroImageScrollTrigger;
 const optionTextSplits = new Map();
 
 const mobileLMedia = window.matchMedia(MOBILE_L_MEDIA_QUERY);
@@ -92,6 +93,8 @@ export const loadGsap = async () => {
 
   return gsapApiPromise;
 };
+
+export const getHeroImageScrollTrigger = () => heroImageScrollTrigger;
 
 const waitForFonts = () => {
   if (!fontsReadyPromise) {
@@ -733,6 +736,8 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
     },
   });
 
+  heroImageScrollTrigger = timeline.scrollTrigger;
+
   timeline.fromTo(
     clone,
     {
@@ -758,6 +763,10 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
 
   storeAnimation({
     kill: () => {
+      if (heroImageScrollTrigger === timeline.scrollTrigger) {
+        heroImageScrollTrigger = undefined;
+      }
+
       timeline.kill();
       clone.remove();
       section.classList.remove(HERO_ACTIVE_CLASS);
