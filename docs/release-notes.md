@@ -2,10 +2,11 @@
 
 ## Unreleased
 
-- Replaced colour-changing hover states on shared arrow buttons with a global
-  horizontal arrow movement. The same motion applies to standalone
-  `.svg-arrow-block` controls, supports keyboard focus and is disabled by
-  `prefers-reduced-motion`.
+- Replaced the shared arrow hover movement with a global push transition. Each
+  `.svg-arrow-block` now receives an accessibility-hidden duplicate that enters
+  as the visible arrow exits; previous-slide controls move in the opposite
+  direction. The effect also supports keyboard focus, keeps the existing arrow
+  colours and is disabled by `prefers-reduced-motion`.
 - Added a `0.2s ease` grey hover and keyboard-focus state to Bricks contact
   form submit buttons, matching the footer button timing.
 - Added responsive content placement for the blog post template. On mobile,

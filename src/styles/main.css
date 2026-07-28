@@ -705,22 +705,40 @@ body {
   stroke: currentColor;
 }
 
-.svg-arrow-block svg {
-  --virtura-arrow-hover-translate-x: 0.2rem;
+.svg-arrow-block.virtura-arrow-motion-ready {
+  --virtura-arrow-enter-x: -100%;
+  --virtura-arrow-exit-x: 100%;
+
+  overflow: hidden;
+  position: relative;
+}
+
+.slider-paggination
+  .svg-arrow-block.virtura-arrow-motion-ready:is(
+    :first-child,
+    [aria-label*="Poprzedni" i],
+    [aria-label*="Previous" i]
+  ) {
+  --virtura-arrow-enter-x: 100%;
+  --virtura-arrow-exit-x: -100%;
+}
+
+.svg-arrow-block.virtura-arrow-motion-ready
+  :is(.virtura-arrow-source, .virtura-arrow-clone) {
   translate: 0 0;
   transition: translate 0.45s var(--virtura-motion-ease);
 }
 
-.slider-paggination
-  .svg-arrow-block[aria-label="Poprzedni slajd"]
-  svg {
-  --virtura-arrow-hover-translate-x: -0.2rem;
+.svg-arrow-block.virtura-arrow-motion-ready .virtura-arrow-clone {
+  inset: 0;
+  margin: auto;
+  pointer-events: none;
+  position: absolute;
+  translate: var(--virtura-arrow-enter-x) 0;
 }
 
-a[href]:has(.svg-arrow-block):is(:hover, :focus-visible, :focus-within)
-  .svg-arrow-block
-  svg,
 :is(
+    a[href]:has(.svg-arrow-block),
     .btn,
     .nav-btn,
     .nav-cta,
@@ -733,14 +751,44 @@ a[href]:has(.svg-arrow-block):is(:hover, :focus-visible, :focus-within)
     .bricks-button,
     .brxe-button
   ):is(:hover, :focus-visible, :focus-within)
-  .svg-arrow-block
-  svg,
-.svg-arrow-block:not(.is-disabled, [aria-disabled="true"]):is(
-    :hover,
-    :focus-visible
+  .svg-arrow-block.virtura-arrow-motion-ready:not(
+    .is-disabled,
+    [aria-disabled="true"]
   )
-  svg {
-  translate: var(--virtura-arrow-hover-translate-x) 0;
+  .virtura-arrow-source,
+.svg-arrow-block.virtura-arrow-motion-ready:not(
+    .is-disabled,
+    [aria-disabled="true"]
+  ):is(:hover, :focus-visible)
+  .virtura-arrow-source {
+  translate: var(--virtura-arrow-exit-x) 0;
+}
+
+:is(
+    a[href]:has(.svg-arrow-block),
+    .btn,
+    .nav-btn,
+    .nav-cta,
+    .footer-btn,
+    .category-link,
+    .img-button,
+    .btn-big,
+    .btn-glass,
+    .btn-wrapper,
+    .bricks-button,
+    .brxe-button
+  ):is(:hover, :focus-visible, :focus-within)
+  .svg-arrow-block.virtura-arrow-motion-ready:not(
+    .is-disabled,
+    [aria-disabled="true"]
+  )
+  .virtura-arrow-clone,
+.svg-arrow-block.virtura-arrow-motion-ready:not(
+    .is-disabled,
+    [aria-disabled="true"]
+  ):is(:hover, :focus-visible)
+  .virtura-arrow-clone {
+  translate: 0 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -757,9 +805,14 @@ a[href]:has(.svg-arrow-block):is(:hover, :focus-visible, :focus-within)
     transition: none;
   }
 
-  .svg-arrow-block svg {
+  .svg-arrow-block.virtura-arrow-motion-ready
+    :is(.virtura-arrow-source, .virtura-arrow-clone) {
     translate: 0 0 !important;
     transition: none;
+  }
+
+  .svg-arrow-block.virtura-arrow-motion-ready .virtura-arrow-clone {
+    display: none;
   }
 
   .service-img-block:is(:hover, :focus-within)::before {

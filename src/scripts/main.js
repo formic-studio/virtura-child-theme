@@ -1,5 +1,6 @@
 import '../styles/main.css';
 import { initAboutSlider } from './about-slider.js';
+import { initArrowMotion } from './arrow-motion.js';
 import { initArchiveFilters } from './archive-filters.js';
 import { initBlogMobileContent } from './blog-mobile-content.js';
 import { initCategoryStack } from './category-stack.js';
@@ -32,6 +33,7 @@ const initTheme = () => {
   initAboutSlider();
   initSpecsSlider();
   initTestimonialsSlider();
+  initArrowMotion();
   initMediaSwitch();
   void introReady
     .catch(() => {})
