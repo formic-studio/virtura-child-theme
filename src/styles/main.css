@@ -727,7 +727,7 @@ body {
 .svg-arrow-block.virtura-arrow-motion-ready
   :is(.virtura-arrow-source, .virtura-arrow-clone) {
   translate: 0 0;
-  transition: translate 0.45s var(--virtura-motion-ease);
+  transition: translate 0.52s var(--virtura-motion-ease);
 }
 
 .svg-arrow-block.virtura-arrow-motion-ready .virtura-arrow-clone {
