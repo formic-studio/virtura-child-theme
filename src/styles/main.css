@@ -819,8 +819,7 @@ body {
 
 .skip.virtura-arrow-motion-ready:not([aria-disabled="true"]):is(
     :hover,
-    :focus-visible,
-    :focus-within
+    :focus-visible
   )
   .virtura-arrow-source {
   translate: 0 var(--virtura-arrow-exit-y);
@@ -828,8 +827,7 @@ body {
 
 .skip.virtura-arrow-motion-ready:not([aria-disabled="true"]):is(
     :hover,
-    :focus-visible,
-    :focus-within
+    :focus-visible
   )
   .virtura-arrow-clone {
   translate: 0 0;
