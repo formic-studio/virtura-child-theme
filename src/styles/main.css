@@ -609,7 +609,9 @@ body {
 }
 
 #brx-content
-  .btn-big:not(:has(.svg-arrow-block)):is(
+  :is(a.btn-big[href], .btn-big:has(a[href])):not(
+    :has(.svg-arrow-block)
+  ):is(
     :hover,
     :focus-visible,
     :focus-within
@@ -619,7 +621,9 @@ body {
 }
 
 #brx-content
-  .btn-big:not(:has(.svg-arrow-block)):is(
+  :is(a.btn-big[href], .btn-big:has(a[href])):not(
+    :has(.svg-arrow-block)
+  ):is(
     :hover,
     :focus-visible,
     :focus-within
@@ -771,7 +775,7 @@ body {
     .footer-btn,
     .category-link,
     .img-button,
-    .btn-big,
+    .btn-big:has(a[href]),
     .btn-glass,
     .btn-wrapper,
     .bricks-button,
@@ -779,11 +783,13 @@ body {
   ):is(:hover, :focus-visible, :focus-within)
   .svg-arrow-block.virtura-arrow-motion-ready:not(
     .is-disabled,
+    .virtura-arrow-motion-non-interactive,
     [aria-disabled="true"]
   )
   .virtura-arrow-source,
 .svg-arrow-block.virtura-arrow-motion-ready:not(
     .is-disabled,
+    .virtura-arrow-motion-non-interactive,
     [aria-disabled="true"]
   ):is(:hover, :focus-visible)
   .virtura-arrow-source {
@@ -798,7 +804,7 @@ body {
     .footer-btn,
     .category-link,
     .img-button,
-    .btn-big,
+    .btn-big:has(a[href]),
     .btn-glass,
     .btn-wrapper,
     .bricks-button,
@@ -806,18 +812,23 @@ body {
   ):is(:hover, :focus-visible, :focus-within)
   .svg-arrow-block.virtura-arrow-motion-ready:not(
     .is-disabled,
+    .virtura-arrow-motion-non-interactive,
     [aria-disabled="true"]
   )
   .virtura-arrow-clone,
 .svg-arrow-block.virtura-arrow-motion-ready:not(
     .is-disabled,
+    .virtura-arrow-motion-non-interactive,
     [aria-disabled="true"]
   ):is(:hover, :focus-visible)
   .virtura-arrow-clone {
   translate: 0 0;
 }
 
-.skip.virtura-arrow-motion-ready:not([aria-disabled="true"]):is(
+.skip.virtura-arrow-motion-ready:not(
+    .virtura-arrow-motion-non-interactive,
+    [aria-disabled="true"]
+  ):is(
     :hover,
     :focus-visible
   )
@@ -825,7 +836,10 @@ body {
   translate: 0 var(--virtura-arrow-exit-y);
 }
 
-.skip.virtura-arrow-motion-ready:not([aria-disabled="true"]):is(
+.skip.virtura-arrow-motion-ready:not(
+    .virtura-arrow-motion-non-interactive,
+    [aria-disabled="true"]
+  ):is(
     :hover,
     :focus-visible
   )

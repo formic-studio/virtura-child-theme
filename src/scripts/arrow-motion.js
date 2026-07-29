@@ -4,6 +4,7 @@ const READY_CLASS = 'virtura-arrow-motion-ready';
 const VERTICAL_CLASS = 'virtura-arrow-motion-vertical';
 const SOURCE_CLASS = 'virtura-arrow-source';
 const CLONE_CLASS = 'virtura-arrow-clone';
+const NON_INTERACTIVE_CLASS = 'virtura-arrow-motion-non-interactive';
 const SHIFT_PROPERTY = '--virtura-arrow-shift';
 const ARROW_TRIGGER_SELECTOR = [
   'a[href]',
@@ -13,7 +14,7 @@ const ARROW_TRIGGER_SELECTOR = [
   '.footer-btn',
   '.category-link',
   '.img-button',
-  '.btn-big',
+  '.btn-big:has(a[href])',
   '.btn-glass',
   '.btn-wrapper',
   '.bricks-button',
@@ -74,6 +75,15 @@ const syncArrowPaint = (source, clone) => {
 };
 
 const setupArrow = (block) => {
+  const btnBig = block.closest('.btn-big');
+  const btnBigHasLink =
+    btnBig?.matches('a[href]') || Boolean(btnBig?.querySelector('a[href]'));
+
+  block.classList.toggle(
+    NON_INTERACTIVE_CLASS,
+    Boolean(btnBig && !btnBigHasLink),
+  );
+
   if (block.classList.contains(READY_CLASS)) {
     return;
   }
