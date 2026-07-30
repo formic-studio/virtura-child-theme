@@ -17,6 +17,11 @@
   `data-virtura-video-eager="true"` to opt a critical video out of source
   deferral. WebM uploads are allowed, while the hosting layer must still serve
   `.webm` files with `Content-Type: video/webm`.
+- Prevented a one-frame flash during the desktop hero image handoff. The
+  original `.hero-img` now remains visible until the responsive
+  `virtura-hero-img-clone` has loaded, completed `decode()` and painted for one
+  frame; only then is the source hidden. Cleanup and reverse scrolling cancel
+  any pending handoff frames.
 - Added automatic media optimization for new WordPress uploads. JPEG and PNG
   display files and responsive variants are generated as WebP at quality 80
   when supported by the active image editor, source uploads remain available

@@ -230,6 +230,35 @@ const createHeroImageClone = (image) => {
   return clone;
 };
 
+const waitForHeroCloneDecode = async (clone) => {
+  if (!(clone instanceof HTMLImageElement)) {
+    return false;
+  }
+
+  if (!clone.complete) {
+    await new Promise((resolve) => {
+      const finish = () => resolve();
+
+      clone.addEventListener('load', finish, { once: true });
+      clone.addEventListener('error', finish, { once: true });
+    });
+  }
+
+  if (!clone.naturalWidth) {
+    return false;
+  }
+
+  if (typeof clone.decode === 'function') {
+    try {
+      await clone.decode();
+    } catch {
+      return clone.complete && clone.naturalWidth > 0;
+    }
+  }
+
+  return clone.complete && clone.naturalWidth > 0;
+};
+
 const setReducedMotionClass = () => {
   document.documentElement.classList.toggle(
     'virtura-reduced-motion',
@@ -623,6 +652,46 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
 
   const clone = createHeroImageClone(image);
   let isCloneActive = false;
+  let isCloneDecoded = false;
+  let sourceHideFrame = 0;
+  let sourceHidePaintFrame = 0;
+
+  const cancelSourceHide = () => {
+    window.cancelAnimationFrame(sourceHideFrame);
+    window.cancelAnimationFrame(sourceHidePaintFrame);
+    sourceHideFrame = 0;
+    sourceHidePaintFrame = 0;
+  };
+
+  const hideSourceAfterClonePaint = () => {
+    cancelSourceHide();
+
+    if (!isCloneActive || !isCloneDecoded) {
+      image.classList.remove(HERO_SOURCE_HIDDEN_CLASS);
+      return;
+    }
+
+    gsap.set(clone, { autoAlpha: 1 });
+
+    sourceHideFrame = window.requestAnimationFrame(() => {
+      sourceHidePaintFrame = window.requestAnimationFrame(() => {
+        sourceHideFrame = 0;
+        sourceHidePaintFrame = 0;
+
+        if (isCloneActive && isCloneDecoded) {
+          image.classList.add(HERO_SOURCE_HIDDEN_CLASS);
+        }
+      });
+    });
+  };
+
+  void waitForHeroCloneDecode(clone).then((decoded) => {
+    isCloneDecoded = decoded;
+
+    if (decoded && isCloneActive) {
+      hideSourceAfterClonePaint();
+    }
+  });
 
   const getSourceBorderRadius = () => window.getComputedStyle(image).borderRadius;
   const syncCloneSourceSize = () => {
@@ -675,7 +744,11 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
   const activateClone = () => {
     isCloneActive = true;
     section.classList.add(HERO_ACTIVE_CLASS);
-    image.classList.add(HERO_SOURCE_HIDDEN_CLASS);
+    image.classList.remove(HERO_SOURCE_HIDDEN_CLASS);
+
+    if (isCloneDecoded) {
+      hideSourceAfterClonePaint();
+    }
   };
 
   const showCloneFromSource = () => {
@@ -714,6 +787,7 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
 
   const hideClone = () => {
     isCloneActive = false;
+    cancelSourceHide();
     section.classList.remove(HERO_ACTIVE_CLASS);
     section.classList.remove(HERO_DOCKED_CLASS);
     image.classList.remove(HERO_SOURCE_HIDDEN_CLASS);
@@ -784,7 +858,9 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
         heroImageScrollTrigger = undefined;
       }
 
+      isCloneActive = false;
       timeline.kill();
+      cancelSourceHide();
       clone.remove();
       section.classList.remove(HERO_ACTIVE_CLASS);
       section.classList.remove(HERO_DOCKED_CLASS);
