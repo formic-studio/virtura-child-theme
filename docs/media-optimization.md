@@ -13,6 +13,9 @@ WordPress Media Library.
 - Dodatkowe szerokości responsywne to `400px`, `480px`, `640px` i `1280px`.
 - Klasy Bricks `hero-img`, `archive-img`, `category-img` i `team-img` otrzymują
   dopasowany atrybut `sizes`.
+- Początkowy obraz `hero-img` korzysta z małego wariantu, natomiast desktopowy
+  `virtura-hero-img-clone` wybiera z `srcset` wariant dopasowany do końcowego
+  rozmiaru fullscreen i aktualizuje go po zmianie viewportu.
 
 ## Weryfikacja po deployu
 

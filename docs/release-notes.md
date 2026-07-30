@@ -11,7 +11,10 @@
   category and team images, and corrected hero loading to `eager` with a valid
   `fetchpriority="high"`. Below-fold homepage media no longer competes with the
   hero, and Bricks video placeholders pointing to JPEG/PNG/WebP files have
-  their invalid `src` removed before reaching the browser.
+  their invalid `src` removed before reaching the browser. The desktop
+  `virtura-hero-img-clone` now selects a source for its fullscreen target
+  instead of stretching the initial 480px candidate, while mobile and reduced
+  motion keep the smaller source.
 - Added an accessible `.skip` control to the homepage hero. Its duplicated
   arrow uses the shared push transition vertically, while activation quickly
   scrolls to the exact end of the pinned hero image animation. The jump uses a

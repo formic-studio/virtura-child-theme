@@ -194,28 +194,35 @@ const getImageSource = (image) => {
   return image.dataset.src || image.getAttribute('data-src') || '';
 };
 
+const getHeroCloneFallbackSource = (image) => {
+  const source = image.getAttribute('src');
+
+  return !isPlaceholderImageSource(source) ? source : getImageSource(image);
+};
+
+const getHeroCloneSourceSize = (image) =>
+  `${Math.ceil(getHeroTargetRect(image).width)}px`;
+
 const createHeroImageClone = (image) => {
   const clone = document.createElement('img');
-  const src = getImageSource(image);
+  const src = getHeroCloneFallbackSource(image);
   const srcset = image.dataset.srcset || image.getAttribute('srcset');
-  const sizes = image.dataset.sizes || image.getAttribute('sizes');
 
   clone.className = HERO_CLONE_CLASS;
   clone.alt = '';
   clone.setAttribute('aria-hidden', 'true');
   clone.decoding = 'async';
   clone.draggable = false;
-
-  if (src) {
-    clone.src = src;
-  }
+  clone.fetchPriority = 'high';
+  clone.loading = 'eager';
 
   if (srcset) {
+    clone.sizes = getHeroCloneSourceSize(image);
     clone.srcset = srcset;
   }
 
-  if (sizes) {
-    clone.sizes = sizes;
+  if (src) {
+    clone.src = src;
   }
 
   document.body.appendChild(clone);
@@ -618,6 +625,11 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
   let isCloneActive = false;
 
   const getSourceBorderRadius = () => window.getComputedStyle(image).borderRadius;
+  const syncCloneSourceSize = () => {
+    if (clone.srcset) {
+      clone.sizes = getHeroCloneSourceSize(image);
+    }
+  };
 
   const setCloneFixed = () => {
     if (clone.parentElement !== document.body) {
@@ -631,6 +643,7 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
   const setCloneToSource = () => {
     const sourceRect = image.getBoundingClientRect();
 
+    syncCloneSourceSize();
     setCloneFixed();
 
     gsap.set(clone, {
@@ -646,6 +659,7 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
   const setCloneToTarget = () => {
     const targetRect = getHeroTargetRect(image);
 
+    syncCloneSourceSize();
     setCloneFixed();
 
     gsap.set(clone, {
@@ -678,6 +692,7 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
   const dockCloneInSection = () => {
     const targetRect = getHeroTargetRect(image);
 
+    syncCloneSourceSize();
     activateClone();
 
     if (clone.parentElement !== section) {
