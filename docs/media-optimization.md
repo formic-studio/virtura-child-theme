@@ -5,9 +5,9 @@ WordPress Media Library.
 
 ## Nowe obrazy
 
-- Oryginalny upload pozostaje bez zmian.
-- Warianty generowane z JPEG i PNG są zapisywane jako WebP, jeżeli aktywny
-  edytor WordPressa obsługuje ten format.
+- Oryginalny upload pozostaje dostępny do odzyskania w `original_image`.
+- Plik główny używany do wyświetlania oraz warianty generowane z JPEG i PNG są
+  zapisywane jako WebP, jeżeli aktywny edytor WordPressa obsługuje ten format.
 - Jakość JPEG/WebP wynosi `80`.
 - Obrazy większe niż `2560px` korzystają z mechanizmu skalowania WordPressa.
 - Dodatkowe szerokości responsywne to `400px`, `480px`, `640px` i `1280px`.

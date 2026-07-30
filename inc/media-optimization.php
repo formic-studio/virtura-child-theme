@@ -2,8 +2,9 @@
 /**
  * Image optimization and responsive media markup.
  *
- * Original uploads remain untouched. WordPress-generated JPEG and PNG
- * sub-sizes are stored as WebP when the active image editor supports it.
+ * Original uploads remain available for recovery. WordPress-generated JPEG
+ * and PNG display files and sub-sizes are stored as WebP when the active image
+ * editor supports it.
  *
  * @package VirturaChildTheme
  */
@@ -63,7 +64,7 @@ function virtura_child_theme_set_legacy_jpeg_quality( $quality, $context = '' ):
 }
 
 /**
- * Generate JPEG and PNG sub-sizes as WebP while preserving source uploads.
+ * Generate JPEG and PNG display files as WebP while preserving source uploads.
  *
  * @param string[] $formats   MIME type output mappings.
  * @param string   $filename  Source filename.
