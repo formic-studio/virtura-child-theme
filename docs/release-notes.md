@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added a black `theme-color` meta tag on the frontend so supported mobile
+  browsers, including Safari on iOS, match their browser chrome to the black
+  footer without changing the white document background used by Bricks.
 - Added browser-assisted video poster generation without requiring FFmpeg.
   New MP4/WebM uploads capture an opening frame at `0.1s`, scale it to a
   maximum width of 1920px, save it as WebP (with a JPEG fallback) in Media

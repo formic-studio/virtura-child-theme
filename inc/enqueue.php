@@ -128,6 +128,22 @@ function virtura_child_theme_enqueue_assets(): void {
 add_action( 'wp_enqueue_scripts', 'virtura_child_theme_enqueue_assets', 20 );
 
 /**
+ * Match supported mobile browser chrome to the black site footer.
+ *
+ * Safari on iOS and Chromium-based mobile browsers use theme-color for their
+ * address and toolbar surfaces. Keep this separate from the document
+ * background so light Bricks sections continue to inherit the intended color.
+ */
+function virtura_child_theme_print_browser_theme_color(): void {
+	if ( is_admin() || virtura_child_theme_is_bricks_builder() ) {
+		return;
+	}
+
+	echo '<meta name="theme-color" content="#000000">' . "\n";
+}
+add_action( 'wp_head', 'virtura_child_theme_print_browser_theme_color', -1 );
+
+/**
  * Hide homepage intro elements before the main ES module starts.
  *
  * The real animation still lives in src/scripts/intro-animation.js. This tiny
