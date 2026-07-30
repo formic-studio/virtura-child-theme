@@ -2,9 +2,12 @@
 
 ## Unreleased
 
-- Added a black `theme-color` meta tag on the frontend so supported mobile
-  browsers, including Safari on iOS, match their browser chrome to the black
-  footer without changing the white document background used by Bricks.
+- Added a black `theme-color` meta tag on the frontend and a matching black
+  mobile document canvas so Safari, including Safari 26 which derives its tint
+  from `html`/`body`, can match the browser chrome and safe area to the footer.
+  The editable `#brx-content` canvas remains white. Corrected the square footer
+  animation to override Bricks' default 16:9 video ratio and cover crop, and
+  removed the global gray lazy-video background that appeared beside it.
 - Added browser-assisted video poster generation without requiring FFmpeg.
   New MP4/WebM uploads capture an opening frame at `0.1s`, scale it to a
   maximum width of 1920px, save it as WebP (with a JPEG fallback) in Media

@@ -14,6 +14,23 @@ body {
   color: var(--color-black, #000);
 }
 
+/*
+ * Safari 26 derives its browser chrome and safe-area tint from the document
+ * background instead of relying only on meta theme-color. Bricks sets the
+ * root background to white, so keep the mobile document/footer canvas black
+ * and restore white behind the editable page content.
+ */
+@media (max-width: 767px) {
+  html,
+  body {
+    background-color: var(--color-black, #000) !important;
+  }
+
+  #brx-content {
+    background-color: var(--color-white, #fff);
+  }
+}
+
 .faq-block.virtura-faq-ready.brxe-block,
 :is(html, body).bricks-is-builder .faq-block.brxe-block {
   row-gap: 0 !important;
@@ -1944,7 +1961,26 @@ body {
   display: block;
   width: 100%;
   height: 100%;
-  background-color: #111;
+}
+
+/*
+ * The footer animation and its generated poster are square. Bricks defaults
+ * every video wrapper to 16:9 and crops posters with object-fit: cover, which
+ * cuts this asset in Safari and exposes the lazy-video placeholder beside it.
+ */
+#brx-footer .grid-3 > .brxe-video {
+  aspect-ratio: 1;
+  background-color: var(--color-black, #000);
+  height: 14.6rem;
+  justify-self: center;
+  max-width: 100%;
+  width: 14.6rem;
+}
+
+#brx-footer .grid-3 > .brxe-video > video {
+  background-color: var(--color-black, #000);
+  object-fit: contain;
+  object-position: center;
 }
 
 .video-about[data-virtura-video-controls="true"].is-video-paused,
