@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Added automatic media optimization for new WordPress uploads. JPEG and PNG
+  responsive variants are generated as WebP at quality 80 when supported by
+  the active image editor, source uploads remain available, and images larger
+  than 2560px use WordPress' scaled primary file. Added 400px, 480px, 640px and
+  1280px intermediate sizes, component-aware `sizes` values for hero, archive,
+  category and team images, and corrected hero loading to `eager` with a valid
+  `fetchpriority="high"`. Below-fold homepage media no longer competes with the
+  hero, and Bricks video placeholders pointing to JPEG/PNG/WebP files have
+  their invalid `src` removed before reaching the browser.
 - Added an accessible `.skip` control to the homepage hero. Its duplicated
   arrow uses the shared push transition vertically, while activation quickly
   scrolls to the exact end of the pinned hero image animation. The jump uses a

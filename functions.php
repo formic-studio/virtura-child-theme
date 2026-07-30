@@ -15,3 +15,4 @@ define( 'VIRTURA_CHILD_THEME_URI', get_stylesheet_directory_uri() );
 
 require_once VIRTURA_CHILD_THEME_PATH . '/inc/enqueue.php';
 require_once VIRTURA_CHILD_THEME_PATH . '/inc/carbon-fields.php';
+require_once VIRTURA_CHILD_THEME_PATH . '/inc/media-optimization.php';

@@ -34,3 +34,8 @@ dostana prosty scroll reveal, o ile uzytkownik nie ma wlaczonego `prefers-reduce
 ## Typografia
 
 `src/styles/font-sizes.css` jest miejscem na aliasy fontow, zmienne CSS i responsywne nadpisania typografii dla Bricks.
+
+## Media
+
+Optymalizacja nowych obrazow i bezpieczna regeneracja istniejacej biblioteki sa
+opisane w `docs/media-optimization.md`.
