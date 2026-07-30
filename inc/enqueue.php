@@ -63,7 +63,12 @@ function virtura_child_theme_is_bricks_builder(): bool {
 /**
  * Enqueue the built Vite entrypoint and associated CSS.
  */
-function virtura_child_theme_enqueue_vite_entry( string $entry, string $handle, bool $enqueue_script = true ): void {
+function virtura_child_theme_enqueue_vite_entry(
+	string $entry,
+	string $handle,
+	bool $enqueue_script = true,
+	array $dependencies = array()
+): void {
 	$manifest = virtura_child_theme_get_manifest();
 
 	if ( ! isset( $manifest[ $entry ] ) || ! is_array( $manifest[ $entry ] ) ) {
@@ -98,7 +103,7 @@ function virtura_child_theme_enqueue_vite_entry( string $entry, string $handle, 
 	wp_enqueue_script(
 		$handle,
 		VIRTURA_CHILD_THEME_URI . '/' . $js_relative_path,
-		array(),
+		$dependencies,
 		virtura_child_theme_asset_version( $js_relative_path ),
 		true
 	);
@@ -186,7 +191,12 @@ add_action( 'wp_head', 'virtura_child_theme_print_intro_prime', 0 );
  * be rendered with type="module".
  */
 function virtura_child_theme_add_module_type_to_script( string $tag, string $handle, string $src ): string {
-	if ( 'virtura-child-theme' !== $handle || empty( $src ) ) {
+	$module_handles = array(
+		'virtura-child-theme',
+		'virtura-video-poster-admin',
+	);
+
+	if ( ! in_array( $handle, $module_handles, true ) || empty( $src ) ) {
 		return $tag;
 	}
 

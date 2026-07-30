@@ -124,6 +124,8 @@ const getVideoSource = (container) => {
       source?.getAttribute('src') ||
       video.dataset.src ||
       video.getAttribute('data-src') ||
+      source?.dataset.src ||
+      source?.getAttribute('data-src') ||
       '',
   };
 };

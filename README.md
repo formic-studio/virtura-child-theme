@@ -37,5 +37,6 @@ dostana prosty scroll reveal, o ile uzytkownik nie ma wlaczonego `prefers-reduce
 
 ## Media
 
-Optymalizacja nowych obrazow i bezpieczna regeneracja istniejacej biblioteki sa
-opisane w `docs/media-optimization.md`.
+Optymalizacja nowych obrazow, automatyczne postery wideo, lazy loading filmow
+i bezpieczna regeneracja istniejacej biblioteki sa opisane w
+`docs/media-optimization.md`.

@@ -1,0 +1,35 @@
+.virtura-video-poster-control {
+  max-width: 360px;
+}
+
+.virtura-video-poster-preview {
+  margin: 0 0 12px;
+  overflow: hidden;
+  border: 1px solid #dcdcde;
+  border-radius: 3px;
+  background: #f0f0f1;
+  aspect-ratio: 16 / 9;
+}
+
+.virtura-video-poster-preview[hidden] {
+  display: none;
+}
+
+.virtura-video-poster-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.virtura-video-poster-control[data-state="loading"] .button {
+  cursor: wait;
+}
+
+.virtura-video-poster-control[data-state="success"] [data-virtura-video-poster-status] {
+  color: #008a20;
+}
+
+.virtura-video-poster-control[data-state="error"] [data-virtura-video-poster-status] {
+  color: #b32d2e;
+}

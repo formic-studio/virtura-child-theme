@@ -77,3 +77,94 @@ W zakładce Network odpowiedź dla wygenerowanego wariantu powinna mieć
 `Content-Type: image/webp`. Hero powinno mieć `loading="eager"` i
 `fetchpriority="high"`; obrazy dalszych sekcji strony głównej powinny być
 ładowane lazy z niskim priorytetem.
+
+## Wideo i automatyczne postery
+
+Generator posterów nie wymaga `ffmpeg`. Działa hybrydowo:
+
+1. Po zakończeniu uploadu MP4/WebM skrypt w panelu otwiera film lokalnie w
+   przeglądarce i pobiera klatkę z `0.1s`.
+2. Klatka jest zmniejszana maksymalnie do szerokości `1920px` i eksportowana
+   jako WebP z jakością `82`. Jeżeli przeglądarka nie obsługuje eksportu WebP,
+   używany jest JPEG.
+3. PHP sprawdza uprawnienia, nonce, rzeczywisty MIME obrazu i limit `5 MB`, po
+   czym zapisuje poster jako osobny attachment w Media Library.
+4. Poster zostaje powiązany z wideo przez `_virtura_video_poster_id` oraz
+   standardowy `_thumbnail_id` WordPressa.
+
+Automat działa przy uploadzie z Media Library, edytora wpisu i Bricks Buildera.
+Okno uploadu musi pozostać otwarte do zakończenia generowania. Jeśli automat
+nie może odczytać filmu, otwórz wideo w Media Library i użyj pola
+`Poster wideo → Wygeneruj poster`. Ten sam przycisk pozwala później wygenerować
+poster ponownie. Poprzedni obraz nie jest automatycznie usuwany z biblioteki.
+
+## Lazy loading wideo
+
+Na froncie źródła zwykłych tagów `video` renderowanych przez Bricks, WordPress
+Video Shortcode i blok Core Video są przenoszone z `src` do `data-src` jeszcze
+w PHP. Dzięki temu przeglądarka nie rozpoczyna pobierania filmu podczas
+parsowania strony.
+
+- Poster i źródło są aktywowane około `600px` przed wejściem filmu do viewportu.
+- Wideo bez autoplay otrzymuje po aktywacji `preload="metadata"`.
+- Wideo z autoplay zaczyna odtwarzanie dopiero blisko viewportu.
+- Przy `prefers-reduced-motion: reduce` autoplay jest wyłączony, a źródło
+  pozostaje odroczone do świadomej interakcji użytkownika.
+- Kliknięcie lub aktywacja klawiaturą ładuje odroczone źródło również przed
+  przecięciem z obserwowanym obszarem.
+
+Jeżeli konkretne wideo musi być dostępne natychmiast, dodaj mu w Bricks custom
+attribute:
+
+```txt
+data-virtura-video-eager="true"
+```
+
+Taki film zachowuje zwykły `src`; nadal respektuje `prefers-reduced-motion`.
+
+Poster jest dobierany automatycznie po adresie filmu z Media Library. Ręcznie
+ustawiony atrybut `poster` ma pierwszeństwo i nie jest nadpisywany.
+
+## WebM na Hostingerze
+
+Child theme zezwala na upload `.webm` jako `video/webm`, ale konfiguracja
+serwera musi również wysyłać poprawny nagłówek HTTP. Odpowiedź
+`Content-Type: text/plain` nie jest naprawiana przez filtr PHP WordPressa.
+
+Po zmianie konfiguracji przez support sprawdź plik:
+
+```bash
+curl -I "https://lightcoral-narwhal-185732.hostingersite.com/wp-content/uploads/SCIEZKA/film.webm"
+```
+
+Oczekiwany wynik zawiera:
+
+```txt
+Content-Type: video/webm
+```
+
+Ten etap nie konwertuje MP4 do WebM. Automatyczne kodowanie wymaga dostępnego
+`ffmpeg` albo zewnętrznej usługi.
+
+## Test po wdrożeniu wideo
+
+Najpierw sprawdź składnię PHP na serwerze:
+
+```bash
+php -l wp-content/themes/virtura-child-theme/inc/video-optimization.php
+php -l wp-content/themes/virtura-child-theme/inc/enqueue.php
+php -l wp-content/themes/virtura-child-theme/functions.php
+```
+
+Następnie wgraj krótki MP4 przez Media Library i pozostaw modal otwarty.
+Po komunikacie o zapisaniu postera sprawdź identyfikator filmu:
+
+```bash
+wp post meta get VIDEO_ID _virtura_video_poster_id
+wp post meta get VIDEO_ID _thumbnail_id
+```
+
+Obie komendy powinny zwrócić identyfikator obrazu. Na frontendzie tag wideo
+przed wejściem w viewport powinien zawierać `data-src` lub element
+`source[data-src]`, `data-poster` i `preload="none"`. Po zbliżeniu filmu do
+viewportu JavaScript przywróci `src` oraz `poster`.

@@ -10,6 +10,7 @@ export default defineConfig({
     outDir: 'dist',
     rollupOptions: {
       input: {
+        adminVideoPoster: resolve(__dirname, 'src/scripts/admin-video-poster.js'),
         main: resolve(__dirname, 'src/scripts/main.js'),
       },
     },

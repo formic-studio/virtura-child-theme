@@ -18,6 +18,7 @@ import { initSpecsSlider } from './specs-slider.js';
 import { initTestimonialsSlider } from './testimonials-slider.js';
 import { initTrainingTabs } from './training-tabs.js';
 import { initVideoAboutControls } from './video-about-controls.js';
+import { initVideoOptimization } from './video-optimization.js';
 
 const initTheme = () => {
   initHeaderTheme();
@@ -27,6 +28,7 @@ const initTheme = () => {
   initFitText();
   initCategoryStack();
   initTrainingTabs();
+  initVideoOptimization();
   initVideoAboutControls();
   initArchiveFilters();
   initBlogMobileContent();

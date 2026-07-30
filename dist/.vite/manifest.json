@@ -17,8 +17,17 @@
     "src": "node_modules/gsap/index.js",
     "isDynamicEntry": true
   },
+  "src/scripts/admin-video-poster.js": {
+    "file": "assets/adminVideoPoster-CV-p1l0a.js",
+    "name": "adminVideoPoster",
+    "src": "src/scripts/admin-video-poster.js",
+    "isEntry": true,
+    "css": [
+      "assets/adminVideoPoster-B6I7Uj7x.css"
+    ]
+  },
   "src/scripts/main.js": {
-    "file": "assets/main-SqtH-q89.js",
+    "file": "assets/main-BKYzKe_0.js",
     "name": "main",
     "src": "src/scripts/main.js",
     "isEntry": true,

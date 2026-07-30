@@ -371,7 +371,8 @@ const sanitizeClonedMenuContent = (element) => {
 
   element.querySelectorAll('video').forEach((video) => {
     video.removeAttribute('autoplay');
-    video.preload = 'metadata';
+    video.removeAttribute('data-virtura-video-autoplay');
+    video.preload = 'none';
   });
 };
 

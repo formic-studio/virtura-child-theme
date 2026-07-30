@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- Added browser-assisted video poster generation without requiring FFmpeg.
+  New MP4/WebM uploads capture an opening frame at `0.1s`, scale it to a
+  maximum width of 1920px, save it as WebP (with a JPEG fallback) in Media
+  Library and link it to the video using both native attachment thumbnail meta
+  and `_virtura_video_poster_id`. Existing videos receive a manual regenerate
+  control in their media details. Bricks, Core Video blocks and WordPress video
+  shortcodes automatically receive the linked poster. Below-fold video sources
+  and posters are deferred in PHP and restored 600px before the viewport;
+  autoplay is disabled for reduced-motion users and direct user interaction
+  can load an otherwise deferred source. Add
+  `data-virtura-video-eager="true"` to opt a critical video out of source
+  deferral. WebM uploads are allowed, while the hosting layer must still serve
+  `.webm` files with `Content-Type: video/webm`.
 - Added automatic media optimization for new WordPress uploads. JPEG and PNG
   display files and responsive variants are generated as WebP at quality 80
   when supported by the active image editor, source uploads remain available
