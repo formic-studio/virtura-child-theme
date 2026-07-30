@@ -103,11 +103,17 @@ poster ponownie. Poprzedni obraz nie jest automatycznie usuwany z biblioteki.
 Na froncie źródła zwykłych tagów `video` renderowanych przez Bricks, WordPress
 Video Shortcode i blok Core Video są przenoszone z `src` do `data-src` jeszcze
 w PHP. Dzięki temu przeglądarka nie rozpoczyna pobierania filmu podczas
-parsowania strony.
+parsowania strony. Powiązany poster pozostaje w natywnym atrybucie `poster`,
+więc parser przeglądarki pobiera lekką klatkę bez czekania na główny JavaScript.
+Frontend używa wariantu postera o szerokości maksymalnie `1280px`.
 
-- Poster i źródło są aktywowane około `600px` przed wejściem filmu do viewportu.
+- Źródło jest aktywowane około `100px` przed wejściem filmu do viewportu.
+- Jednocześnie inicjalizowane są maksymalnie dwa filmy; następne czekają, aż
+  poprzednie otrzymają pierwszą klatkę lub zakończy się limit czasu.
 - Wideo bez autoplay otrzymuje po aktywacji `preload="metadata"`.
 - Wideo z autoplay zaczyna odtwarzanie dopiero blisko viewportu.
+- Autoplay jest zatrzymywany po wyjściu filmu poza obserwowany obszar i wznawiany
+  po powrocie.
 - Przy `prefers-reduced-motion: reduce` autoplay jest wyłączony, a źródło
   pozostaje odroczone do świadomej interakcji użytkownika.
 - Kliknięcie lub aktywacja klawiaturą ładuje odroczone źródło również przed
@@ -146,6 +152,16 @@ Content-Type: video/webm
 Ten etap nie konwertuje MP4 do WebM. Automatyczne kodowanie wymaga dostępnego
 `ffmpeg` albo zewnętrznej usługi.
 
+### Obecne materiały na stronie „O nas”
+
+Kontrola produkcji z 30 lipca 2026 wykazała, że główne pliki MP4 mają około
+`19–28 MB` każdy. W sprawdzonym `video-about-1.mp4` atom `moov` znajduje się za
+`mdat`, więc plik nie został przygotowany jako fast start. Lazy loading,
+natychmiastowy poster i kolejkowanie poprawiają pierwszy render oraz rozkład
+ruchu sieciowego, ale nie zastępują kompresji źródła. Docelowo te MP4 należy
+przekodować z `-movflags +faststart` i przepływnością dopasowaną do
+rozdzielczości.
+
 ## Test po wdrożeniu wideo
 
 Najpierw sprawdź składnię PHP na serwerze:
@@ -166,5 +182,6 @@ wp post meta get VIDEO_ID _thumbnail_id
 
 Obie komendy powinny zwrócić identyfikator obrazu. Na frontendzie tag wideo
 przed wejściem w viewport powinien zawierać `data-src` lub element
-`source[data-src]`, `data-poster` i `preload="none"`. Po zbliżeniu filmu do
-viewportu JavaScript przywróci `src` oraz `poster`.
+`source[data-src]`, natywny `poster` i `preload="none"`. Po zbliżeniu filmu do
+viewportu JavaScript przywróci `src`; poster pozostanie widoczny do rozpoczęcia
+odtwarzania.

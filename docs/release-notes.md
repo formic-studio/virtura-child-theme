@@ -8,10 +8,12 @@
   Library and link it to the video using both native attachment thumbnail meta
   and `_virtura_video_poster_id`. Existing videos receive a manual regenerate
   control in their media details. Bricks, Core Video blocks and WordPress video
-  shortcodes automatically receive the linked poster. Below-fold video sources
-  and posters are deferred in PHP and restored 600px before the viewport;
-  autoplay is disabled for reduced-motion users and direct user interaction
-  can load an otherwise deferred source. Add
+  shortcodes automatically receive the linked poster. Posters use the 1280px
+  responsive variant and remain in the native HTML `poster` attribute so they
+  can paint before JavaScript. Video sources are deferred in PHP and restored
+  100px before the viewport, with at most two videos starting concurrently.
+  Autoplay pauses outside the observed area, is disabled for reduced-motion
+  users, and direct user interaction can load an otherwise deferred source. Add
   `data-virtura-video-eager="true"` to opt a critical video out of source
   deferral. WebM uploads are allowed, while the hosting layer must still serve
   `.webm` files with `Content-Type: video/webm`.

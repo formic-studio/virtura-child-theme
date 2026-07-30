@@ -1940,6 +1940,13 @@ body {
 
 }
 
+.brxe-video > video[data-virtura-video-lazy="true"] {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: #111;
+}
+
 .video-about[data-virtura-video-controls="true"].is-video-paused,
 .video-about[data-virtura-video-controls="true"].is-video-paused video {
   cursor: var(--video-about-start-cursor);

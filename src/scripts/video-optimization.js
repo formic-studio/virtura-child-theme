@@ -1,7 +1,12 @@
 const LAZY_VIDEO_SELECTOR = 'video[data-virtura-video-lazy="true"]';
+const MAX_CONCURRENT_VIDEO_STARTS = 2;
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
+const VIDEO_START_TIMEOUT = 10000;
 const reducedMotionMedia = window.matchMedia(REDUCED_MOTION_QUERY);
 const initializedVideos = new WeakSet();
+const queuedVideos = new WeakSet();
+const videoStartQueue = [];
+let activeVideoStarts = 0;
 let observer = null;
 let mutationObserver = null;
 
@@ -43,7 +48,7 @@ export const ensureVideoLoaded = (video, { allowAutoplay = true } = {}) => {
   const sourcesChanged = restoreVideoSources(video);
 
   if (sourcesChanged) {
-    video.preload = video.dataset.virturaVideoAutoplay === 'true' ? 'auto' : 'metadata';
+    video.preload = 'metadata';
     video.load();
   }
 
@@ -61,6 +66,82 @@ export const ensureVideoLoaded = (video, { allowAutoplay = true } = {}) => {
   return sourcesChanged;
 };
 
+const waitForFirstFrame = (video) => {
+  if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => {
+    let timeoutId = 0;
+
+    const cleanup = () => {
+      window.clearTimeout(timeoutId);
+      video.removeEventListener('loadeddata', finish);
+      video.removeEventListener('error', finish);
+      video.removeEventListener('abort', finish);
+    };
+
+    const finish = () => {
+      cleanup();
+      resolve();
+    };
+
+    video.addEventListener('loadeddata', finish, { once: true });
+    video.addEventListener('error', finish, { once: true });
+    video.addEventListener('abort', finish, { once: true });
+    timeoutId = window.setTimeout(finish, VIDEO_START_TIMEOUT);
+  });
+};
+
+const drainVideoStartQueue = () => {
+  while (
+    activeVideoStarts < MAX_CONCURRENT_VIDEO_STARTS
+    && videoStartQueue.length
+  ) {
+    const video = videoStartQueue.shift();
+
+    queuedVideos.delete(video);
+
+    if (
+      !(video instanceof HTMLVideoElement)
+      || video.dataset.virturaVideoNear !== 'true'
+      || reducedMotionMedia.matches
+    ) {
+      continue;
+    }
+
+    if (video.dataset.virturaVideoLoaded === 'true') {
+      ensureVideoLoaded(video);
+      continue;
+    }
+
+    activeVideoStarts += 1;
+
+    const frameReady = waitForFirstFrame(video);
+
+    ensureVideoLoaded(video);
+
+    void frameReady.finally(() => {
+      activeVideoStarts = Math.max(0, activeVideoStarts - 1);
+      drainVideoStartQueue();
+    });
+  }
+};
+
+const queueVideoStart = (video) => {
+  if (
+    !(video instanceof HTMLVideoElement)
+    || queuedVideos.has(video)
+    || reducedMotionMedia.matches
+  ) {
+    return;
+  }
+
+  queuedVideos.add(video);
+  videoStartQueue.push(video);
+  drainVideoStartQueue();
+};
+
 const pauseForReducedMotion = (video) => {
   if (video.hasAttribute('autoplay')) {
     video.dataset.virturaVideoAutoplay = 'true';
@@ -73,20 +154,26 @@ const pauseForReducedMotion = (video) => {
 
 const handleIntersection = (entries) => {
   entries.forEach((entry) => {
+    const video = entry.target;
+
     if (!entry.isIntersecting) {
+      video.dataset.virturaVideoNear = 'false';
+
+      if (video.dataset.virturaVideoAutoplay === 'true') {
+        video.autoplay = false;
+        video.removeAttribute('autoplay');
+        video.pause();
+      }
+
       return;
     }
-
-    const video = entry.target;
 
     video.dataset.virturaVideoNear = 'true';
     revealPoster(video);
 
     if (!reducedMotionMedia.matches) {
-      ensureVideoLoaded(video);
+      queueVideoStart(video);
     }
-
-    observer?.unobserve(video);
   });
 };
 
@@ -96,7 +183,7 @@ const getObserver = () => {
   }
 
   observer = new IntersectionObserver(handleIntersection, {
-    rootMargin: '600px 0px',
+    rootMargin: '100px 0px',
     threshold: 0.01,
   });
 
@@ -124,7 +211,8 @@ const initVideo = (video) => {
   revealPoster(video);
 
   if (!reducedMotionMedia.matches) {
-    ensureVideoLoaded(video);
+    video.dataset.virturaVideoNear = 'true';
+    queueVideoStart(video);
   }
 };
 
@@ -174,7 +262,7 @@ const handleReducedMotionChange = (event) => {
     }
 
     if (video.dataset.virturaVideoNear === 'true') {
-      ensureVideoLoaded(video);
+      queueVideoStart(video);
     }
   });
 };

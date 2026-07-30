@@ -515,7 +515,11 @@ function virtura_child_theme_optimize_video_markup( string $html ): string {
 			if ( ! preg_match( '/\sposter\s*=/i', $opening_tag ) ) {
 				$video_id   = virtura_child_theme_get_video_attachment_id_from_url( $source_url );
 				$poster_id  = $video_id ? virtura_child_theme_get_video_poster_id( $video_id ) : 0;
-				$poster_url = $poster_id ? wp_get_attachment_image_url( $poster_id, 'full' ) : false;
+				$poster_url = $poster_id ? wp_get_attachment_image_url( $poster_id, 'virtura-responsive-1280' ) : false;
+
+				if ( $poster_id && ! $poster_url ) {
+					$poster_url = wp_get_attachment_image_url( $poster_id, 'full' );
+				}
 
 				if ( $poster_url ) {
 					$opening_tag = virtura_child_theme_set_html_tag_attribute( $opening_tag, 'poster', $poster_url );
@@ -534,7 +538,6 @@ function virtura_child_theme_optimize_video_markup( string $html ): string {
 
 			$opening_tag = virtura_child_theme_set_html_tag_attribute( $opening_tag, 'preload', 'none' );
 			$opening_tag = virtura_child_theme_set_html_tag_attribute( $opening_tag, 'data-virtura-video-lazy', 'true' );
-			$opening_tag = virtura_child_theme_defer_html_tag_attribute( $opening_tag, 'poster' );
 			$opening_tag = virtura_child_theme_defer_html_tag_attribute( $opening_tag, 'src' );
 
 			$video_html = $opening_tag . substr( $video_html, strlen( $opening_match[0] ) );
