@@ -7,8 +7,6 @@ const HERO_SECTION_SELECTOR = '.section_hero';
 const HERO_HEADING_SELECTOR = '.section_hero .hero-heading:is(h1, .brxe-heading), .section_hero .hero-heading :is(h1, .brxe-heading)';
 const HERO_IMAGE_SELECTOR = '.section_hero .hero-img';
 const HERO_ARROW_SELECTOR = '#brxe-rigtwk';
-const NAV_LOGO_SELECTOR = '#brxe-cimskf';
-const NAV_LOGO_FALLBACK_SELECTOR = '#brx-header .svg-link';
 const INTRO_PATHS = new Set(['/', '/strona-glowna/']);
 const LOGO_WIDTH = 147;
 const LOGO_MARK_WIDTH = 42;
@@ -135,21 +133,8 @@ const shouldRunIntro = () => (
   window.scrollY < 24 &&
   !reducedMotionMedia.matches &&
   !isBricksBuilder() &&
-  document.querySelector(HERO_SECTION_SELECTOR) &&
-  getNavLogoTarget()
+  document.querySelector(HERO_SECTION_SELECTOR)
 );
-
-const getNavLogoTarget = () => (
-  document.querySelector(NAV_LOGO_SELECTOR) ||
-  document.querySelector(NAV_LOGO_FALLBACK_SELECTOR)
-);
-
-const getIntroMarkScale = () => {
-  const scaleForWidth = window.innerWidth / 18;
-  const scaleForHeight = window.innerHeight / 12;
-
-  return Math.max(48, scaleForWidth, scaleForHeight);
-};
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
@@ -361,25 +346,6 @@ const createIntroOverlay = () => {
   return overlay;
 };
 
-const getLogoTargetTransform = (gsap, logo, target) => {
-  const logoRect = logo.getBoundingClientRect();
-  const targetRect = target.getBoundingClientRect();
-  const currentX = Number(gsap.getProperty(logo, 'x')) || 0;
-  const currentY = Number(gsap.getProperty(logo, 'y')) || 0;
-  const currentScale = Number(gsap.getProperty(logo, 'scale')) || 1;
-  const logoCenterX = logoRect.left + logoRect.width / 2;
-  const logoCenterY = logoRect.top + logoRect.height / 2;
-  const targetCenterX = targetRect.left + targetRect.width / 2;
-  const targetCenterY = targetRect.top + targetRect.height / 2;
-  const scale = currentScale * (targetRect.width / logoRect.width);
-
-  return {
-    scale,
-    x: currentX + targetCenterX - logoCenterX,
-    y: currentY + targetCenterY - logoCenterY,
-  };
-};
-
 export const initIntroAnimation = async () => {
   const root = document.documentElement;
 
@@ -393,7 +359,6 @@ export const initIntroAnimation = async () => {
   const heroImage = getHeroImage();
   const heroNativeImage = primeImageLoad(heroImage);
   const heroArrow = getHeroArrow();
-  const navLogo = getNavLogoTarget();
   const overlay = createIntroOverlay();
   const imageReadyPromise = waitForImage(heroNativeImage);
   const unlockIntroScroll = createIntroScrollLock();
@@ -445,7 +410,6 @@ export const initIntroAnimation = async () => {
   let imageGateReleased = imageReady;
   let imageRevealed = false;
   let arrowRevealed = false;
-  let targetTransform = null;
 
   const revealArrowWhenReady = () => {
     if (!heroArrow || !imageReady || !imageRevealed || arrowRevealed) {
@@ -475,9 +439,9 @@ export const initIntroAnimation = async () => {
     yPercent: -50,
   });
   gsap.set(mark, {
-    autoAlpha: 1,
+    autoAlpha: 0,
     rotation: 0,
-    scale: getIntroMarkScale(),
+    scale: 1,
     transformOrigin: '50% 50%',
   });
   gsap.set(nameClip, { width: 0 });
@@ -524,14 +488,6 @@ export const initIntroAnimation = async () => {
       xPercent: -145,
     });
   }
-
-  const getTargetTransform = () => {
-    if (!targetTransform) {
-      targetTransform = getLogoTargetTransform(gsap, logo, navLogo);
-    }
-
-    return targetTransform;
-  };
 
   let resolveIntroComplete = () => {};
   const introComplete = new Promise((resolve) => {
@@ -582,10 +538,9 @@ export const initIntroAnimation = async () => {
 
   timeline
     .to(mark, {
-      duration: 2.25,
-      ease: 'power4.inOut',
-      rotation: 360,
-      scale: 1,
+      autoAlpha: 1,
+      duration: 0.85,
+      ease: 'power2.out',
     })
     .to(
       nameClip,
@@ -594,7 +549,7 @@ export const initIntroAnimation = async () => {
         ease: 'power4.inOut',
         width: LOGO_NAME_WIDTH,
       },
-      '-=0.22'
+      '+=0.12'
     )
     .to(
       name,
@@ -614,18 +569,7 @@ export const initIntroAnimation = async () => {
       },
       '<'
     )
-    .add('dockStart', '+=0.32')
-    .to(
-      logo,
-      {
-        duration: 1.2,
-        ease: 'power3.inOut',
-        scale: () => getTargetTransform().scale,
-        x: () => getTargetTransform().x,
-        y: () => getTargetTransform().y,
-      },
-      'dockStart'
-    )
+    .add('transitionStart', '+=0.32')
     .add(() => {
       if (headerSurface) {
         gsap.set(headerSurface, { autoAlpha: 1 });
@@ -634,8 +578,8 @@ export const initIntroAnimation = async () => {
 
       root.classList.add('virtura-intro-revealing');
       root.classList.remove('virtura-intro-running');
-    }, 'dockStart+=0.48')
-    .add('headingReveal', 'dockStart+=0.32')
+    }, 'transitionStart+=0.48')
+    .add('headingReveal', 'transitionStart+=0.32')
     .to(
       introBg ? [introBg] : [],
       {
@@ -643,7 +587,7 @@ export const initIntroAnimation = async () => {
         duration: 0.78,
         ease: 'power2.out',
       },
-      'dockStart+=0.5'
+      'transitionStart+=0.5'
     )
     .to(
       heroHeading ? [heroHeading] : [],
@@ -712,7 +656,7 @@ export const initIntroAnimation = async () => {
       imageRevealed = true;
       revealArrowWhenReady();
     }, 'imageReveal+=1.05')
-    .add('navReveal', 'dockStart+=0.55')
+    .add('navReveal', 'transitionStart+=0.55')
     .to(
       headerRevealState,
       {
@@ -730,10 +674,10 @@ export const initIntroAnimation = async () => {
       logo,
       {
         autoAlpha: 0,
-        duration: 0.32,
+        duration: 0.55,
         ease: 'power2.out',
       },
-      'navReveal+=0.68'
+      'navReveal'
     )
     .to(
       overlay,
