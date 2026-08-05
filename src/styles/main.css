@@ -2125,15 +2125,6 @@ body {
   will-change: auto;
 }
 
-.virtura-option-line {
-  display: block;
-  will-change: opacity, transform;
-}
-
-.virtura-option-dot {
-  will-change: opacity, transform;
-}
-
 .virtura-option-button {
   will-change: clip-path;
 }
@@ -2697,8 +2688,6 @@ body {
     transform: none !important;
   }
 
-  .virtura-option-line,
-  .virtura-option-dot,
   .virtura-option-button,
   .virtura-option-media-target {
     opacity: 1 !important;

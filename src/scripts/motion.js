@@ -26,21 +26,6 @@ const CATEGORY_SUBCATEGORY_BUTTON_REVEAL_START = 'top 92%';
 const CATEGORY_SUBCATEGORY_BUTTON_SELECTOR = '.subcategory-block .btn';
 const OPTION_BLOCK_SELECTOR = '.option-block';
 const OPTION_CARD_SELECTOR = '.offer-block';
-const OPTION_TEXT_SELECTOR = [
-  ':scope :is(h1, h2, h3, h4, h5, h6, .brxe-heading)',
-  ':scope :is(.brxe-text-basic, .brxe-text-link)',
-  ':scope .brxe-list .title',
-].join(', ');
-const OPTION_TEXT_EXCLUDE_SELECTOR = [
-  '.btn',
-  '.svg-arrow-block',
-  '.brxe-image',
-  '.brxe-video',
-  'picture',
-  'figure',
-  'svg',
-].join(', ');
-const OPTION_DOT_SELECTOR = ':scope .brxe-list .icon, :scope .brxe-list .dot';
 const OPTION_BUTTON_SELECTOR = '.btn';
 const OPTION_MEDIA_FRAME_SELECTOR = '.offer-img-block';
 const OPTION_MEDIA_SELECTOR = 'img, video';
@@ -51,17 +36,11 @@ const OPTION_MEDIA_EXCLUDE_SELECTOR = [
   '.level-dot',
   'svg',
 ].join(', ');
-const OPTION_LINE_READY_CLASS = 'virtura-option-line-ready';
-const OPTION_LINE_CLASS = 'virtura-option-line';
-const OPTION_DOT_CLASS = 'virtura-option-dot';
 const OPTION_BUTTON_CLASS = 'virtura-option-button';
 const OPTION_MEDIA_FRAME_CLASS = 'virtura-option-media-frame';
 const OPTION_MEDIA_RADIUS_ATTR = 'data-virtura-option-media-radius';
 const OPTION_MEDIA_TARGET_CLASS = 'virtura-option-media-target';
 const OPTION_MEDIA_MIN_AREA = 12000;
-const OPTION_TEXT_REVEAL_START = 'top 86%';
-const OPTION_TEXT_REVEAL_DURATION = 1.24;
-const OPTION_TEXT_REVEAL_STAGGER = 0.08;
 const OPTION_BUTTON_REVEAL_DURATION = 0.85;
 const OPTION_BUTTON_REVEAL_START = 'top 92%';
 const OPTION_MEDIA_PARALLAX_DISTANCE = 8.5;
@@ -72,7 +51,6 @@ let splitTextApiPromise;
 let fontsReadyPromise;
 let motionInitialized = false;
 let heroImageScrollTrigger;
-const optionTextSplits = new Map();
 
 const mobileLMedia = window.matchMedia(MOBILE_L_MEDIA_QUERY);
 
@@ -280,8 +258,6 @@ const clearAnimations = () => {
     animation.kill();
   });
 
-  optionTextSplits.forEach((split) => split.revert());
-  optionTextSplits.clear();
   motionInitialized = false;
 };
 
@@ -319,17 +295,6 @@ const resetCategoryRevealElements = () => {
 };
 
 const resetOptionMotionElements = () => {
-  document.querySelectorAll(`.${OPTION_LINE_READY_CLASS}`).forEach((element) => {
-    element.classList.remove(OPTION_LINE_READY_CLASS);
-  });
-
-  document.querySelectorAll(`.${OPTION_DOT_CLASS}`).forEach((element) => {
-    element.classList.remove(OPTION_DOT_CLASS);
-    element.style.removeProperty('opacity');
-    element.style.removeProperty('transform');
-    element.style.removeProperty('visibility');
-  });
-
   document.querySelectorAll(`.${OPTION_BUTTON_CLASS}`).forEach((element) => {
     element.classList.remove(OPTION_BUTTON_CLASS);
     element.style.removeProperty('-webkit-clip-path');
@@ -355,21 +320,6 @@ const resetOptionMotionElements = () => {
     element.style.removeProperty('will-change');
   });
 };
-
-const hasReadableText = (element) =>
-  Boolean(element.textContent?.replace(/\s+/g, ' ').trim());
-
-const getOptionTextElements = (block) => Array.from(block.querySelectorAll(OPTION_TEXT_SELECTOR))
-  .filter((element) => {
-    if (!hasReadableText(element)) {
-      return false;
-    }
-
-    return !element.closest(OPTION_TEXT_EXCLUDE_SELECTOR);
-  });
-
-const getOptionDotElements = (block) => Array.from(block.querySelectorAll(OPTION_DOT_SELECTOR))
-  .filter((element) => !element.closest(OPTION_TEXT_EXCLUDE_SELECTOR));
 
 const getOptionButton = (block) => {
   const contentBlock = block.parentElement;
@@ -468,74 +418,6 @@ const applyOptionMediaFrameRadius = (frame, media) => {
   frame.style.borderRadius = mediaBorderRadius;
 };
 
-const splitOptionTextLines = (SplitText, element) => {
-  const existingSplit = optionTextSplits.get(element);
-
-  if (existingSplit) {
-    existingSplit.revert();
-    optionTextSplits.delete(element);
-  }
-
-  const split = SplitText.create(element, {
-    aria: 'auto',
-    linesClass: OPTION_LINE_CLASS,
-    mask: 'lines',
-    type: 'lines',
-  });
-
-  optionTextSplits.set(element, split);
-  element.classList.add(OPTION_LINE_READY_CLASS);
-
-  return split.lines || [];
-};
-
-const sortElementsByDocumentOrder = (elements) => elements.sort((first, second) => {
-  if (first === second) {
-    return 0;
-  }
-
-  return first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_PRECEDING
-    ? 1
-    : -1;
-});
-
-const initOptionTextReveal = (gsap, SplitText, block) => {
-  const lines = getOptionTextElements(block)
-    .flatMap((element) => splitOptionTextLines(SplitText, element));
-  const dots = getOptionDotElements(block);
-  const revealItems = sortElementsByDocumentOrder([...lines, ...dots]);
-
-  if (!revealItems.length) {
-    return;
-  }
-
-  dots.forEach((dot) => dot.classList.add(OPTION_DOT_CLASS));
-
-  gsap.set(revealItems, {
-    autoAlpha: 0,
-    yPercent: 112,
-  });
-
-  const timeline = gsap.timeline({
-    scrollTrigger: {
-      invalidateOnRefresh: true,
-      start: OPTION_TEXT_REVEAL_START,
-      toggleActions: 'play none none reverse',
-      trigger: block,
-    },
-  });
-
-  timeline.to(revealItems, {
-    autoAlpha: 1,
-    duration: OPTION_TEXT_REVEAL_DURATION,
-    ease: 'power4.out',
-    stagger: OPTION_TEXT_REVEAL_STAGGER,
-    yPercent: 0,
-  });
-
-  storeAnimation(timeline);
-};
-
 const initOptionButtonReveal = (gsap, block) => {
   const button = getOptionButton(block);
 
@@ -618,15 +500,12 @@ const initOptionMediaMotion = (gsap, ScrollTrigger, block) => {
   );
 };
 
-const initOptionBlockMotion = async (gsap, ScrollTrigger, optionBlocks) => {
+const initOptionBlockMotion = (gsap, ScrollTrigger, optionBlocks) => {
   if (!optionBlocks.length) {
     return;
   }
 
-  const SplitText = await loadSplitText(gsap);
-
   optionBlocks.forEach((block) => {
-    initOptionTextReveal(gsap, SplitText, block);
     initOptionButtonReveal(gsap, block);
     initOptionMediaMotion(gsap, ScrollTrigger, block);
   });
@@ -1048,7 +927,7 @@ export const initMotion = async () => {
   initHeroImageScale(gsap, ScrollTrigger);
   initScrollReveal(gsap, motionElements);
   initCategoryBlockReveal(gsap, categoryBlocks);
-  await initOptionBlockMotion(gsap, ScrollTrigger, optionBlocks);
+  initOptionBlockMotion(gsap, ScrollTrigger, optionBlocks);
 
   if (reducedMotionMedia.matches) {
     document.documentElement.classList.remove('virtura-motion-ready');
