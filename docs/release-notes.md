@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Rewired the complete homepage hero sequence from the removed `.hero-img` to
+  the new `.hero-video`. The intro now promotes the lazy video source and waits
+  for its first frame before revealing it. On desktop, the same live video
+  element expands to the fullscreen scroll state, so playback stays continuous
+  without creating a second video decoder; mobile and reduced-motion views keep
+  the static layout.
 - Added a black `theme-color` meta tag on the frontend and a matching black
   mobile document canvas so Safari, including Safari 26 which derives its tint
   from `html`/`body`, can match the browser chrome and safe area to the footer.
@@ -23,11 +29,6 @@
   `data-virtura-video-eager="true"` to opt a critical video out of source
   deferral. WebM uploads are allowed, while the hosting layer must still serve
   `.webm` files with `Content-Type: video/webm`.
-- Prevented a one-frame flash during the desktop hero image handoff. The
-  original `.hero-img` now remains visible until the responsive
-  `virtura-hero-img-clone` has loaded, completed `decode()` and painted for one
-  frame; only then is the source hidden. Cleanup and reverse scrolling cancel
-  any pending handoff frames.
 - Added automatic media optimization for new WordPress uploads. JPEG and PNG
   display files and responsive variants are generated as WebP at quality 80
   when supported by the active image editor, source uploads remain available
@@ -37,13 +38,10 @@
   category and team images, and corrected hero loading to `eager` with a valid
   `fetchpriority="high"`. Below-fold homepage media no longer competes with the
   hero, and Bricks video placeholders pointing to JPEG/PNG/WebP files have
-  their invalid `src` removed before reaching the browser. The desktop
-  `virtura-hero-img-clone` now selects a source for its fullscreen target
-  instead of stretching the initial 480px candidate, while mobile and reduced
-  motion keep the smaller source.
+  their invalid `src` removed before reaching the browser.
 - Added an accessible `.skip` control to the homepage hero. Its duplicated
   arrow uses the shared push transition vertically, while activation quickly
-  scrolls to the exact end of the pinned hero image animation. The jump uses a
+  scrolls to the exact end of the pinned hero media animation. The jump uses a
   short Lenis transition, falls back to the following section when the desktop
   ScrollTrigger is unavailable and becomes immediate for reduced motion.
 - Replaced the shared arrow hover movement with a global push transition. Each

@@ -1,11 +1,12 @@
 import { loadGsap } from './motion.js';
+import { ensureVideoLoaded } from './video-optimization.js';
 
 const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 const HEADER_SURFACE_SELECTOR = '.header-overlay';
 const HERO_SECTION_SELECTOR = '.section_hero';
 const HERO_HEADING_SELECTOR = '.section_hero .hero-heading:is(h1, .brxe-heading), .section_hero .hero-heading :is(h1, .brxe-heading)';
-const HERO_IMAGE_SELECTOR = '.section_hero .hero-img';
+const HERO_MEDIA_SELECTOR = '.section_hero .hero-video';
 const HERO_ARROW_SELECTOR = '#brxe-rigtwk';
 const INTRO_PATHS = new Set(['/', '/strona-glowna/']);
 const LOGO_WIDTH = 147;
@@ -172,84 +173,41 @@ const setHeaderRevealClip = (surface, progress) => {
 
 const getHeroHeading = () => document.querySelector(HERO_HEADING_SELECTOR);
 
-const getHeroImage = () => document.querySelector(HERO_IMAGE_SELECTOR);
+const getHeroMedia = () => document.querySelector(HERO_MEDIA_SELECTOR);
 
-const isPlaceholderImageSource = (src) => !src || src.startsWith('data:image/svg+xml');
-
-const getNativeImage = (element) => {
+const getNativeVideo = (element) => {
   if (!element) {
     return null;
   }
 
-  if (element instanceof HTMLImageElement) {
+  if (element instanceof HTMLVideoElement) {
     return element;
   }
 
-  return element.querySelector('img');
+  return element.querySelector('video');
 };
 
-const promoteLazyImageSource = (image) => {
-  const dataSizes = image.dataset.sizes || image.getAttribute('data-sizes');
-  const dataSrcset = image.dataset.srcset ||
-    image.getAttribute('data-srcset') ||
-    image.getAttribute('data-lazy-srcset');
-  const dataSrc = image.dataset.src ||
-    image.getAttribute('data-src') ||
-    image.getAttribute('data-lazy-src') ||
-    image.getAttribute('data-original');
+const primeVideoLoad = (element) => {
+  const video = getNativeVideo(element);
 
-  if (dataSizes) {
-    image.sizes = dataSizes;
-  }
-
-  if (dataSrcset) {
-    image.srcset = dataSrcset;
-  }
-
-  if (
-    dataSrc &&
-    (
-      isPlaceholderImageSource(image.currentSrc) ||
-      isPlaceholderImageSource(image.getAttribute('src')) ||
-      image.getAttribute('src') !== dataSrc
-    )
-  ) {
-    image.src = dataSrc;
-  }
-
-  image.classList.remove('lazy', 'lazyload', 'lazyloading');
-  image.classList.add('skip-lazy');
-};
-
-const primeImageLoad = (element) => {
-  const image = getNativeImage(element);
-
-  if (!image) {
+  if (!video) {
     return null;
   }
 
-  promoteLazyImageSource(image);
+  video.preload = 'auto';
+  ensureVideoLoaded(video);
 
-  image.loading = 'eager';
-  image.decoding = 'async';
-
-  if ('fetchPriority' in image) {
-    image.fetchPriority = 'high';
-  }
-
-  return image;
+  return video;
 };
 
 const getHeroArrow = () => document.querySelector(HERO_ARROW_SELECTOR);
 
-const isImageReady = (image) => !image || (
-  image.complete &&
-  image.naturalWidth > 0 &&
-  !isPlaceholderImageSource(image.currentSrc)
+const isVideoReady = (video) => !video || (
+  video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA
 );
 
-const waitForImage = (image, timeout = 6000) => new Promise((resolve) => {
-  if (!image) {
+const waitForVideo = (video, timeout = 6000) => new Promise((resolve) => {
+  if (!video) {
     resolve();
     return;
   }
@@ -264,33 +222,29 @@ const waitForImage = (image, timeout = 6000) => new Promise((resolve) => {
 
     settled = true;
     window.clearTimeout(timeoutId);
-    image.removeEventListener('load', finish);
-    image.removeEventListener('error', finish);
-
-    if (image.complete && typeof image.decode === 'function') {
-      image.decode().catch(() => {}).finally(resolve);
-      return;
-    }
-
+    video.removeEventListener('loadeddata', finish);
+    video.removeEventListener('error', finish);
+    video.removeEventListener('abort', finish);
     resolve();
   };
 
-  if (image.complete) {
+  if (isVideoReady(video)) {
     finish();
     return;
   }
 
   timeoutId = window.setTimeout(finish, timeout);
-  image.addEventListener('load', finish, { once: true });
-  image.addEventListener('error', finish, { once: true });
+  video.addEventListener('loadeddata', finish, { once: true });
+  video.addEventListener('error', finish, { once: true });
+  video.addEventListener('abort', finish, { once: true });
 });
 
-const createImageSweep = (image, overlay) => {
-  if (!image || !overlay) {
+const createMediaSweep = (media, overlay) => {
+  if (!media || !overlay) {
     return null;
   }
 
-  const rect = image.getBoundingClientRect();
+  const rect = media.getBoundingClientRect();
 
   if (!rect.width || !rect.height) {
     return null;
@@ -298,7 +252,7 @@ const createImageSweep = (image, overlay) => {
 
   const sweep = document.createElement('div');
 
-  sweep.className = 'virtura-intro-image-sweep';
+  sweep.className = 'virtura-intro-media-sweep';
   sweep.setAttribute('aria-hidden', 'true');
   sweep.style.height = `${rect.height}px`;
   sweep.style.left = `${rect.left}px`;
@@ -309,12 +263,12 @@ const createImageSweep = (image, overlay) => {
   return sweep;
 };
 
-const syncImageSweep = (sweep, image) => {
-  if (!sweep || !image) {
+const syncMediaSweep = (sweep, media) => {
+  if (!sweep || !media) {
     return;
   }
 
-  const rect = image.getBoundingClientRect();
+  const rect = media.getBoundingClientRect();
 
   if (!rect.width || !rect.height) {
     return;
@@ -356,11 +310,11 @@ export const initIntroAnimation = async () => {
 
   const headerSurface = document.querySelector(HEADER_SURFACE_SELECTOR);
   const heroHeading = getHeroHeading();
-  const heroImage = getHeroImage();
-  const heroNativeImage = primeImageLoad(heroImage);
+  const heroMedia = getHeroMedia();
+  const heroNativeVideo = primeVideoLoad(heroMedia);
   const heroArrow = getHeroArrow();
   const overlay = createIntroOverlay();
-  const imageReadyPromise = waitForImage(heroNativeImage);
+  const mediaReadyPromise = waitForVideo(heroNativeVideo);
   const unlockIntroScroll = createIntroScrollLock();
   let introStateCleanedUp = false;
   const cleanupIntroState = () => {
@@ -404,15 +358,15 @@ export const initIntroAnimation = async () => {
   const mark = overlay.querySelector('[data-intro-mark]');
   const nameClip = overlay.querySelector('[data-intro-name-clip]');
   const name = overlay.querySelector('[data-intro-name]');
-  const imageSweep = createImageSweep(heroImage, overlay);
+  const mediaSweep = createMediaSweep(heroMedia, overlay);
   const headerRevealState = { progress: 0 };
-  let imageReady = isImageReady(heroNativeImage);
-  let imageGateReleased = imageReady;
-  let imageRevealed = false;
+  let mediaReady = isVideoReady(heroNativeVideo);
+  let mediaGateReleased = mediaReady;
+  let mediaRevealed = false;
   let arrowRevealed = false;
 
   const revealArrowWhenReady = () => {
-    if (!heroArrow || !imageReady || !imageRevealed || arrowRevealed) {
+    if (!heroArrow || !mediaReady || !mediaRevealed || arrowRevealed) {
       return;
     }
 
@@ -426,8 +380,8 @@ export const initIntroAnimation = async () => {
     });
   };
 
-  imageReadyPromise.then(() => {
-    imageReady = true;
+  mediaReadyPromise.then(() => {
+    mediaReady = true;
     revealArrowWhenReady();
   });
 
@@ -463,8 +417,8 @@ export const initIntroAnimation = async () => {
     });
   }
 
-  if (heroImage) {
-    gsap.set(heroImage, {
+  if (heroMedia) {
+    gsap.set(heroMedia, {
       autoAlpha: 0,
       clipPath: 'polygon(0% 0%, 10% 0%, 0% 100%, 0% 100%)',
       filter: 'blur(10px) contrast(1.12) saturate(0.82)',
@@ -482,8 +436,8 @@ export const initIntroAnimation = async () => {
     });
   }
 
-  if (imageSweep) {
-    gsap.set(imageSweep, {
+  if (mediaSweep) {
+    gsap.set(mediaSweep, {
       autoAlpha: 0,
       xPercent: -145,
     });
@@ -515,8 +469,8 @@ export const initIntroAnimation = async () => {
         });
       }
 
-      if (heroImage) {
-        gsap.set(heroImage, {
+      if (heroMedia) {
+        gsap.set(heroMedia, {
           clearProps:
             'clipPath,filter,opacity,scale,transform,visibility,webkitClipPath',
         });
@@ -526,13 +480,13 @@ export const initIntroAnimation = async () => {
     },
   });
 
-  const releaseImageGate = () => {
-    if (imageGateReleased) {
+  const releaseMediaGate = () => {
+    if (mediaGateReleased) {
       return;
     }
 
-    imageGateReleased = true;
-    syncImageSweep(imageSweep, heroImage);
+    mediaGateReleased = true;
+    syncMediaSweep(mediaSweep, heroMedia);
     timeline.play();
   };
 
@@ -601,19 +555,19 @@ export const initIntroAnimation = async () => {
       },
       'headingReveal'
     )
-    .add('imageReveal', 'headingReveal+=1.5')
+    .add('mediaReveal', 'headingReveal+=1.5')
     .add(() => {
-      if (imageReady) {
-        imageGateReleased = true;
-        syncImageSweep(imageSweep, heroImage);
+      if (mediaReady) {
+        mediaGateReleased = true;
+        syncMediaSweep(mediaSweep, heroMedia);
         return;
       }
 
       timeline.pause();
-      imageReadyPromise.then(releaseImageGate);
-    }, 'imageReveal-=0.02')
+      mediaReadyPromise.then(releaseMediaGate);
+    }, 'mediaReveal-=0.02')
     .fromTo(
-      heroImage ? [heroImage] : [],
+      heroMedia ? [heroMedia] : [],
       {
         autoAlpha: 1,
         clipPath: 'polygon(0% 0%, 10% 0%, 0% 100%, 0% 100%)',
@@ -631,31 +585,31 @@ export const initIntroAnimation = async () => {
         scale: 1,
         webkitClipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
       },
-      'imageReveal'
+      'mediaReveal'
     )
     .to(
-      imageSweep ? [imageSweep] : [],
+      mediaSweep ? [mediaSweep] : [],
       {
         autoAlpha: 1,
         duration: 0.18,
         ease: 'none',
       },
-      'imageReveal+=0.04'
+      'mediaReveal+=0.04'
     )
     .to(
-      imageSweep ? [imageSweep] : [],
+      mediaSweep ? [mediaSweep] : [],
       {
         autoAlpha: 0,
         duration: 0.95,
         ease: 'power2.out',
         xPercent: 140,
       },
-      'imageReveal+=0.04'
+      'mediaReveal+=0.04'
     )
     .add(() => {
-      imageRevealed = true;
+      mediaRevealed = true;
       revealArrowWhenReady();
-    }, 'imageReveal+=1.05')
+    }, 'mediaReveal+=1.05')
     .add('navReveal', 'transitionStart+=0.55')
     .to(
       headerRevealState,

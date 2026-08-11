@@ -159,7 +159,7 @@ function virtura_child_theme_print_intro_prime(): void {
 		html.virtura-intro-prime #brx-header.header-overlay,
 		html.virtura-intro-prime #brx-header .header-overlay,
 		html.virtura-intro-prime .section_hero .hero-heading,
-		html.virtura-intro-prime .section_hero .hero-img,
+		html.virtura-intro-prime .section_hero .hero-video,
 		html.virtura-intro-prime #brxe-rigtwk {
 			opacity: 0 !important;
 			visibility: hidden !important;

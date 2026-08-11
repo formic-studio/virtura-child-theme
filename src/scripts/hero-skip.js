@@ -1,4 +1,4 @@
-import { getHeroImageScrollTrigger } from './motion.js';
+import { getHeroMediaScrollTrigger } from './motion.js';
 import { scrollToPosition } from './smooth-scroll.js';
 
 const SKIP_SELECTOR = '.section_hero .skip';
@@ -33,7 +33,7 @@ const getSkipTarget = (control) => {
     return Math.ceil(nextSection.getBoundingClientRect().top + window.scrollY);
   }
 
-  const scrollTrigger = getHeroImageScrollTrigger();
+  const scrollTrigger = getHeroMediaScrollTrigger();
 
   if (scrollTrigger && Number.isFinite(scrollTrigger.end)) {
     return Math.ceil(scrollTrigger.end + 1);

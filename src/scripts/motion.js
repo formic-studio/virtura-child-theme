@@ -1,12 +1,12 @@
 const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
 const activeAnimations = [];
 
-const HERO_IMAGE_SELECTOR = '.section_hero .hero-img';
+const HERO_MEDIA_SELECTOR = '.section_hero .hero-video';
 const HERO_SECTION_SELECTOR = '.section_hero';
-const HERO_CLONE_CLASS = 'virtura-hero-img-clone';
-const HERO_SOURCE_HIDDEN_CLASS = 'virtura-hero-img-source-hidden';
-const HERO_ACTIVE_CLASS = 'virtura-hero-img-motion-active';
-const HERO_DOCKED_CLASS = 'virtura-hero-img-motion-docked';
+const HERO_PLACEHOLDER_CLASS = 'virtura-hero-video-placeholder';
+const HERO_FLOATING_CLASS = 'virtura-hero-video-floating';
+const HERO_ACTIVE_CLASS = 'virtura-hero-video-motion-active';
+const HERO_DOCKED_CLASS = 'virtura-hero-video-motion-docked';
 const HERO_TARGET_OVERSCAN = '6rem';
 const MOBILE_L_MEDIA_QUERY = '(max-width: 767px)';
 const CATEGORY_BLOCK_SELECTOR = '.section_category .category-block';
@@ -50,7 +50,7 @@ let gsapApiPromise;
 let splitTextApiPromise;
 let fontsReadyPromise;
 let motionInitialized = false;
-let heroImageScrollTrigger;
+let heroMediaScrollTrigger;
 
 const mobileLMedia = window.matchMedia(MOBILE_L_MEDIA_QUERY);
 
@@ -72,7 +72,7 @@ export const loadGsap = async () => {
   return gsapApiPromise;
 };
 
-export const getHeroImageScrollTrigger = () => heroImageScrollTrigger;
+export const getHeroMediaScrollTrigger = () => heroMediaScrollTrigger;
 
 const waitForFonts = () => {
   if (!fontsReadyPromise) {
@@ -106,11 +106,11 @@ const getCategoryBlocks = () => Array.from(document.querySelectorAll(CATEGORY_BL
 
 const getOptionBlocks = () => Array.from(document.querySelectorAll(OPTION_BLOCK_SELECTOR));
 
-const getHeroImage = () => document.querySelector(HERO_IMAGE_SELECTOR);
+const getHeroMedia = () => document.querySelector(HERO_MEDIA_SELECTOR);
 
-const getHeroSection = (image) => image?.closest(HERO_SECTION_SELECTOR);
+const getHeroSection = (media) => media?.closest(HERO_SECTION_SELECTOR);
 
-const shouldInitHeroImageScale = () => !mobileLMedia.matches;
+const shouldInitHeroMediaScale = () => !mobileLMedia.matches;
 
 const getCssLengthInPixels = (value) => {
   if (!value) {
@@ -133,13 +133,16 @@ const getCssLengthInPixels = (value) => {
   return Number.isFinite(width) ? width : 0;
 };
 
-const getHeroTargetRect = (image) => {
+const getHeroTargetRect = (media) => {
   const overscan = Math.max(0, getCssLengthInPixels(HERO_TARGET_OVERSCAN));
   const targetWidth = Math.max(1, window.innerWidth + overscan * 2);
   const targetHeight = Math.max(1, window.innerHeight + overscan * 2);
-  const sourceRect = image.getBoundingClientRect();
-  const sourceWidth = image.naturalWidth || sourceRect.width || targetWidth;
-  const sourceHeight = image.naturalHeight || sourceRect.height || targetHeight;
+  const sourceRect = media.getBoundingClientRect();
+  const video = media instanceof HTMLVideoElement
+    ? media
+    : media.querySelector('video');
+  const sourceWidth = video?.videoWidth || sourceRect.width || targetWidth;
+  const sourceHeight = video?.videoHeight || sourceRect.height || targetHeight;
   const aspectRatio = sourceWidth / sourceHeight;
 
   let width = targetWidth;
@@ -156,85 +159,6 @@ const getHeroTargetRect = (image) => {
     top: (window.innerHeight - height) / 2,
     width,
   };
-};
-
-const isPlaceholderImageSource = (src) => !src || src.startsWith('data:image/svg+xml');
-
-const getImageSource = (image) => {
-  if (!isPlaceholderImageSource(image.currentSrc)) {
-    return image.currentSrc;
-  }
-
-  if (!isPlaceholderImageSource(image.getAttribute('src'))) {
-    return image.getAttribute('src');
-  }
-
-  return image.dataset.src || image.getAttribute('data-src') || '';
-};
-
-const getHeroCloneFallbackSource = (image) => {
-  const source = image.getAttribute('src');
-
-  return !isPlaceholderImageSource(source) ? source : getImageSource(image);
-};
-
-const getHeroCloneSourceSize = (image) =>
-  `${Math.ceil(getHeroTargetRect(image).width)}px`;
-
-const createHeroImageClone = (image) => {
-  const clone = document.createElement('img');
-  const src = getHeroCloneFallbackSource(image);
-  const srcset = image.dataset.srcset || image.getAttribute('srcset');
-
-  clone.className = HERO_CLONE_CLASS;
-  clone.alt = '';
-  clone.setAttribute('aria-hidden', 'true');
-  clone.decoding = 'async';
-  clone.draggable = false;
-  clone.fetchPriority = 'high';
-  clone.loading = 'eager';
-
-  if (srcset) {
-    clone.sizes = getHeroCloneSourceSize(image);
-    clone.srcset = srcset;
-  }
-
-  if (src) {
-    clone.src = src;
-  }
-
-  document.body.appendChild(clone);
-
-  return clone;
-};
-
-const waitForHeroCloneDecode = async (clone) => {
-  if (!(clone instanceof HTMLImageElement)) {
-    return false;
-  }
-
-  if (!clone.complete) {
-    await new Promise((resolve) => {
-      const finish = () => resolve();
-
-      clone.addEventListener('load', finish, { once: true });
-      clone.addEventListener('error', finish, { once: true });
-    });
-  }
-
-  if (!clone.naturalWidth) {
-    return false;
-  }
-
-  if (typeof clone.decode === 'function') {
-    try {
-      await clone.decode();
-    } catch {
-      return clone.complete && clone.naturalWidth > 0;
-    }
-  }
-
-  return clone.complete && clone.naturalWidth > 0;
 };
 
 const setReducedMotionClass = () => {
@@ -521,81 +445,42 @@ const getCategoryElementStartX = (element, block) => {
     + CATEGORY_BUTTON_START_BUFFER;
 };
 
-const initHeroImageScale = (gsap, ScrollTrigger) => {
-  const image = getHeroImage();
-  const section = getHeroSection(image);
+const initHeroMediaScale = (gsap, ScrollTrigger) => {
+  const media = getHeroMedia();
+  const section = getHeroSection(media);
 
-  if (!image || !section || !shouldInitHeroImageScale()) {
+  if (!media || !section || !shouldInitHeroMediaScale()) {
     return;
   }
 
-  const clone = createHeroImageClone(image);
-  let isCloneActive = false;
-  let isCloneDecoded = false;
-  let sourceHideFrame = 0;
-  let sourceHidePaintFrame = 0;
+  const placeholder = document.createElement('div');
+  const nativeVideo = media instanceof HTMLVideoElement
+    ? media
+    : media.querySelector('video');
 
-  const cancelSourceHide = () => {
-    window.cancelAnimationFrame(sourceHideFrame);
-    window.cancelAnimationFrame(sourceHidePaintFrame);
-    sourceHideFrame = 0;
-    sourceHidePaintFrame = 0;
-  };
+  placeholder.className = `${media.className} ${HERO_PLACEHOLDER_CLASS}`;
+  placeholder.setAttribute('aria-hidden', 'true');
+  media.before(placeholder);
+  media.classList.add(HERO_FLOATING_CLASS);
 
-  const hideSourceAfterClonePaint = () => {
-    cancelSourceHide();
+  const getSourceBorderRadius = () => window.getComputedStyle(media).borderRadius;
 
-    if (!isCloneActive || !isCloneDecoded) {
-      image.classList.remove(HERO_SOURCE_HIDDEN_CLASS);
-      return;
-    }
-
-    gsap.set(clone, { autoAlpha: 1 });
-
-    sourceHideFrame = window.requestAnimationFrame(() => {
-      sourceHidePaintFrame = window.requestAnimationFrame(() => {
-        sourceHideFrame = 0;
-        sourceHidePaintFrame = 0;
-
-        if (isCloneActive && isCloneDecoded) {
-          image.classList.add(HERO_SOURCE_HIDDEN_CLASS);
-        }
-      });
-    });
-  };
-
-  void waitForHeroCloneDecode(clone).then((decoded) => {
-    isCloneDecoded = decoded;
-
-    if (decoded && isCloneActive) {
-      hideSourceAfterClonePaint();
-    }
-  });
-
-  const getSourceBorderRadius = () => window.getComputedStyle(image).borderRadius;
-  const syncCloneSourceSize = () => {
-    if (clone.srcset) {
-      clone.sizes = getHeroCloneSourceSize(image);
-    }
-  };
-
-  const setCloneFixed = () => {
-    if (clone.parentElement !== document.body) {
-      document.body.appendChild(clone);
+  const setMediaFixed = () => {
+    if (media.parentElement !== document.body) {
+      document.body.appendChild(media);
     }
 
     section.classList.remove(HERO_DOCKED_CLASS);
-    gsap.set(clone, { position: 'fixed' });
+    gsap.set(media, { position: 'fixed' });
   };
 
-  const setCloneToSource = () => {
-    const sourceRect = image.getBoundingClientRect();
+  const setMediaToSource = () => {
+    const sourceRect = placeholder.getBoundingClientRect();
 
-    syncCloneSourceSize();
-    setCloneFixed();
+    setMediaFixed();
 
-    gsap.set(clone, {
-      autoAlpha: isCloneActive ? 1 : 0,
+    gsap.set(media, {
+      autoAlpha: 1,
       borderRadius: getSourceBorderRadius(),
       height: sourceRect.height,
       left: sourceRect.left,
@@ -604,13 +489,12 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
     });
   };
 
-  const setCloneToTarget = () => {
-    const targetRect = getHeroTargetRect(image);
+  const setMediaToTarget = () => {
+    const targetRect = getHeroTargetRect(placeholder);
 
-    syncCloneSourceSize();
-    setCloneFixed();
+    setMediaFixed();
 
-    gsap.set(clone, {
+    gsap.set(media, {
       autoAlpha: 1,
       borderRadius: getSourceBorderRadius(),
       height: targetRect.height,
@@ -620,40 +504,33 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
     });
   };
 
-  const activateClone = () => {
-    isCloneActive = true;
+  const activateMedia = () => {
     section.classList.add(HERO_ACTIVE_CLASS);
-    image.classList.remove(HERO_SOURCE_HIDDEN_CLASS);
-
-    if (isCloneDecoded) {
-      hideSourceAfterClonePaint();
-    }
   };
 
-  const showCloneFromSource = () => {
-    activateClone();
-    setCloneFixed();
-    gsap.set(clone, { autoAlpha: 1 });
+  const showMediaFromSource = () => {
+    activateMedia();
+    setMediaFixed();
+    gsap.set(media, { autoAlpha: 1 });
   };
 
-  const showCloneFromTarget = () => {
-    activateClone();
-    setCloneToTarget();
+  const showMediaFromTarget = () => {
+    activateMedia();
+    setMediaToTarget();
   };
 
-  const dockCloneInSection = () => {
-    const targetRect = getHeroTargetRect(image);
+  const dockMediaInSection = () => {
+    const targetRect = getHeroTargetRect(placeholder);
 
-    syncCloneSourceSize();
-    activateClone();
+    activateMedia();
 
-    if (clone.parentElement !== section) {
-      section.appendChild(clone);
+    if (media.parentElement !== section) {
+      section.appendChild(media);
     }
 
     section.classList.add(HERO_DOCKED_CLASS);
 
-    gsap.set(clone, {
+    gsap.set(media, {
       autoAlpha: 1,
       borderRadius: getSourceBorderRadius(),
       height: targetRect.height,
@@ -664,41 +541,37 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
     });
   };
 
-  const hideClone = () => {
-    isCloneActive = false;
-    cancelSourceHide();
+  const resetMediaToSource = () => {
     section.classList.remove(HERO_ACTIVE_CLASS);
     section.classList.remove(HERO_DOCKED_CLASS);
-    image.classList.remove(HERO_SOURCE_HIDDEN_CLASS);
-    setCloneFixed();
-    gsap.set(clone, { autoAlpha: 0 });
+    setMediaToSource();
   };
 
-  setCloneToSource();
+  setMediaToSource();
 
   const timeline = gsap.timeline({
     scrollTrigger: {
       anticipatePin: 1,
       end: '+=120%',
       invalidateOnRefresh: true,
-      onEnter: showCloneFromSource,
-      onEnterBack: showCloneFromTarget,
-      onLeave: dockCloneInSection,
-      onLeaveBack: hideClone,
+      onEnter: showMediaFromSource,
+      onEnterBack: showMediaFromTarget,
+      onLeave: dockMediaInSection,
+      onLeaveBack: resetMediaToSource,
       onRefresh: (self) => {
         if (self.progress >= 1) {
-          dockCloneInSection();
+          dockMediaInSection();
           return;
         }
 
         if (self.progress <= 0) {
-          hideClone();
+          resetMediaToSource();
           return;
         }
 
-        showCloneFromSource();
+        showMediaFromSource();
       },
-      onRefreshInit: setCloneToSource,
+      onRefreshInit: setMediaToSource,
       pin: true,
       scrub: true,
       start: 'top top',
@@ -706,44 +579,50 @@ const initHeroImageScale = (gsap, ScrollTrigger) => {
     },
   });
 
-  heroImageScrollTrigger = timeline.scrollTrigger;
+  heroMediaScrollTrigger = timeline.scrollTrigger;
 
   timeline.fromTo(
-    clone,
+    media,
     {
       borderRadius: () => getSourceBorderRadius(),
-      height: () => image.getBoundingClientRect().height,
-      left: () => image.getBoundingClientRect().left,
-      top: () => image.getBoundingClientRect().top,
-      width: () => image.getBoundingClientRect().width,
+      height: () => placeholder.getBoundingClientRect().height,
+      left: () => placeholder.getBoundingClientRect().left,
+      top: () => placeholder.getBoundingClientRect().top,
+      width: () => placeholder.getBoundingClientRect().width,
     },
     {
       borderRadius: () => getSourceBorderRadius(),
       ease: 'none',
-      height: () => getHeroTargetRect(image).height,
-      left: () => getHeroTargetRect(image).left,
-      top: () => getHeroTargetRect(image).top,
-      width: () => getHeroTargetRect(image).width,
+      height: () => getHeroTargetRect(placeholder).height,
+      left: () => getHeroTargetRect(placeholder).left,
+      top: () => getHeroTargetRect(placeholder).top,
+      width: () => getHeroTargetRect(placeholder).width,
     },
   );
 
-  if (!image.complete) {
-    image.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
+  if (nativeVideo && nativeVideo.readyState < HTMLMediaElement.HAVE_METADATA) {
+    nativeVideo.addEventListener(
+      'loadedmetadata',
+      () => ScrollTrigger.refresh(),
+      { once: true },
+    );
   }
 
   storeAnimation({
     kill: () => {
-      if (heroImageScrollTrigger === timeline.scrollTrigger) {
-        heroImageScrollTrigger = undefined;
+      if (heroMediaScrollTrigger === timeline.scrollTrigger) {
+        heroMediaScrollTrigger = undefined;
       }
 
-      isCloneActive = false;
+      timeline.scrollTrigger?.kill();
       timeline.kill();
-      cancelSourceHide();
-      clone.remove();
       section.classList.remove(HERO_ACTIVE_CLASS);
       section.classList.remove(HERO_DOCKED_CLASS);
-      image.classList.remove(HERO_SOURCE_HIDDEN_CLASS);
+      media.classList.remove(HERO_FLOATING_CLASS);
+      placeholder.replaceWith(media);
+      gsap.set(media, {
+        clearProps: 'borderRadius,height,left,maxWidth,opacity,position,top,visibility,width',
+      });
     },
   });
 };
@@ -892,11 +771,11 @@ export const initMotion = async () => {
   setReducedMotionClass();
 
   const motionElements = getMotionElements();
-  const heroImage = getHeroImage();
+  const heroMedia = getHeroMedia();
   const categoryBlocks = getCategoryBlocks();
   const optionBlocks = getOptionBlocks();
 
-  if (!motionElements.length && !heroImage && !categoryBlocks.length && !optionBlocks.length) {
+  if (!motionElements.length && !heroMedia && !categoryBlocks.length && !optionBlocks.length) {
     return;
   }
 
@@ -924,7 +803,7 @@ export const initMotion = async () => {
     return;
   }
 
-  initHeroImageScale(gsap, ScrollTrigger);
+  initHeroMediaScale(gsap, ScrollTrigger);
   initScrollReveal(gsap, motionElements);
   initCategoryBlockReveal(gsap, categoryBlocks);
   initOptionBlockMotion(gsap, ScrollTrigger, optionBlocks);

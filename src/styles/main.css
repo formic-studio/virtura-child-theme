@@ -1818,7 +1818,7 @@ body {
 .virtura-intro-prime #brx-header.header-overlay,
 .virtura-intro-prime #brx-header .header-overlay,
 .virtura-intro-prime .section_hero .hero-heading,
-.virtura-intro-prime .section_hero .hero-img,
+.virtura-intro-prime .section_hero .hero-video,
 .virtura-intro-prime #brxe-rigtwk {
   opacity: 0;
   visibility: hidden;
@@ -1846,7 +1846,7 @@ body {
 }
 
 .virtura-intro-running .section_hero .hero-heading,
-.virtura-intro-running .section_hero .hero-img,
+.virtura-intro-running .section_hero .hero-video,
 .virtura-intro-running #brxe-rigtwk {
   opacity: 0;
   visibility: hidden;
@@ -1912,7 +1912,7 @@ body {
   width: 100%;
 }
 
-.virtura-intro-image-sweep {
+.virtura-intro-media-sweep {
   background: linear-gradient(
     105deg,
     rgba(255, 255, 255, 0) 0%,
@@ -2227,46 +2227,32 @@ body {
   }
 }
 
-.virtura-hero-img-clone {
+.virtura-hero-video-placeholder {
+  flex: 0 0 auto;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.virtura-hero-video-floating {
   border-radius: var(--space-16, 1.6rem);
   display: block;
   margin: 0;
   max-width: none;
-  object-fit: fill;
-  object-position: center center;
-  opacity: 0;
   pointer-events: auto;
   position: fixed;
   transform: translateZ(0);
   user-select: none;
-  visibility: hidden;
-  -webkit-user-drag: none;
   will-change: left, top, width, height, border-radius;
   z-index: 20;
 }
 
-.hero-img.virtura-hero-img-source-hidden {
-  opacity: 0 !important;
-}
-
-.virtura-hero-img-motion-active {
+.virtura-hero-video-motion-active {
   isolation: isolate;
   position: relative;
 }
 
-.virtura-hero-img-motion-docked {
+.virtura-hero-video-motion-docked {
   overflow: hidden;
-}
-
-@media (max-width: 767px) {
-  .virtura-hero-img-clone {
-    display: none !important;
-  }
-
-  .hero-img.virtura-hero-img-source-hidden {
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
 }
 
 .section_category .category-wrapper.virtura-category-stack-ready {
@@ -2695,7 +2681,7 @@ body {
     will-change: auto;
   }
 
-  .hero-img {
+  .hero-video {
     opacity: 1 !important;
     transform: none !important;
   }

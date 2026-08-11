@@ -4,7 +4,7 @@ const CONTENT_SECTION_SELECTOR = '#brx-content .brxe-section';
 const DEFAULT_HIDE_OFFSET = 360;
 const DIRECTION_DELTA = 12;
 const HIDE_DISTANCE = 24;
-const HERO_IMAGE_SELECTOR = '.hero-img';
+const HERO_MEDIA_SELECTOR = '.hero-video';
 const HERO_MOTION_QUERY = '(min-width: 768px)';
 const HERO_SECTION_SELECTOR = '.section_hero';
 const INTENT_TTL = 2000;
@@ -26,7 +26,7 @@ const getConfiguredHideOffset = (header) => {
 const getHeroExitTarget = () => {
   const heroSection = document.querySelector(HERO_SECTION_SELECTOR);
 
-  if (!heroSection?.querySelector(HERO_IMAGE_SELECTOR)) {
+  if (!heroSection?.querySelector(HERO_MEDIA_SELECTOR)) {
     return null;
   }
 
