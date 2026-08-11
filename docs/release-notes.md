@@ -4,7 +4,9 @@
 
 - Rewired the complete homepage hero sequence from the removed `.hero-img` to
   the new `.hero-video`. The intro now promotes the lazy video source and waits
-  for its first frame before revealing it. On desktop, the same live video
+  for its first frame before revealing it. Autoplay remains paused during the
+  logo and heading sequence, then starts the video from its opening frame at the
+  exact beginning of the `.hero-video` reveal. On desktop, the same live video
   element expands to the fullscreen scroll state, so playback stays continuous
   without creating a second video decoder; mobile and reduced-motion views keep
   the static layout.

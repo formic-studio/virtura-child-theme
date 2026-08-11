@@ -2,6 +2,7 @@ const LAZY_VIDEO_SELECTOR = 'video[data-virtura-video-lazy="true"]';
 const MAX_CONCURRENT_VIDEO_STARTS = 2;
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 const VIDEO_START_TIMEOUT = 10000;
+const VIDEO_AUTOPLAY_HOLD_ATTRIBUTE = 'data-virtura-video-autoplay-hold';
 const reducedMotionMedia = window.matchMedia(REDUCED_MOTION_QUERY);
 const initializedVideos = new WeakSet();
 const queuedVideos = new WeakSet();
@@ -38,7 +39,14 @@ const restoreVideoSources = (video) => {
   return changed;
 };
 
-export const ensureVideoLoaded = (video, { allowAutoplay = true } = {}) => {
+const isVideoAutoplayHeld = (video) => (
+  video.hasAttribute(VIDEO_AUTOPLAY_HOLD_ATTRIBUTE)
+);
+
+export const ensureVideoLoaded = (
+  video,
+  { allowAutoplay = true, preload = 'metadata' } = {},
+) => {
   if (!(video instanceof HTMLVideoElement)) {
     return false;
   }
@@ -48,7 +56,7 @@ export const ensureVideoLoaded = (video, { allowAutoplay = true } = {}) => {
   const sourcesChanged = restoreVideoSources(video);
 
   if (sourcesChanged) {
-    video.preload = 'metadata';
+    video.preload = preload;
     video.load();
   }
 
@@ -57,6 +65,7 @@ export const ensureVideoLoaded = (video, { allowAutoplay = true } = {}) => {
   if (
     allowAutoplay
     && !reducedMotionMedia.matches
+    && !isVideoAutoplayHeld(video)
     && video.dataset.virturaVideoAutoplay === 'true'
   ) {
     video.autoplay = true;
@@ -257,7 +266,10 @@ const handleReducedMotionChange = (event) => {
       return;
     }
 
-    if (video.dataset.virturaVideoAutoplay === 'true') {
+    if (
+      video.dataset.virturaVideoAutoplay === 'true'
+      && !isVideoAutoplayHeld(video)
+    ) {
       video.autoplay = true;
     }
 

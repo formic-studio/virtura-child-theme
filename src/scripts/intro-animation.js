@@ -16,6 +16,7 @@ const LOGO_MARK_CENTER_OFFSET = LOGO_WIDTH / 2 - LOGO_MARK_WIDTH / 2;
 const INTRO_CENTER_SCALE = 2.2;
 const INTRO_PRIME_CLASS = 'virtura-intro-prime';
 const INTRO_FAILSAFE_TIMEOUT = 15000;
+const VIDEO_AUTOPLAY_HOLD_ATTRIBUTE = 'data-virtura-video-autoplay-hold';
 const SCROLL_LOCK_KEYS = new Set([
   ' ',
   'ArrowDown',
@@ -187,6 +188,21 @@ const getNativeVideo = (element) => {
   return element.querySelector('video');
 };
 
+const holdHeroVideoPlayback = (video) => {
+  if (!(video instanceof HTMLVideoElement)) {
+    return;
+  }
+
+  if (video.hasAttribute('autoplay')) {
+    video.dataset.virturaVideoAutoplay = 'true';
+  }
+
+  video.setAttribute(VIDEO_AUTOPLAY_HOLD_ATTRIBUTE, 'true');
+  video.autoplay = false;
+  video.removeAttribute('autoplay');
+  video.pause();
+};
+
 const primeVideoLoad = (element) => {
   const video = getNativeVideo(element);
 
@@ -194,10 +210,40 @@ const primeVideoLoad = (element) => {
     return null;
   }
 
-  video.preload = 'auto';
-  ensureVideoLoaded(video);
+  holdHeroVideoPlayback(video);
+  ensureVideoLoaded(video, {
+    allowAutoplay: false,
+    preload: 'auto',
+  });
 
   return video;
+};
+
+const releaseHeroVideoPlayback = (video) => {
+  if (
+    !(video instanceof HTMLVideoElement)
+    || !video.hasAttribute(VIDEO_AUTOPLAY_HOLD_ATTRIBUTE)
+  ) {
+    return;
+  }
+
+  video.removeAttribute(VIDEO_AUTOPLAY_HOLD_ATTRIBUTE);
+
+  if (
+    reducedMotionMedia.matches
+    || video.dataset.virturaVideoAutoplay !== 'true'
+  ) {
+    return;
+  }
+
+  try {
+    video.currentTime = 0;
+  } catch {
+    // The first frame may still be finalizing after the load timeout.
+  }
+
+  video.autoplay = true;
+  void video.play().catch(() => {});
 };
 
 const getHeroArrow = () => document.querySelector(HERO_ARROW_SELECTOR);
@@ -327,6 +373,7 @@ export const initIntroAnimation = async () => {
     root.classList.remove(INTRO_PRIME_CLASS);
     root.classList.remove('virtura-intro-running');
     root.classList.remove('virtura-intro-revealing');
+    releaseHeroVideoPlayback(heroNativeVideo);
     overlay.remove();
   };
   const introFailsafeTimer = window.setTimeout(
@@ -487,6 +534,7 @@ export const initIntroAnimation = async () => {
 
     mediaGateReleased = true;
     syncMediaSweep(mediaSweep, heroMedia);
+    releaseHeroVideoPlayback(heroNativeVideo);
     timeline.play();
   };
 
@@ -560,6 +608,7 @@ export const initIntroAnimation = async () => {
       if (mediaReady) {
         mediaGateReleased = true;
         syncMediaSweep(mediaSweep, heroMedia);
+        releaseHeroVideoPlayback(heroNativeVideo);
         return;
       }
 
