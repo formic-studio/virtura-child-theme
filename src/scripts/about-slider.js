@@ -29,6 +29,9 @@ const TEXT_WORD_EASE = "sine.out";
 const TEXT_WORD_STAGGER = 0.035;
 const TEXT_FADE_OUT_DURATION = 0.22;
 const SWIPE_THRESHOLD = 40;
+const HASH_ALIASES = new Map([
+  ["ubezpieczenie", "ubezpieczenia"],
+]);
 
 const reducedMotionMedia = window.matchMedia(
   "(prefers-reduced-motion: reduce)",
@@ -51,6 +54,22 @@ const loadSliderAnimation = async () => {
 };
 
 const clampIndex = (index, length) => Math.min(Math.max(index, 0), length - 1);
+
+const getHashId = (hash) => {
+  const encodedId = hash.replace(/^#/, "");
+
+  if (!encodedId) {
+    return "";
+  }
+
+  try {
+    return decodeURIComponent(encodedId);
+  } catch {
+    return encodedId;
+  }
+};
+
+const normalizePathname = (pathname) => pathname.replace(/\/+$/, "") || "/";
 
 const revertTextSplit = (item) => {
   const split = textSplitInstances.get(item);
@@ -386,6 +405,13 @@ const initSlider = (slider) => {
   let activeIndex = 0;
   let touchStartX = null;
 
+  const getSlideIndexFromHash = (hash) => {
+    const hashId = getHashId(hash);
+    const slideId = HASH_ALIASES.get(hashId) || hashId;
+
+    return textSlides.findIndex((slide) => slide.id === slideId);
+  };
+
   const goTo = (nextIndex, options) => {
     const clampedIndex = clampIndex(nextIndex, slideCount);
     const previousIndex = activeIndex;
@@ -442,9 +468,60 @@ const initSlider = (slider) => {
     { passive: true },
   );
 
+  window.addEventListener("hashchange", () => {
+    const hashIndex = getSlideIndexFromHash(window.location.hash);
+
+    if (hashIndex >= 0) {
+      goTo(hashIndex);
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    if (
+      !(event.target instanceof Element) ||
+      (event instanceof MouseEvent &&
+        (event.button !== 0 ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey))
+    ) {
+      return;
+    }
+
+    const link = event.target.closest("a[href]");
+
+    if (!link || link.hasAttribute("download") || link.target === "_blank") {
+      return;
+    }
+
+    const currentUrl = new URL(window.location.href);
+    const linkUrl = new URL(link.href, currentUrl);
+
+    if (
+      linkUrl.origin !== currentUrl.origin ||
+      normalizePathname(linkUrl.pathname) !==
+        normalizePathname(currentUrl.pathname) ||
+      linkUrl.search !== currentUrl.search
+    ) {
+      return;
+    }
+
+    const hashIndex = getSlideIndexFromHash(linkUrl.hash);
+
+    if (hashIndex >= 0) {
+      goTo(hashIndex);
+    }
+  });
+
   slider.classList.add(READY_CLASS);
   slider.setAttribute("aria-roledescription", "carousel");
-  goTo(0, { animate: false, force: true });
+  const initialHashIndex = getSlideIndexFromHash(window.location.hash);
+
+  goTo(initialHashIndex >= 0 ? initialHashIndex : 0, {
+    animate: false,
+    force: true,
+  });
 };
 
 export const initAboutSlider = () => {
