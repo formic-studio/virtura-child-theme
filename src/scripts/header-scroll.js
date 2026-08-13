@@ -9,6 +9,8 @@ const HERO_MOTION_QUERY = '(min-width: 768px)';
 const HERO_SECTION_SELECTOR = '.section_hero';
 const INTENT_TTL = 2000;
 const SHOW_DISTANCE = 28;
+const STICKY_CONFLICT_SELECTOR = '.specs-slider .spec-top';
+const STICKY_POSITION_EPSILON = 2;
 const TOUCH_DELTA = 8;
 const MOBILE_NAV_QUERY = '(max-width: 991px)';
 
@@ -62,6 +64,29 @@ const isEditableTarget = (target) => {
   return Boolean(target.closest('input, textarea, select, [contenteditable]'));
 };
 
+const isStickyConflictActive = (elements) => elements.some((element) => {
+  if (!(element instanceof HTMLElement) || !element.isConnected) {
+    return false;
+  }
+
+  const styles = getComputedStyle(element);
+
+  if (styles.position !== 'sticky') {
+    return false;
+  }
+
+  const stickyTop = Number.parseFloat(styles.top);
+
+  if (!Number.isFinite(stickyTop)) {
+    return false;
+  }
+
+  return (
+    Math.abs(element.getBoundingClientRect().top - stickyTop) <=
+    STICKY_POSITION_EPSILON
+  );
+});
+
 export const initHeaderScroll = () => {
   const header = document.querySelector(HEADER_SELECTOR);
 
@@ -71,6 +96,9 @@ export const initHeaderScroll = () => {
 
   const configuredHideOffset = getConfiguredHideOffset(header);
   const heroExitTarget = getHeroExitTarget();
+  const stickyConflictElements = Array.from(
+    document.querySelectorAll(STICKY_CONFLICT_SELECTOR),
+  );
   let previousY = window.scrollY;
   let peakY = previousY;
   let frame = null;
@@ -143,6 +171,24 @@ export const initHeaderScroll = () => {
       header.contains(activeElement) && !hasClosedMobileNavFocus;
     const hasVisibleNavActivity =
       !isHidden && header.classList.contains('header-nav-active');
+    const hasHeaderInteraction =
+      header.classList.contains('giga-menu-open') ||
+      header.classList.contains('header-nav-active') ||
+      hasHeaderFocus;
+    const shouldSuppressStickyConflict =
+      !hasHeaderInteraction &&
+      isStickyConflictActive(stickyConflictElements);
+
+    if (shouldSuppressStickyConflict) {
+      if (!isHidden || revealFrame !== null) {
+        hideHeader();
+      }
+
+      previousY = currentY;
+      peakY = currentY;
+      return;
+    }
+
     const shouldKeepVisible =
       currentY <= hideOffset ||
       header.classList.contains('giga-menu-open') ||
