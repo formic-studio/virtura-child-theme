@@ -3,6 +3,7 @@ import { loadGsap, loadSplitText } from "./motion.js";
 const SLIDER_SELECTOR = ".about-slider";
 const IMAGE_SELECTOR = ".slider-img-item";
 const TEXT_SELECTOR = ".slider-text-block";
+const TEXT_WRAPPER_SELECTOR = ".slider-text-block-wrapper";
 const CONTROLS_SELECTOR = ".slider-paggination .svg-arrow-block";
 const ACTIVE_CLASS = "is-active";
 const DISABLED_CLASS = "is-disabled";
@@ -393,6 +394,7 @@ const initSlider = (slider) => {
 
   const images = Array.from(slider.querySelectorAll(IMAGE_SELECTOR));
   const textBlocks = Array.from(slider.querySelectorAll(TEXT_SELECTOR));
+  const textWrapper = slider.querySelector(TEXT_WRAPPER_SELECTOR);
   const controls = Array.from(slider.querySelectorAll(CONTROLS_SELECTOR));
   const slideCount = Math.min(images.length, textBlocks.length);
 
@@ -412,7 +414,23 @@ const initSlider = (slider) => {
     return textSlides.findIndex((slide) => slide.id === slideId);
   };
 
+  const resetTextWrapperScroll = () => {
+    if (!textWrapper) {
+      return;
+    }
+
+    textWrapper.scrollLeft = 0;
+    textWrapper.scrollTop = 0;
+  };
+
+  const stabilizeTextWrapperScroll = () => {
+    resetTextWrapperScroll();
+    window.requestAnimationFrame(resetTextWrapperScroll);
+  };
+
   const goTo = (nextIndex, options) => {
+    stabilizeTextWrapperScroll();
+
     const clampedIndex = clampIndex(nextIndex, slideCount);
     const previousIndex = activeIndex;
 
