@@ -17,6 +17,24 @@ WordPress Media Library.
   `virtura-hero-img-clone` wybiera z `srcset` wariant dopasowany do końcowego
   rozmiaru fullscreen i aktualizuje go po zmianie viewportu.
 
+## ALT i obrazy dekoracyjne
+
+Tekstem alternatywnym zarządzamy centralnie w WordPress Media Library:
+
+- w widoku listy użyj kolumny `ALT / dostępność`, wpisz opis i wybierz `Zapisz`;
+- ten sam opis można edytować w szczegółach załącznika w polu
+  `Tekst alternatywny (ALT)`;
+- jeżeli obraz nie przekazuje informacji i pełni wyłącznie funkcję wizualną,
+  zaznacz `Dekoracyjny` — frontend otrzyma wtedy poprawne `alt=""`;
+- opis pozostaje zapisany po oznaczeniu obrazu jako dekoracyjny i wraca po
+  odznaczeniu tej opcji;
+- wartości z Media Library są stosowane również do responsywnych obrazów
+  renderowanych przez Bricks.
+
+Nie używaj nazwy pliku jako ALT i nie zaczynaj opisu od „zdjęcie” lub
+„grafika”. Jeżeli obraz powtarza informację znajdującą się bezpośrednio obok,
+zwykle powinien zostać oznaczony jako dekoracyjny.
+
 ## Weryfikacja po deployu
 
 Przejdź przez SSH do katalogu WordPressa:

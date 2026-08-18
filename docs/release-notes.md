@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Added Media Library accessibility controls for images. Editors can update
+  the native ALT text and explicitly mark an image as decorative from both
+  attachment details and the Media Library list. Decorative images render with
+  `alt=""`, while meaningful alternatives are propagated through WordPress and
+  Bricks responsive markup. Stored descriptions are preserved when the
+  decorative option is toggled, and LiteSpeed page cache is purged after a
+  change.
 - Rewired the complete homepage hero sequence from the removed `.hero-img` to
   the new `.hero-video`. The intro now promotes the lazy video source and waits
   for its first frame before revealing it. Autoplay remains paused during the
