@@ -130,6 +130,15 @@ body {
     margin-top: var(--space-80, 8rem) !important;
     width: 100%;
   }
+
+  .blog-tags > .virtura-blog-mobile-related-heading {
+    align-self: stretch;
+    flex: 0 0 100%;
+    margin-bottom: var(--space-24, 2.4rem);
+    order: -1 !important;
+    text-align: left !important;
+    width: 100%;
+  }
 }
 
 @media (max-width: 767px) {

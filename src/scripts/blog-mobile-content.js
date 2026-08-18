@@ -1,8 +1,12 @@
 const BLOG_LAYOUT_SELECTOR = '.blog-grid-top';
 const RICH_TEXT_SELECTOR = '.blog-rich-text';
 const FEATURED_TEXT_SELECTOR = '.font-color-violet';
+const RELATED_LAYOUT_SELECTOR = '.blog-grid-bottom';
+const RELATED_HEADING_SELECTOR = '.font-size-tittle-big';
+const RELATED_TAGS_SELECTOR = '.blog-tags';
 const MOBILE_QUERY = '(max-width: 767px)';
 const INSERTED_CLASS = 'virtura-blog-mobile-insert';
+const RELATED_HEADING_CLASS = 'virtura-blog-mobile-related-heading';
 
 const isElement = (element) => element instanceof HTMLElement;
 
@@ -62,6 +66,43 @@ const restoreOriginalPosition = ({ featuredBlock, placeholder }) => {
   featuredBlock.classList.remove(INSERTED_CLASS);
 };
 
+const getRelatedHeading = (layout) =>
+  Array.from(layout.children).find(
+    (child) => isElement(child) && child.matches(RELATED_HEADING_SELECTOR),
+  ) || null;
+
+const createRelatedState = (layout) => {
+  const heading = getRelatedHeading(layout);
+  const tags = layout.querySelector(RELATED_TAGS_SELECTOR);
+
+  if (!isElement(heading) || !isElement(tags)) {
+    return null;
+  }
+
+  const placeholder = document.createComment('virtura-blog-related-heading');
+  heading.before(placeholder);
+
+  return {
+    heading,
+    placeholder,
+    tags,
+  };
+};
+
+const moveHeadingBeforeTags = ({ heading, tags }) => {
+  tags.prepend(heading);
+  heading.classList.add(RELATED_HEADING_CLASS);
+};
+
+const restoreRelatedHeading = ({ heading, placeholder }) => {
+  if (!placeholder.isConnected) {
+    return;
+  }
+
+  placeholder.after(heading);
+  heading.classList.remove(RELATED_HEADING_CLASS);
+};
+
 export const initBlogMobileContent = () => {
   if (
     document.documentElement.classList.contains('bricks-is-builder') ||
@@ -70,23 +111,35 @@ export const initBlogMobileContent = () => {
     return;
   }
 
-  const states = Array.from(document.querySelectorAll(BLOG_LAYOUT_SELECTOR))
+  const featuredStates = Array.from(document.querySelectorAll(BLOG_LAYOUT_SELECTOR))
     .map(createLayoutState)
     .filter(Boolean);
+  const relatedStates = Array.from(document.querySelectorAll(RELATED_LAYOUT_SELECTOR))
+    .map(createRelatedState)
+    .filter(Boolean);
 
-  if (!states.length) {
+  if (!featuredStates.length && !relatedStates.length) {
     return;
   }
 
   const mediaQuery = window.matchMedia(MOBILE_QUERY);
   const syncLayout = () => {
-    states.forEach((state) => {
+    featuredStates.forEach((state) => {
       if (mediaQuery.matches) {
         moveInsideRichText(state);
         return;
       }
 
       restoreOriginalPosition(state);
+    });
+
+    relatedStates.forEach((state) => {
+      if (mediaQuery.matches) {
+        moveHeadingBeforeTags(state);
+        return;
+      }
+
+      restoreRelatedHeading(state);
     });
   };
 
