@@ -2176,7 +2176,7 @@ body {
   }
 }
 
-@media (hover: none) {
+@media (max-width: 767px), (hover: none), (pointer: coarse) {
   .offer-img-block > .ppf-img-hover {
     opacity: 1 !important;
   }

@@ -11,10 +11,12 @@
   `ppf-img-hover` to the absolutely positioned overlay. The child-theme CSS
   owns both images' opacity states. Hovering the complete `.offer-block`
   reveals the overlay, keyboard focus receives the same state, and
-  devices without hover display the overlay immediately. Reduced-motion mode
-  removes the transition. The base image remains fully opaque while the overlay
-  fades in, preventing the white card background from flashing through. The
-  existing offer-image GSAP parallax moves both layers in sync so aligned
+  touch devices or layouts at the mobile breakpoint display the overlay
+  immediately. The explicit breakpoint also covers Bricks' responsive preview,
+  which retains the desktop computer's mouse capability. Reduced-motion mode
+  removes the transition. The base image remains fully opaque while the
+  overlay fades in, preventing the white card background from flashing through.
+  The existing offer-image GSAP parallax moves both layers in sync so aligned
   before/after artwork does not jump during the transition.
 - Added Media Library accessibility controls for images. Editors can update
   the native ALT text and explicitly mark an image as decorative from both
