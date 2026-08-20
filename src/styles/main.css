@@ -2161,6 +2161,36 @@ body {
   will-change: transform;
 }
 
+.offer-img-block > :is(.ppf-img-default, .ppf-img-hover) {
+  transition: opacity 0.35s ease;
+}
+
+.offer-img-block > .ppf-img-default {
+  opacity: 1 !important;
+}
+
+.offer-img-block > .ppf-img-hover {
+  opacity: 0 !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .offer-block:hover .offer-img-block > .ppf-img-default {
+    opacity: 0 !important;
+  }
+
+  .offer-block:hover .offer-img-block > .ppf-img-hover {
+    opacity: 1 !important;
+  }
+}
+
+.offer-block:focus-within .offer-img-block > .ppf-img-default {
+  opacity: 0 !important;
+}
+
+.offer-block:focus-within .offer-img-block > .ppf-img-hover {
+  opacity: 1 !important;
+}
+
 .about-slider.virtura-about-slider-ready
   :is(.slider-img-item, .slider-text-block) {
   flex: 0 0 100%;
@@ -2695,14 +2725,22 @@ body {
     transition: none;
   }
 
+  .offer-img-block > :is(.ppf-img-default, .ppf-img-hover) {
+    transition: none;
+  }
+
   [data-motion] {
     opacity: 1 !important;
     transform: none !important;
   }
 
-  .virtura-option-button,
-  .virtura-option-media-target {
+  .virtura-option-button {
     opacity: 1 !important;
+    transform: none !important;
+    will-change: auto;
+  }
+
+  .virtura-option-media-target {
     transform: none !important;
     will-change: auto;
   }

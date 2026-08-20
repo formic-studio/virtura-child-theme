@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Added a CSS crossfade for paired PPF offer images. In each Bricks
+  `.offer-img-block`, assign `ppf-img-default` to the in-flow image and
+  `ppf-img-hover` to the absolutely positioned overlay. The child-theme CSS
+  owns both images' opacity states. Hovering the complete `.offer-block`
+  reveals the overlay, keyboard focus receives the same state, and
+  reduced-motion mode removes the
+  transition. The existing offer-image GSAP parallax now moves both layers in
+  sync so aligned before/after artwork does not jump during the crossfade.
 - Added Media Library accessibility controls for images. Editors can update
   the native ALT text and explicitly mark an image as decorative from both
   attachment details and the Media Library list. Decorative images render with

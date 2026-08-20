@@ -40,6 +40,7 @@ const OPTION_BUTTON_CLASS = 'virtura-option-button';
 const OPTION_MEDIA_FRAME_CLASS = 'virtura-option-media-frame';
 const OPTION_MEDIA_RADIUS_ATTR = 'data-virtura-option-media-radius';
 const OPTION_MEDIA_TARGET_CLASS = 'virtura-option-media-target';
+const OPTION_MEDIA_PAIR_SELECTOR = '.ppf-img-default, .ppf-img-hover';
 const OPTION_MEDIA_MIN_AREA = 12000;
 const OPTION_BUTTON_REVEAL_DURATION = 0.85;
 const OPTION_BUTTON_REVEAL_START = 'top 92%';
@@ -326,6 +327,17 @@ const getOptionMediaFrame = (media) => {
   return null;
 };
 
+const getOptionMediaTargets = (frame, media) => {
+  if (!media.matches(OPTION_MEDIA_PAIR_SELECTOR)) {
+    return [media];
+  }
+
+  const pairedMedia = Array.from(frame.children)
+    .filter((element) => element.matches(OPTION_MEDIA_PAIR_SELECTOR));
+
+  return pairedMedia.length > 1 ? pairedMedia : [media];
+};
+
 const applyOptionMediaFrameRadius = (frame, media) => {
   const frameBorderRadius = window.getComputedStyle(frame).borderRadius;
   const mediaBorderRadius = window.getComputedStyle(media).borderRadius;
@@ -390,18 +402,23 @@ const initOptionMediaMotion = (gsap, ScrollTrigger, block) => {
   }
 
   const card = block.closest(OPTION_CARD_SELECTOR) || block;
+  const mediaTargets = getOptionMediaTargets(frame, media);
 
   frame.classList.add(OPTION_MEDIA_FRAME_CLASS);
   applyOptionMediaFrameRadius(frame, media);
-  media.classList.add(OPTION_MEDIA_TARGET_CLASS);
+  mediaTargets.forEach((mediaTarget) => {
+    mediaTarget.classList.add(OPTION_MEDIA_TARGET_CLASS);
 
-  if (media instanceof HTMLImageElement && !media.complete) {
-    media.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
-  }
+    if (mediaTarget instanceof HTMLImageElement && !mediaTarget.complete) {
+      mediaTarget.addEventListener('load', () => ScrollTrigger.refresh(), {
+        once: true,
+      });
+    }
+  });
 
   storeAnimation(
     gsap.fromTo(
-      media,
+      mediaTargets,
       {
         scale: OPTION_MEDIA_SCALE,
         transformOrigin: 'center center',
