@@ -138,27 +138,11 @@ const shouldRunIntro = () => (
   document.querySelector(HERO_SECTION_SELECTOR)
 );
 
-const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
-
 const getHeaderRevealClip = (progress) => {
-  if (progress <= 0.001) {
-    return 'polygon(0% 0%, 0% 0%, 0% 18%, 0% 34%, 0% 52%, 0% 70%, 0% 88%, 0% 100%, 0% 100%)';
-  }
+  const normalizedProgress = Math.min(Math.max(progress, 0), 1);
+  const hiddenRightEdge = (1 - normalizedProgress) * 100;
 
-  const base = progress * 108;
-  const point = (offset) => `${clamp(base + offset, 0, 110).toFixed(2)}%`;
-
-  return [
-    'polygon(0% 0%',
-    `${point(1)} 0%`,
-    `${point(-4)} 18%`,
-    `${point(3)} 34%`,
-    `${point(-7)} 52%`,
-    `${point(5)} 70%`,
-    `${point(-2)} 88%`,
-    `${point(2)} 100%`,
-    '0% 100%)',
-  ].join(', ');
+  return `inset(0 ${hiddenRightEdge.toFixed(2)}% 0 0)`;
 };
 
 const setHeaderRevealClip = (surface, progress) => {

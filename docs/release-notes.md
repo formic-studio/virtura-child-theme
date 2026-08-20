@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Replaced the homepage intro header's staggered polygon reveal with a clean,
+  rectangular left-to-right wipe. The navigation now keeps one straight
+  vertical reveal edge while preserving the existing intro sequence and
+  timing.
 - Added a CSS crossfade for paired PPF offer images. In each Bricks
   `.offer-img-block`, assign `ppf-img-default` to the in-flow image and
   `ppf-img-hover` to the absolutely positioned overlay. The child-theme CSS
