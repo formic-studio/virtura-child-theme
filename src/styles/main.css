@@ -2161,30 +2161,19 @@ body {
   will-change: transform;
 }
 
-.offer-img-block > :is(.ppf-img-default, .ppf-img-hover) {
-  transition: opacity 0.35s ease;
-}
-
 .offer-img-block > .ppf-img-default {
   opacity: 1 !important;
 }
 
 .offer-img-block > .ppf-img-hover {
   opacity: 0 !important;
+  transition: opacity 0.35s ease;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .offer-block:hover .offer-img-block > .ppf-img-default {
-    opacity: 0 !important;
-  }
-
   .offer-block:hover .offer-img-block > .ppf-img-hover {
     opacity: 1 !important;
   }
-}
-
-.offer-block:focus-within .offer-img-block > .ppf-img-default {
-  opacity: 0 !important;
 }
 
 .offer-block:focus-within .offer-img-block > .ppf-img-hover {
@@ -2725,7 +2714,7 @@ body {
     transition: none;
   }
 
-  .offer-img-block > :is(.ppf-img-default, .ppf-img-hover) {
+  .offer-img-block > .ppf-img-hover {
     transition: none;
   }
 

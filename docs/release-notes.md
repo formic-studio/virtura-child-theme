@@ -8,8 +8,10 @@
   owns both images' opacity states. Hovering the complete `.offer-block`
   reveals the overlay, keyboard focus receives the same state, and
   reduced-motion mode removes the
-  transition. The existing offer-image GSAP parallax now moves both layers in
-  sync so aligned before/after artwork does not jump during the crossfade.
+  transition. The base image remains fully opaque while the overlay fades in,
+  preventing the white card background from flashing through. The existing
+  offer-image GSAP parallax moves both layers in sync so aligned before/after
+  artwork does not jump during the transition.
 - Added Media Library accessibility controls for images. Editors can update
   the native ALT text and explicitly mark an image as decorative from both
   attachment details and the Media Library list. Decorative images render with
