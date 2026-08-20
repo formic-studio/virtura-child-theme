@@ -2176,6 +2176,12 @@ body {
   }
 }
 
+@media (hover: none) {
+  .offer-img-block > .ppf-img-hover {
+    opacity: 1 !important;
+  }
+}
+
 .offer-block:focus-within .offer-img-block > .ppf-img-hover {
   opacity: 1 !important;
 }
