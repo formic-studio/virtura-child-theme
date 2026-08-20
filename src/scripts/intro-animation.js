@@ -17,6 +17,15 @@ const INTRO_CENTER_SCALE = 2.2;
 const INTRO_PRIME_CLASS = 'virtura-intro-prime';
 const INTRO_FAILSAFE_TIMEOUT = 15000;
 const VIDEO_AUTOPLAY_HOLD_ATTRIBUTE = 'data-virtura-video-autoplay-hold';
+const HEADER_REVEAL_EDGE_POINTS = [
+  [0, 0.35],
+  [16, -0.45],
+  [33, 0.7],
+  [50, -0.9],
+  [67, 0.55],
+  [84, -0.4],
+  [100, 0.3],
+];
 const SCROLL_LOCK_KEYS = new Set([
   ' ',
   'ArrowDown',
@@ -140,9 +149,15 @@ const shouldRunIntro = () => (
 
 const getHeaderRevealClip = (progress) => {
   const normalizedProgress = Math.min(Math.max(progress, 0), 1);
-  const hiddenRightEdge = (1 - normalizedProgress) * 100;
+  const edgePosition = normalizedProgress * 100;
+  const edgeStrength = Math.sin(normalizedProgress * Math.PI);
+  const edgePoints = HEADER_REVEAL_EDGE_POINTS.map(([y, offset]) => {
+    const x = edgePosition + offset * edgeStrength;
 
-  return `inset(0 ${hiddenRightEdge.toFixed(2)}% 0 0)`;
+    return `${x.toFixed(2)}% ${y}%`;
+  });
+
+  return `polygon(0% 0%, ${edgePoints.join(', ')}, 0% 100%)`;
 };
 
 const setHeaderRevealClip = (surface, progress) => {
