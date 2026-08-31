@@ -1,8 +1,8 @@
 import { loadGsap, loadSplitText } from "./motion.js";
 
 const SLIDER_SELECTOR = ".about-slider";
-const IMAGE_SELECTOR = ".slider-img-item";
-const TEXT_SELECTOR = ".slider-text-block";
+const IMAGE_SELECTOR = ".slider-img-block > .slider-img-item";
+const TEXT_SELECTOR = ".slider-text-block-wrapper > .slider-text-block";
 const TEXT_WRAPPER_SELECTOR = ".slider-text-block-wrapper";
 const PAGINATION_SELECTOR = ".slider-paggination";
 const CONTROLS_SELECTOR = ".slider-paggination .svg-arrow-block";

@@ -9,7 +9,10 @@
   `{echo:virtura_get_realization_slider()}` and includes the attachment ID,
   full image URL, image ALT text, title and description for every slide. A
   single configured slide is displayed as static content and automatically
-  hides the slider navigation.
+  hides the slider navigation. Slider initialization now counts only direct
+  children of the image and text wrappers, preventing a nested Bricks Image
+  that shares the `slider-img-item` styling class from being treated as and
+  hidden like an additional slide.
 - Added a global `data-display-none="true"` utility for conditionally hiding
   complete Bricks elements. On the realization template, assign the
   `data-display-none` attribute to the "Behind the scenes" section and return
