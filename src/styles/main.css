@@ -377,6 +377,8 @@ body {
   gap: var(--archive-grid-gap);
   grid-auto-flow: dense;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  scroll-margin-top: var(--space-120, 12rem);
+  transition: opacity 0.18s ease;
 }
 
 .archive-grid > .bricks-layout-wrapper {
@@ -430,6 +432,31 @@ body {
   pointer-events: none;
 }
 
+.archive-grid.is-ajax-updating {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.archive-grid.is-ajax-revealing > .archive-block,
+.archive-grid.is-ajax-revealing
+  > .bricks-layout-wrapper
+  > .bricks-layout-item {
+  animation: virtura-archive-item-enter 0.48s var(--virtura-motion-ease) both;
+  animation-delay: calc(var(--virtura-archive-item-index, 0) * 35ms);
+}
+
+@keyframes virtura-archive-item-enter {
+  from {
+    opacity: 0;
+    transform: translateY(1.2rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .virtura-archive-pagination {
   display: flex;
   justify-content: center;
@@ -439,6 +466,11 @@ body {
 
 .virtura-archive-pagination[hidden] {
   display: none;
+}
+
+.virtura-archive-pagination[aria-busy="true"] {
+  opacity: 0.55;
+  pointer-events: none;
 }
 
 .virtura-archive-pagination > ul.page-numbers {
@@ -533,6 +565,17 @@ body:has(.brxe-pagination) .virtura-archive-pagination {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .archive-grid {
+    transition: none;
+  }
+
+  .archive-grid.is-ajax-revealing > .archive-block,
+  .archive-grid.is-ajax-revealing
+    > .bricks-layout-wrapper
+    > .bricks-layout-item {
+    animation: none;
+  }
+
   .virtura-archive-pagination li > .page-numbers,
   .virtura-archive-pagination :is(.prev, .next) svg {
     transition: none;

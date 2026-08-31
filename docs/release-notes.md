@@ -6,8 +6,9 @@
   grids. Their main Bricks queries now return at most 11 posts per page and
   retain the total-row count needed for later pages. The accessible previous,
   next and numbered controls render only when a query has more than one page,
-  preserve active filter URL parameters and yield to a native Bricks
-  Pagination element if one is added later.
+  preserve active filter URL parameters, replace the archive grid over AJAX,
+  and keep regular page links as a no-JavaScript fallback. Newly loaded cards
+  use a short staggered reveal animation and respect reduced-motion settings.
 - Added an optional, unlimited `Opinia Google` Carbon Fields complex field to
   realization posts. Each review contains an author, constrained 1–5 rating,
   description and review URL and is exposed through a Bricks Array Query
