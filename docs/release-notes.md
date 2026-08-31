@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Added a global `data-display-none="true"` utility for conditionally hiding
+  complete Bricks elements. On the realization template, assign the
+  `data-display-none` attribute to the "Behind the scenes" section and return
+  `true` when the section should be omitted. A missing attribute, an empty
+  value or any value other than `true` leaves the section visible.
 - Refined the homepage intro header's polygon reveal into a restrained,
   gently irregular left-to-right wipe. The edge offsets are now subtle and
   their strength eases in and back out across the reveal, preventing individual

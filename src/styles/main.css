@@ -110,6 +110,10 @@ body {
   display: none !important;
 }
 
+[data-display-none="true"] {
+  display: none !important;
+}
+
 .list-reset-spaced,
 .list-reset-spaced ul {
   display: flex;
