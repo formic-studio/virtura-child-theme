@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added exclusive playback for the three sound-enabled team videos inside
+  `.team-wrapper`. Starting one video pauses the other two while preserving
+  their playback positions. Muted autoplay videos elsewhere on the About page
+  are unaffected.
 - Split the frontend JavaScript into a small global core and DOM-gated feature
   chunks. Sliders, FAQ, archive filters and pagination, training tabs, blog
   mobile layout, fit-text and page motion now download only when their matching

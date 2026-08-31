@@ -1,5 +1,6 @@
 const VIDEO_ABOUT_SELECTOR = '.video-about';
 const VIDEO_SELECTOR = 'video';
+const TEAM_WRAPPER_SELECTOR = '.team-wrapper';
 const PLAYING_CLASS = 'is-video-playing';
 const PAUSED_CLASS = 'is-video-paused';
 
@@ -17,6 +18,20 @@ const syncVideoState = (container, video) => {
     'aria-label',
     isPlaying ? 'Zatrzymaj film' : 'Odtwórz film',
   );
+};
+
+const pauseOtherTeamVideos = (video) => {
+  const teamWrapper = video.closest(TEAM_WRAPPER_SELECTOR);
+
+  if (!teamWrapper) {
+    return;
+  }
+
+  teamWrapper.querySelectorAll(VIDEO_SELECTOR).forEach((teamVideo) => {
+    if (teamVideo !== video) {
+      teamVideo.pause();
+    }
+  });
 };
 
 const toggleVideo = async (container, video) => {
@@ -61,7 +76,12 @@ const initVideoAboutControl = (container) => {
 
   const syncState = () => syncVideoState(container, video);
 
-  ['play', 'playing', 'pause', 'ended', 'emptied', 'loadeddata'].forEach(
+  video.addEventListener('play', () => {
+    pauseOtherTeamVideos(video);
+    syncState();
+  });
+
+  ['playing', 'pause', 'ended', 'emptied', 'loadeddata'].forEach(
     (eventName) => video.addEventListener(eventName, syncState),
   );
 
