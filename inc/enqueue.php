@@ -150,7 +150,11 @@ add_action( 'wp_head', 'virtura_child_theme_print_browser_theme_color', -1 );
  * bootstrap only prevents a first-paint flash of the header/hero elements.
  */
 function virtura_child_theme_print_intro_prime(): void {
-	if ( is_admin() || virtura_child_theme_is_bricks_builder() ) {
+	if (
+		is_admin() ||
+		virtura_child_theme_is_bricks_builder() ||
+		( ! is_front_page() && ! is_page( 'strona-glowna' ) )
+	) {
 		return;
 	}
 

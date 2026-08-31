@@ -1,4 +1,4 @@
-import { loadGsap, loadSplitText } from "./motion.js";
+import { loadGsap, loadSplitText } from './animation-runtime.js';
 
 const SLIDER_SELECTOR = ".about-slider";
 const IMAGE_SELECTOR = ".slider-img-block > .slider-img-item";

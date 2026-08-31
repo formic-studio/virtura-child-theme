@@ -1,3 +1,6 @@
+import { loadGsap } from './animation-runtime.js';
+import { addSmoothScrollListener } from './smooth-scroll.js';
+
 const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
 const activeAnimations = [];
 
@@ -47,59 +50,13 @@ const OPTION_BUTTON_REVEAL_START = 'top 92%';
 const OPTION_MEDIA_PARALLAX_DISTANCE = 8.5;
 const OPTION_MEDIA_SCALE = 1.18;
 
-let gsapApiPromise;
-let splitTextApiPromise;
-let fontsReadyPromise;
 let motionInitialized = false;
 let heroMediaScrollTrigger;
+let removeSmoothScrollListener;
 
 const mobileLMedia = window.matchMedia(MOBILE_L_MEDIA_QUERY);
 
-export const loadGsap = async () => {
-  if (!gsapApiPromise) {
-    gsapApiPromise = Promise.all([
-      import('gsap'),
-      import('gsap/ScrollTrigger'),
-    ]).then(([gsapModule, scrollTriggerModule]) => {
-      const gsap = gsapModule.gsap || gsapModule.default;
-      const ScrollTrigger = scrollTriggerModule.ScrollTrigger || scrollTriggerModule.default;
-
-      gsap.registerPlugin(ScrollTrigger);
-
-      return { gsap, ScrollTrigger };
-    });
-  }
-
-  return gsapApiPromise;
-};
-
 export const getHeroMediaScrollTrigger = () => heroMediaScrollTrigger;
-
-const waitForFonts = () => {
-  if (!fontsReadyPromise) {
-    fontsReadyPromise =
-      document.fonts?.ready?.catch(() => {}) || Promise.resolve();
-  }
-
-  return fontsReadyPromise;
-};
-
-export const loadSplitText = async (gsap) => {
-  if (!splitTextApiPromise) {
-    splitTextApiPromise = Promise.all([
-      import('gsap/SplitText'),
-      waitForFonts(),
-    ]).then(([splitTextModule]) => {
-      const SplitText = splitTextModule.SplitText || splitTextModule.default;
-
-      gsap.registerPlugin(SplitText);
-
-      return SplitText;
-    });
-  }
-
-  return splitTextApiPromise;
-};
 
 const getMotionElements = () => Array.from(document.querySelectorAll('[data-motion]'));
 
@@ -810,6 +767,10 @@ export const initMotion = async () => {
   }
 
   const { gsap, ScrollTrigger } = await loadGsap();
+
+  if (!removeSmoothScrollListener) {
+    removeSmoothScrollListener = addSmoothScrollListener(ScrollTrigger.update);
+  }
 
   if (reducedMotionMedia.matches) {
     document.documentElement.classList.remove('virtura-motion-ready');

@@ -1,4 +1,4 @@
-import { loadGsap } from './motion.js';
+import { loadGsap } from './animation-runtime.js';
 
 const SLIDER_SELECTOR = '.specs-slider';
 const TRACK_SELECTOR = '.specs-wrapper';

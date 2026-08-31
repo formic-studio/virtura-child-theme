@@ -1,4 +1,4 @@
-import { loadGsap } from './motion.js';
+import { loadGsap } from './animation-runtime.js';
 import { ensureVideoLoaded } from './video-optimization.js';
 
 const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');

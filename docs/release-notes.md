@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Split the frontend JavaScript into a small global core and DOM-gated feature
+  chunks. Sliders, FAQ, archive filters and pagination, training tabs, blog
+  mobile layout, fit-text and page motion now download only when their matching
+  Bricks component exists. The shared GSAP loader is isolated from the full
+  motion implementation. Lenis uses its native animation-frame loop, while
+  ScrollTrigger synchronization is attached only on pages that initialize
+  motion. The homepage intro bootstrap is printed only on the front page.
+  Existing initialization order, reduced-motion handling and lazy-video
+  behavior are preserved.
 - Added automatic numbered pagination to the Blog and Realization archive
   grids. Their main Bricks queries now return at most 11 posts per page and
   retain the total-row count needed for later pages. The accessible previous,

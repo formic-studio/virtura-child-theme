@@ -1,4 +1,4 @@
-import { loadGsap } from './motion.js';
+import { loadGsap } from './animation-runtime.js';
 
 const FAQ_SELECTOR = '.faq-block';
 const FAQ_GROUP_SELECTOR = '.faq-wrapper';
@@ -167,6 +167,22 @@ const initItem = (root, index) => {
     icon.setAttribute('focusable', 'false');
   }
 
+  const primeAnimation = () => {
+    if (!reducedMotionMedia.matches) {
+      void getGsap().catch(() => {});
+    }
+  };
+
+  heading.addEventListener('pointerenter', primeAnimation, {
+    once: true,
+    passive: true,
+  });
+  heading.addEventListener('pointerdown', primeAnimation, {
+    once: true,
+    passive: true,
+  });
+  heading.addEventListener('focusin', primeAnimation, { once: true });
+
   heading.addEventListener('click', () => toggleItem(item));
   heading.addEventListener('keydown', (event) => {
     if (event.key !== 'Enter' && event.key !== ' ') {
@@ -190,10 +206,6 @@ export const initFaqAccordion = () => {
   }
 
   faqBlocks.forEach(initItem);
-
-  if (!reducedMotionMedia.matches) {
-    void getGsap().catch(() => {});
-  }
 };
 
 const handleReducedMotionChange = () => {

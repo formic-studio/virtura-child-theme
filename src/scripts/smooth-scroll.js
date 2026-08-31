@@ -1,12 +1,11 @@
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
-import { loadGsap } from './motion.js';
 
 const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
 const fastScrollEasing = (progress) => 1 - Math.pow(1 - progress, 4);
 
 let smoothScrollInstance;
-let gsapTickerCallback;
+const smoothScrollListeners = new Set();
 
 const isBricksBuilder = () => (
   document.body.classList.contains('bricks-is-builder')
@@ -15,6 +14,7 @@ const isBricksBuilder = () => (
 
 const createLenis = () => new Lenis({
   anchors: true,
+  autoRaf: true,
   duration: 1.2,
   easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
   gestureOrientation: 'vertical',
@@ -25,6 +25,20 @@ const createLenis = () => new Lenis({
   touchMultiplier: 2,
   wheelMultiplier: 1,
 });
+
+export const addSmoothScrollListener = (listener) => {
+  if (typeof listener !== 'function') {
+    return () => {};
+  }
+
+  smoothScrollListeners.add(listener);
+  smoothScrollInstance?.on('scroll', listener);
+
+  return () => {
+    smoothScrollListeners.delete(listener);
+    smoothScrollInstance?.off('scroll', listener);
+  };
+};
 
 export const scrollToPosition = (
   target,
@@ -73,13 +87,6 @@ export const scrollToPosition = (
 };
 
 export const destroySmoothScroll = () => {
-  if (gsapTickerCallback) {
-    void loadGsap().then(({ gsap }) => {
-      gsap.ticker.remove(gsapTickerCallback);
-    });
-  }
-
-  gsapTickerCallback = undefined;
   smoothScrollInstance?.destroy();
   smoothScrollInstance = undefined;
 };
@@ -89,21 +96,10 @@ export const initSmoothScroll = async () => {
     return smoothScrollInstance;
   }
 
-  const { gsap, ScrollTrigger } = await loadGsap();
-
-  if (reducedMotionMedia.matches || isBricksBuilder()) {
-    return undefined;
-  }
-
   smoothScrollInstance = createLenis();
-  smoothScrollInstance.on('scroll', ScrollTrigger.update);
-
-  gsapTickerCallback = (time) => {
-    smoothScrollInstance?.raf(time * 1000);
-  };
-
-  gsap.ticker.add(gsapTickerCallback);
-  gsap.ticker.lagSmoothing(0);
+  smoothScrollListeners.forEach((listener) => {
+    smoothScrollInstance.on('scroll', listener);
+  });
 
   return smoothScrollInstance;
 };
