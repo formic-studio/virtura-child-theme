@@ -27,7 +27,7 @@
     ]
   },
   "src/scripts/main.js": {
-    "file": "assets/main-2M5jqWSG.js",
+    "file": "assets/main-CVbnyvz-.js",
     "name": "main",
     "src": "src/scripts/main.js",
     "isEntry": true,
@@ -37,7 +37,7 @@
       "node_modules/gsap/SplitText.js"
     ],
     "css": [
-      "assets/main-BnqVVQCe.css"
+      "assets/main-BNkaDFSP.css"
     ]
   }
 }

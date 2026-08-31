@@ -397,10 +397,10 @@ body {
   overflow: hidden;
 }
 
-.archive-block:nth-child(5n),
-.archive-grid > .bricks-layout-wrapper > .bricks-layout-item:nth-child(5n) {
+.archive-grid > .archive-block:nth-child(5),
+.archive-grid > .bricks-layout-wrapper > .bricks-layout-item:nth-child(5) {
   align-self: stretch;
-  aspect-ratio: auto;
+  aspect-ratio: 1.84 / 1;
   grid-column: span 2;
 }
 
@@ -494,9 +494,15 @@ body {
 
 .virtura-archive-pagination :is(.prev, .next).page-numbers {
   background: transparent;
-  border-radius: 50%;
+  border-radius: 0;
+  color: var(--color-black, #000);
   min-width: 3.6rem;
   padding: 0;
+}
+
+.virtura-archive-pagination a:is(.prev, .next).page-numbers:is(:hover, :focus-visible) {
+  background: transparent;
+  color: var(--color-black, #000);
 }
 
 .virtura-archive-pagination :is(.prev, .next) svg {
@@ -506,7 +512,16 @@ body {
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 2;
+  transition: transform 0.2s ease;
   width: 2rem;
+}
+
+.virtura-archive-pagination a.prev.page-numbers:hover svg {
+  transform: translateX(-0.3rem);
+}
+
+.virtura-archive-pagination a.next.page-numbers:hover svg {
+  transform: translateX(0.3rem);
 }
 
 .virtura-archive-pagination .page-numbers.is-disabled {
@@ -518,7 +533,8 @@ body:has(.brxe-pagination) .virtura-archive-pagination {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .virtura-archive-pagination li > .page-numbers {
+  .virtura-archive-pagination li > .page-numbers,
+  .virtura-archive-pagination :is(.prev, .next) svg {
     transition: none;
   }
 }
@@ -533,8 +549,8 @@ body:has(.brxe-pagination) .virtura-archive-pagination {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .archive-block:nth-child(5n),
-  .archive-grid > .bricks-layout-wrapper > .bricks-layout-item:nth-child(5n) {
+  .archive-grid > .archive-block:nth-child(5),
+  .archive-grid > .bricks-layout-wrapper > .bricks-layout-item:nth-child(5) {
     grid-column: span 2;
   }
 }
@@ -546,9 +562,9 @@ body:has(.brxe-pagination) .virtura-archive-pagination {
   }
 
   .archive-block,
-  .archive-block:nth-child(5n),
+  .archive-grid > .archive-block:nth-child(5),
   .archive-grid > .bricks-layout-wrapper > .bricks-layout-item,
-  .archive-grid > .bricks-layout-wrapper > .bricks-layout-item:nth-child(5n) {
+  .archive-grid > .bricks-layout-wrapper > .bricks-layout-item:nth-child(5) {
     aspect-ratio: 1 / 1.15;
     grid-column: auto;
   }

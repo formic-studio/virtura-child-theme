@@ -3,7 +3,7 @@
 ## Unreleased
 
 - Added automatic numbered pagination to the Blog and Realization archive
-  grids. Their main Bricks queries now return at most 10 posts per page and
+  grids. Their main Bricks queries now return at most 11 posts per page and
   retain the total-row count needed for later pages. The accessible previous,
   next and numbered controls render only when a query has more than one page,
   preserve active filter URL parameters and yield to a native Bricks
