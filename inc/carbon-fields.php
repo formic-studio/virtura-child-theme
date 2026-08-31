@@ -78,6 +78,52 @@ function virtura_child_theme_register_realization_carbon_fields(): void {
 					),
 			)
 		);
+
+	\Carbon_Fields\Container::make(
+		'post_meta',
+		__( 'Slider realizacji', 'virtura-child-theme' )
+	)
+		->where( 'post_type', '=', 'realizacja' )
+		->add_fields(
+			array(
+				\Carbon_Fields\Field::make(
+					'complex',
+					'virtura_realization_slider',
+					__( 'Slajdy', 'virtura-child-theme' )
+				)
+					->setup_labels(
+						array(
+							'singular_name' => __( 'slajd', 'virtura-child-theme' ),
+							'plural_name'   => __( 'slajdy', 'virtura-child-theme' ),
+						)
+					)
+					->set_layout( 'tabbed-vertical' )
+					->set_collapsed( true )
+					->set_header_template(
+						'<% if (slide_title) { %>Slajd <%- $_index + 1 %>: <%- slide_title %><% } else { %>Slajd <%- $_index + 1 %><% } %>'
+					)
+					->add_fields(
+						array(
+							\Carbon_Fields\Field::make(
+								'image',
+								'slide_image',
+								__( 'Zdjęcie', 'virtura-child-theme' )
+							)
+								->set_value_type( 'id' ),
+							\Carbon_Fields\Field::make(
+								'text',
+								'slide_title',
+								__( 'Tytuł', 'virtura-child-theme' )
+							),
+							\Carbon_Fields\Field::make(
+								'textarea',
+								'slide_description',
+								__( 'Opis', 'virtura-child-theme' )
+							),
+						)
+					),
+			)
+		);
 }
 add_action( 'carbon_fields_register_fields', 'virtura_child_theme_register_realization_carbon_fields' );
 
@@ -117,6 +163,87 @@ function virtura_get_post_date_month_year( $post_id = 0 ): string {
 	}
 
 	return get_the_date( 'm.Y', $post_id );
+}
+
+/**
+ * Return Carbon Fields realization-slider data as a PHP array.
+ *
+ * @param int|string $post_id Optional realization ID.
+ */
+function virtura_child_theme_get_realization_slider_data( $post_id = 0 ): array {
+	if ( ! function_exists( 'carbon_get_post_meta' ) ) {
+		return array();
+	}
+
+	$post_id = absint( $post_id );
+
+	if ( ! $post_id ) {
+		$post_id = virtura_child_theme_get_current_realization_id();
+	}
+
+	if ( ! $post_id || 'realizacja' !== get_post_type( $post_id ) ) {
+		return array();
+	}
+
+	$slides = carbon_get_post_meta( $post_id, 'virtura_realization_slider' );
+
+	if ( ! is_array( $slides ) ) {
+		return array();
+	}
+
+	$formatted_slides = array();
+
+	foreach ( $slides as $slide_index => $slide ) {
+		if ( ! is_array( $slide ) ) {
+			continue;
+		}
+
+		$image_id  = isset( $slide['slide_image'] ) ? absint( $slide['slide_image'] ) : 0;
+		$image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'full' ) : '';
+		$image_alt = $image_id ? get_post_meta( $image_id, '_wp_attachment_image_alt', true ) : '';
+
+		$formatted_slides[] = array(
+			'slide_index'       => $slide_index + 1,
+			'slide_image_id'    => $image_id,
+			'slide_image_url'   => is_string( $image_url ) ? $image_url : '',
+			'slide_image_alt'   => is_string( $image_alt ) ? trim( $image_alt ) : '',
+			'slide_title'       => isset( $slide['slide_title'] ) ? trim( (string) $slide['slide_title'] ) : '',
+			'slide_description' => isset( $slide['slide_description'] ) ? trim( (string) $slide['slide_description'] ) : '',
+		);
+	}
+
+	return $formatted_slides;
+}
+
+/**
+ * Return realization-slider items as JSON objects for Bricks Array Query editor.
+ *
+ * This is meant to be used inside the editor's outer brackets:
+ * [
+ *   {echo:virtura_get_realization_slider()}
+ * ]
+ *
+ * @param int|string $post_id Optional realization ID. Useful when called from Bricks via {post_id}.
+ */
+function virtura_get_realization_slider( $post_id = 0 ): string {
+	$json = wp_json_encode( virtura_child_theme_get_realization_slider_data( $post_id ) );
+
+	if ( ! is_string( $json ) || '[]' === $json ) {
+		return '';
+	}
+
+	return trim( $json, '[]' );
+}
+
+/**
+ * Return realization-slider data as a full JSON array.
+ *
+ * @param int|string $post_id Optional realization ID. Useful when called from Bricks via {post_id}.
+ */
+function virtura_get_realization_slider_json( $post_id = 0 ): string {
+	$json = wp_json_encode( virtura_child_theme_get_realization_slider_data( $post_id ) );
+
+	return is_string( $json ) ? $json : '[]';
 }
 
 /**
@@ -216,7 +343,7 @@ function virtura_get_realization_work_scope_json( $post_id = 0 ): string {
 }
 
 /**
- * Allow Bricks dynamic data `{echo:...}` to call the work-scope helper.
+ * Allow Bricks dynamic data `{echo:...}` to call realization data helpers.
  *
  * @param mixed $function_names Allowed function names.
  *
@@ -229,6 +356,8 @@ function virtura_child_theme_allow_bricks_echo_functions( $function_names ): arr
 
 	$function_names[] = 'virtura_get_realization_work_scope';
 	$function_names[] = 'virtura_get_realization_work_scope_json';
+	$function_names[] = 'virtura_get_realization_slider';
+	$function_names[] = 'virtura_get_realization_slider_json';
 	$function_names[] = 'virtura_get_post_date_month_year';
 
 	return array_values( array_unique( $function_names ) );

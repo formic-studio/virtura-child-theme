@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Added an unlimited Carbon Fields `Slider realizacji` complex field to
+  `realizacja` posts. Each slide contains an attachment image, title and
+  description and can be reordered or collapsed in the editor. The data is
+  exposed to Bricks Array Query through
+  `{echo:virtura_get_realization_slider()}` and includes the attachment ID,
+  full image URL, image ALT text, title and description for every slide.
 - Added a global `data-display-none="true"` utility for conditionally hiding
   complete Bricks elements. On the realization template, assign the
   `data-display-none` attribute to the "Behind the scenes" section and return
