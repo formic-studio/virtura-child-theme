@@ -133,37 +133,57 @@ function virtura_child_theme_register_realization_carbon_fields(): void {
 		->add_fields(
 			array(
 				\Carbon_Fields\Field::make(
-					'text',
-					'virtura_realization_google_review_author',
-					__( 'Imię i nazwisko', 'virtura-child-theme' )
-				),
-				\Carbon_Fields\Field::make(
-					'select',
-					'virtura_realization_google_review_rating',
-					__( 'Ocena', 'virtura-child-theme' )
+					'complex',
+					'virtura_realization_google_reviews',
+					__( 'Opinie', 'virtura-child-theme' )
 				)
-					->set_options(
+					->setup_labels(
 						array(
-							'1' => __( '1 z 5', 'virtura-child-theme' ),
-							'2' => __( '2 z 5', 'virtura-child-theme' ),
-							'3' => __( '3 z 5', 'virtura-child-theme' ),
-							'4' => __( '4 z 5', 'virtura-child-theme' ),
-							'5' => __( '5 z 5', 'virtura-child-theme' ),
+							'singular_name' => __( 'opinia', 'virtura-child-theme' ),
+							'plural_name'   => __( 'opinie', 'virtura-child-theme' ),
 						)
 					)
-					->set_default_value( '5' ),
-				\Carbon_Fields\Field::make(
-					'textarea',
-					'virtura_realization_google_review_description',
-					__( 'Opis', 'virtura-child-theme' )
-				),
-				\Carbon_Fields\Field::make(
-					'text',
-					'virtura_realization_google_review_url',
-					__( 'Link do opinii Google', 'virtura-child-theme' )
-				)
-					->set_help_text(
-						__( 'Opcjonalny pełny adres URL nakładany w Bricks na cały element opinii.', 'virtura-child-theme' )
+					->set_layout( 'tabbed-vertical' )
+					->set_collapsed( true )
+					->set_header_template(
+						'<% if (review_author) { %>Opinia <%- $_index + 1 %>: <%- review_author %><% } else { %>Opinia <%- $_index + 1 %><% } %>'
+					)
+					->add_fields(
+						array(
+							\Carbon_Fields\Field::make(
+								'text',
+								'review_author',
+								__( 'Imię i nazwisko', 'virtura-child-theme' )
+							),
+							\Carbon_Fields\Field::make(
+								'select',
+								'review_rating',
+								__( 'Ocena', 'virtura-child-theme' )
+							)
+								->set_options(
+									array(
+										'1' => __( '1 z 5', 'virtura-child-theme' ),
+										'2' => __( '2 z 5', 'virtura-child-theme' ),
+										'3' => __( '3 z 5', 'virtura-child-theme' ),
+										'4' => __( '4 z 5', 'virtura-child-theme' ),
+										'5' => __( '5 z 5', 'virtura-child-theme' ),
+									)
+								)
+								->set_default_value( '5' ),
+							\Carbon_Fields\Field::make(
+								'textarea',
+								'review_description',
+								__( 'Opis', 'virtura-child-theme' )
+							),
+							\Carbon_Fields\Field::make(
+								'text',
+								'review_url',
+								__( 'Link do opinii Google', 'virtura-child-theme' )
+							)
+								->set_help_text(
+									__( 'Opcjonalny pełny adres URL nakładany w Bricks na cały element opinii.', 'virtura-child-theme' )
+								),
+						)
 					),
 			)
 		);
@@ -209,23 +229,13 @@ function virtura_get_post_date_month_year( $post_id = 0 ): string {
 }
 
 /**
- * Return Google review data assigned to a realization.
+ * Return Google reviews assigned to a realization.
  *
  * @param int|string $post_id Optional realization ID.
- *
- * @return array{author:string,rating:int,description:string,url:string,hidden:string}
  */
-function virtura_child_theme_get_realization_google_review_data( $post_id = 0 ): array {
-	$empty_review = array(
-		'author'      => '',
-		'rating'      => 5,
-		'description' => '',
-		'url'         => '',
-		'hidden'      => 'true',
-	);
-
+function virtura_child_theme_get_realization_google_reviews_data( $post_id = 0 ): array {
 	if ( ! function_exists( 'carbon_get_post_meta' ) ) {
-		return $empty_review;
+		return array();
 	}
 
 	$post_id = absint( $post_id );
@@ -235,95 +245,90 @@ function virtura_child_theme_get_realization_google_review_data( $post_id = 0 ):
 	}
 
 	if ( ! $post_id || 'realizacja' !== get_post_type( $post_id ) ) {
-		return $empty_review;
+		return array();
 	}
 
-	$author      = trim( (string) carbon_get_post_meta( $post_id, 'virtura_realization_google_review_author' ) );
-	$rating      = absint( carbon_get_post_meta( $post_id, 'virtura_realization_google_review_rating' ) );
-	$description = trim( (string) carbon_get_post_meta( $post_id, 'virtura_realization_google_review_description' ) );
-	$url         = trim( (string) carbon_get_post_meta( $post_id, 'virtura_realization_google_review_url' ) );
+	$reviews = carbon_get_post_meta( $post_id, 'virtura_realization_google_reviews' );
 
-	if ( $rating < 1 || $rating > 5 ) {
-		$rating = 5;
+	if ( ! is_array( $reviews ) ) {
+		return array();
 	}
 
-	return array(
-		'author'      => $author,
-		'rating'      => $rating,
-		'description' => $description,
-		'url'         => esc_url( $url ),
-		'hidden'      => '' === $description ? 'true' : '',
-	);
+	$formatted_reviews = array();
+
+	foreach ( $reviews as $review_index => $review ) {
+		if ( ! is_array( $review ) ) {
+			continue;
+		}
+
+		$description = isset( $review['review_description'] ) ? trim( (string) $review['review_description'] ) : '';
+
+		if ( '' === $description ) {
+			continue;
+		}
+
+		$rating = isset( $review['review_rating'] ) ? absint( $review['review_rating'] ) : 5;
+
+		if ( $rating < 1 || $rating > 5 ) {
+			$rating = 5;
+		}
+
+		$formatted_reviews[] = array(
+			'review_index'            => $review_index + 1,
+			'review_author'           => isset( $review['review_author'] ) ? trim( (string) $review['review_author'] ) : '',
+			'review_rating'           => $rating,
+			'review_rating_label'     => sprintf(
+				/* translators: %d: Review rating from 1 to 5. */
+				__( 'Ocena %d na 5', 'virtura-child-theme' ),
+				$rating
+			),
+			'review_description'      => $description,
+			'review_description_html' => nl2br( esc_html( $description ) ),
+			'review_url'              => isset( $review['review_url'] ) ? esc_url( trim( (string) $review['review_url'] ) ) : '',
+		);
+	}
+
+	return $formatted_reviews;
 }
 
 /**
- * Return the Google review author for Bricks dynamic data.
+ * Return Google review items as JSON objects for Bricks Array Query editor.
+ *
+ * This is meant to be used inside the editor's outer brackets:
+ * [
+ *   {echo:virtura_get_realization_google_reviews()}
+ * ]
  *
  * @param int|string $post_id Optional realization ID.
  */
-function virtura_get_realization_google_review_author( $post_id = 0 ): string {
-	$review = virtura_child_theme_get_realization_google_review_data( $post_id );
+function virtura_get_realization_google_reviews( $post_id = 0 ): string {
+	$json = wp_json_encode( virtura_child_theme_get_realization_google_reviews_data( $post_id ) );
 
-	return $review['author'];
+	if ( ! is_string( $json ) || '[]' === $json ) {
+		return '';
+	}
+
+	return trim( $json, '[]' );
 }
 
 /**
- * Return the Google review rating for Bricks attributes.
+ * Return Google review data as a full JSON array.
  *
  * @param int|string $post_id Optional realization ID.
  */
-function virtura_get_realization_google_review_rating( $post_id = 0 ): string {
-	$review = virtura_child_theme_get_realization_google_review_data( $post_id );
+function virtura_get_realization_google_reviews_json( $post_id = 0 ): string {
+	$json = wp_json_encode( virtura_child_theme_get_realization_google_reviews_data( $post_id ) );
 
-	return (string) $review['rating'];
+	return is_string( $json ) ? $json : '[]';
 }
 
 /**
- * Return an accessible Google review rating label.
- *
- * @param int|string $post_id Optional realization ID.
- */
-function virtura_get_realization_google_review_rating_label( $post_id = 0 ): string {
-	$review = virtura_child_theme_get_realization_google_review_data( $post_id );
-
-	return sprintf(
-		/* translators: %d: Review rating from 1 to 5. */
-		__( 'Ocena %d na 5', 'virtura-child-theme' ),
-		$review['rating']
-	);
-}
-
-/**
- * Return the formatted Google review description for Bricks dynamic data.
- *
- * @param int|string $post_id Optional realization ID.
- */
-function virtura_get_realization_google_review_description( $post_id = 0 ): string {
-	$review = virtura_child_theme_get_realization_google_review_data( $post_id );
-
-	return nl2br( esc_html( $review['description'] ) );
-}
-
-/**
- * Return the Google review URL for Bricks dynamic data.
- *
- * @param int|string $post_id Optional realization ID.
- */
-function virtura_get_realization_google_review_url( $post_id = 0 ): string {
-	$review = virtura_child_theme_get_realization_google_review_data( $post_id );
-
-	return $review['url'];
-}
-
-/**
- * Return "true" when the realization has no Google review description.
+ * Return "true" when the realization has no complete Google reviews.
  *
  * @param int|string $post_id Optional realization ID.
  */
 function virtura_get_realization_google_review_hidden( $post_id = 0 ): string {
-	$review = virtura_child_theme_get_realization_google_review_data( $post_id );
-
-	return $review['hidden'];
+	return empty( virtura_child_theme_get_realization_google_reviews_data( $post_id ) ) ? 'true' : '';
 }
 
 /**
@@ -519,11 +524,8 @@ function virtura_child_theme_allow_bricks_echo_functions( $function_names ): arr
 	$function_names[] = 'virtura_get_realization_work_scope_json';
 	$function_names[] = 'virtura_get_realization_slider';
 	$function_names[] = 'virtura_get_realization_slider_json';
-	$function_names[] = 'virtura_get_realization_google_review_author';
-	$function_names[] = 'virtura_get_realization_google_review_rating';
-	$function_names[] = 'virtura_get_realization_google_review_rating_label';
-	$function_names[] = 'virtura_get_realization_google_review_description';
-	$function_names[] = 'virtura_get_realization_google_review_url';
+	$function_names[] = 'virtura_get_realization_google_reviews';
+	$function_names[] = 'virtura_get_realization_google_reviews_json';
 	$function_names[] = 'virtura_get_realization_google_review_hidden';
 	$function_names[] = 'virtura_get_post_date_month_year';
 
