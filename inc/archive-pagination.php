@@ -44,7 +44,7 @@ function virtura_child_theme_bricks_element_has_class( array $settings, string $
 }
 
 /**
- * Detect a frontend request for one of the archive templates.
+ * Detect a frontend request for one of the archive listing pages.
  *
  * The main-query flag keeps the check working inside Bricks REST/AJAX requests,
  * where WordPress conditional tags do not describe the original archive URL.
@@ -53,7 +53,10 @@ function virtura_child_theme_bricks_element_has_class( array $settings, string $
  * @param array $settings   Bricks element settings.
  */
 function virtura_child_theme_is_archive_grid_query( array $query_vars, array $settings ): bool {
-	if ( ! virtura_child_theme_bricks_element_has_class( $settings, 'archive-grid' ) ) {
+	$is_archive_card = virtura_child_theme_bricks_element_has_class( $settings, 'archive-block' );
+	$is_menu_card    = virtura_child_theme_bricks_element_has_class( $settings, 'grid-2-item' );
+
+	if ( ! $is_archive_card || $is_menu_card ) {
 		return false;
 	}
 
@@ -63,7 +66,38 @@ function virtura_child_theme_is_archive_grid_query( array $query_vars, array $se
 		$is_archive_main_query = ! empty( $settings['query']['is_archive_main_query'] );
 	}
 
-	return $is_archive_main_query || is_archive() || is_home();
+	if ( ! $is_archive_main_query && ! virtura_child_theme_is_archive_listing_request() ) {
+		return false;
+	}
+
+	$post_types = $query_vars['post_type'] ?? ( $settings['query']['post_type'] ?? 'post' );
+	$post_types = array_map( 'sanitize_key', (array) $post_types );
+
+	return (bool) array_intersect( array( 'post', 'realizacja' ), $post_types );
+}
+
+/**
+ * Check whether the current request belongs to the Blog or Realizations page.
+ *
+ * The referrer fallback is needed when Bricks refreshes a filtered query over
+ * REST/AJAX and WordPress no longer exposes the original page conditional.
+ */
+function virtura_child_theme_is_archive_listing_request(): bool {
+	if ( is_archive() || is_home() || is_page( array( 'blog', 'realizacje' ) ) ) {
+		return true;
+	}
+
+	$is_async_request = wp_doing_ajax() || ( defined( 'REST_REQUEST' ) && REST_REQUEST );
+	$referer           = $is_async_request ? wp_get_referer() : '';
+
+	if ( ! $referer ) {
+		return false;
+	}
+
+	$path = (string) wp_parse_url( $referer, PHP_URL_PATH );
+	$slug = basename( untrailingslashit( $path ) );
+
+	return in_array( $slug, array( 'blog', 'realizacje' ), true );
 }
 
 /**
@@ -119,6 +153,7 @@ function virtura_child_theme_limit_archive_grid_query(
 		'current'               => $current_page,
 		'total'                 => 0,
 		'has_native_navigation' => ! empty( $settings['postsNavigation'] ),
+		'rendered'              => false,
 	);
 
 	return $query_vars;
@@ -282,7 +317,24 @@ function virtura_child_theme_render_archive_pagination(
 }
 
 /**
- * Append pagination directly after the matching Bricks archive element.
+ * Return the settings stored on a rendered Bricks element.
+ *
+ * @param \Bricks\Element $element Bricks element instance.
+ */
+function virtura_child_theme_get_bricks_element_settings( $element ): array {
+	if ( isset( $element->settings ) && is_array( $element->settings ) ) {
+		return $element->settings;
+	}
+
+	if ( isset( $element->element['settings'] ) && is_array( $element->element['settings'] ) ) {
+		return $element->element['settings'];
+	}
+
+	return array();
+}
+
+/**
+ * Append pagination directly after the archive grid containing the query.
  *
  * @param string          $html    Rendered Bricks element HTML.
  * @param \Bricks\Element $element Bricks element instance.
@@ -295,26 +347,39 @@ function virtura_child_theme_append_archive_pagination( string $html, $element )
 		return $html;
 	}
 
-	$element_id = isset( $element->id ) ? (string) $element->id : '';
-	$queries    = $GLOBALS['virtura_archive_queries'] ?? array();
+	$settings = virtura_child_theme_get_bricks_element_settings( $element );
+	$queries  = $GLOBALS['virtura_archive_queries'] ?? array();
 
-	if ( ! $element_id || empty( $queries[ $element_id ] ) ) {
+	if (
+		empty( $queries ) ||
+		! virtura_child_theme_bricks_element_has_class( $settings, 'archive-grid' )
+	) {
 		return $html;
 	}
 
-	$query_state = $queries[ $element_id ];
+	foreach ( $queries as $query_element_id => $query_state ) {
+		if (
+			! empty( $query_state['rendered'] ) ||
+			! empty( $query_state['has_native_navigation'] ) ||
+			(int) $query_state['total'] < 2
+		) {
+			continue;
+		}
 
-	if ( ! empty( $query_state['has_native_navigation'] ) || (int) $query_state['total'] < 2 ) {
-		return $html;
+		$pagination = virtura_child_theme_render_archive_pagination(
+			(int) $query_state['current'],
+			(int) $query_state['total'],
+			(string) $query_element_id
+		);
+
+		if ( $pagination ) {
+			$GLOBALS['virtura_archive_queries'][ $query_element_id ]['rendered'] = true;
+
+			return $html . $pagination;
+		}
 	}
 
-	$pagination = virtura_child_theme_render_archive_pagination(
-		(int) $query_state['current'],
-		(int) $query_state['total'],
-		$element_id
-	);
-
-	return $html . $pagination;
+	return $html;
 }
 add_filter(
 	'bricks/frontend/render_element',

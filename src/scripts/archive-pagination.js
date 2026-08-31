@@ -1,8 +1,45 @@
 const PAGINATION_SELECTOR = '.virtura-archive-pagination[data-query-element-id]';
+const ARCHIVE_GRID_SELECTOR = '.archive-grid';
+const QUERY_TRAIL_SELECTOR = '.brx-query-trail[data-query-element-id][data-query-vars]';
+const ARCHIVE_POST_TYPES = new Set(['post', 'realizacja']);
 
 const PREVIOUS_LABEL = 'Poprzednia strona';
 const NEXT_LABEL = 'Następna strona';
 const PAGE_LABEL = 'Strona';
+
+const getQueryVariables = (queryTrail) => {
+  try {
+    return JSON.parse(queryTrail.dataset.queryVars || '{}');
+  } catch {
+    return {};
+  }
+};
+
+const getArchiveQueryTrail = (archiveGrid) =>
+  Array.from(archiveGrid.querySelectorAll(QUERY_TRAIL_SELECTOR)).find((queryTrail) => {
+    const queryVariables = getQueryVariables(queryTrail);
+    const postTypes = Array.isArray(queryVariables.post_type)
+      ? queryVariables.post_type
+      : [queryVariables.post_type];
+
+    return postTypes.some((postType) => ARCHIVE_POST_TYPES.has(postType));
+  });
+
+const findPagination = (queryId) =>
+  Array.from(document.querySelectorAll(PAGINATION_SELECTOR)).find(
+    (pagination) => pagination.dataset.queryElementId === queryId,
+  );
+
+const createPagination = (archiveGrid, queryId) => {
+  const pagination = document.createElement('nav');
+
+  pagination.className = 'virtura-archive-pagination';
+  pagination.dataset.queryElementId = queryId;
+  pagination.setAttribute('aria-label', 'Paginacja archiwum');
+  archiveGrid.insertAdjacentElement('afterend', pagination);
+
+  return pagination;
+};
 
 const createScreenReaderText = (text) => {
   const label = document.createElement('span');
@@ -138,36 +175,47 @@ const renderPagination = (pagination, currentPage, totalPages) => {
   pagination.replaceChildren(list);
 };
 
-const syncPagination = (pagination) => {
+const syncPagination = (pagination, queryTrail = null) => {
   const queryId = pagination.dataset.queryElementId;
   const queryInstance = window.bricksData?.queryLoopInstances?.[queryId];
-
-  if (!queryInstance) {
-    return;
-  }
-
-  const currentPage = Math.max(1, Number.parseInt(queryInstance.page, 10) || 1);
-  const totalPages = Math.max(0, Number.parseInt(queryInstance.maxPages, 10) || 0);
+  const currentPage = Math.max(
+    1,
+    Number.parseInt(queryInstance?.page ?? queryTrail?.dataset.page, 10) || 1,
+  );
+  const totalPages = Math.max(
+    0,
+    Number.parseInt(queryInstance?.maxPages ?? queryTrail?.dataset.maxPages, 10) || 0,
+  );
 
   renderPagination(pagination, currentPage, totalPages);
 };
 
-const syncQueryPagination = (queryId) => {
-  document.querySelectorAll(PAGINATION_SELECTOR).forEach((pagination) => {
-    if (!queryId || pagination.dataset.queryElementId === queryId) {
-      syncPagination(pagination);
+const ensureArchivePaginations = (updatedQueryId = '') => {
+  document.querySelectorAll(ARCHIVE_GRID_SELECTOR).forEach((archiveGrid) => {
+    const queryTrail = getArchiveQueryTrail(archiveGrid);
+    const queryId = queryTrail?.dataset.queryElementId;
+
+    if (!queryId || (updatedQueryId && updatedQueryId !== queryId)) {
+      return;
+    }
+
+    const totalPages = Math.max(0, Number.parseInt(queryTrail.dataset.maxPages, 10) || 0);
+    let pagination = findPagination(queryId);
+
+    if (!pagination && totalPages > 1) {
+      pagination = createPagination(archiveGrid, queryId);
+    }
+
+    if (pagination) {
+      syncPagination(pagination, queryTrail);
     }
   });
 };
 
 export const initArchivePagination = () => {
-  if (!document.querySelector(PAGINATION_SELECTOR)) {
-    return;
-  }
-
-  window.requestAnimationFrame(() => syncQueryPagination());
+  window.requestAnimationFrame(() => ensureArchivePaginations());
 
   document.addEventListener('bricks/ajax/query_result/displayed', (event) => {
-    window.requestAnimationFrame(() => syncQueryPagination(event.detail?.queryId));
+    window.requestAnimationFrame(() => ensureArchivePaginations(event.detail?.queryId));
   });
 };
