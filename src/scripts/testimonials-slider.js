@@ -3,6 +3,7 @@ import { loadGsap } from './motion.js';
 const SLIDER_SELECTOR = '.testimonials-slider';
 const TRACK_SELECTOR = '.slider-wrapper';
 const ITEM_SELECTOR = '.slider-item';
+const PAGINATION_SELECTOR = '.slider-paggination';
 const CONTROLS_SELECTOR = '.slider-paggination .svg-arrow-block';
 const ACTIVE_CLASS = 'is-active';
 const DISABLED_CLASS = 'is-disabled';
@@ -141,11 +142,25 @@ const initSlider = (slider) => {
 
   const track = slider.querySelector(TRACK_SELECTOR);
   const items = track ? Array.from(track.querySelectorAll(ITEM_SELECTOR)) : [];
+  const pagination = slider.querySelector(PAGINATION_SELECTOR);
   const controls = Array.from(slider.querySelectorAll(CONTROLS_SELECTOR));
 
-  if (!track || items.length < 2 || controls.length < 2) {
+  if (!track || items.length < 1 || (items.length > 1 && controls.length < 2)) {
     return;
   }
+
+  slider.classList.add(READY_CLASS);
+  slider.dataset.slideCount = String(items.length);
+
+  if (items.length === 1) {
+    pagination?.setAttribute('hidden', '');
+    slider.dataset.activeSlide = '1';
+    setActiveState(items, 0);
+
+    return;
+  }
+
+  pagination?.removeAttribute('hidden');
 
   let activeIndex = 0;
   let touchStartX = null;
@@ -240,7 +255,6 @@ const initSlider = (slider) => {
     window.addEventListener('resize', scheduleRefresh, { passive: true });
   }
 
-  slider.classList.add(READY_CLASS);
   slider.setAttribute('aria-roledescription', 'carousel');
   clearPreviousMotionStyles(track, items);
   positions = getScrollPositions(track, items);

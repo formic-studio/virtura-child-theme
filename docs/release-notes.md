@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Added an optional `Opinia Google` Carbon Fields meta box to realization
+  posts with author, constrained 1–5 rating, description and review URL.
+  Bricks echo helpers expose every value, an accessible rating label and an
+  automatic `data-display-none` value that hides the testimonial section when
+  the description is empty. A `data-rating` attribute on `.spec-level`
+  controls the five existing `.level-dot` elements without manually assigning
+  active classes. A realization with one testimonial also hides its unused
+  slider navigation automatically.
 - Added an unlimited Carbon Fields `Slider realizacji` complex field to
   `realizacja` posts. Each slide contains an attachment image, title and
   description and can be reordered or collapsed in the editor. The data is

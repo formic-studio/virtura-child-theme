@@ -114,6 +114,18 @@ body {
   display: none !important;
 }
 
+.spec-level[data-rating] > .level-dot {
+  background-color: transparent !important;
+}
+
+.spec-level[data-rating="1"] > .level-dot:nth-child(-n + 1),
+.spec-level[data-rating="2"] > .level-dot:nth-child(-n + 2),
+.spec-level[data-rating="3"] > .level-dot:nth-child(-n + 3),
+.spec-level[data-rating="4"] > .level-dot:nth-child(-n + 4),
+.spec-level[data-rating="5"] > .level-dot:nth-child(-n + 5) {
+  background-color: var(--color-darker-grey, #848484) !important;
+}
+
 .list-reset-spaced,
 .list-reset-spaced ul {
   display: flex;
@@ -2255,7 +2267,7 @@ body {
   pointer-events: none;
 }
 
-.about-slider .slider-paggination[hidden] {
+:is(.about-slider, .testimonials-slider) .slider-paggination[hidden] {
   display: none !important;
 }
 
