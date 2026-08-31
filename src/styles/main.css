@@ -430,6 +430,99 @@ body {
   pointer-events: none;
 }
 
+.virtura-archive-pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(var(--space-40, 4rem), 4vw, var(--space-64, 6.4rem));
+  width: 100%;
+}
+
+.virtura-archive-pagination[hidden] {
+  display: none;
+}
+
+.virtura-archive-pagination > ul.page-numbers {
+  align-items: center;
+  display: flex;
+  gap: var(--space-8, 0.8rem);
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.virtura-archive-pagination li {
+  margin: 0;
+  padding: 0;
+}
+
+.virtura-archive-pagination li > .page-numbers {
+  align-items: center;
+  background: var(--color-light-grey, #ececec);
+  border: 0;
+  border-radius: var(--space-4, 0.4rem);
+  color: var(--color-black, #000);
+  display: inline-flex;
+  font: inherit;
+  font-size: 1.4rem;
+  font-weight: 600;
+  height: 3.6rem;
+  justify-content: center;
+  line-height: 1;
+  min-width: 3.6rem;
+  padding: 0 var(--space-8, 0.8rem);
+  text-decoration: none;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.virtura-archive-pagination a.page-numbers:is(:hover, :focus-visible) {
+  background: var(--color-darker-grey, #8f8f8f);
+  color: var(--color-white, #fff);
+}
+
+.virtura-archive-pagination a.page-numbers:focus-visible {
+  outline: 2px solid var(--color-black, #000);
+  outline-offset: var(--space-4, 0.4rem);
+}
+
+.virtura-archive-pagination .page-numbers.current {
+  background: var(--color-black, #000);
+  color: var(--color-white, #fff);
+}
+
+.virtura-archive-pagination :is(.prev, .next).page-numbers {
+  background: transparent;
+  border-radius: 50%;
+  min-width: 3.6rem;
+  padding: 0;
+}
+
+.virtura-archive-pagination :is(.prev, .next) svg {
+  fill: none;
+  height: 2rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  width: 2rem;
+}
+
+.virtura-archive-pagination .page-numbers.is-disabled {
+  opacity: 0.32;
+}
+
+body:has(.brxe-pagination) .virtura-archive-pagination {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .virtura-archive-pagination li > .page-numbers {
+    transition: none;
+  }
+}
+
 .virtura-mobile-menu-surface {
   display: none;
 }

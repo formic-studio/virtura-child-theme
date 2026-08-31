@@ -2,6 +2,7 @@ import '../styles/main.css';
 import { initAboutSlider } from './about-slider.js';
 import { initArrowMotion } from './arrow-motion.js';
 import { initArchiveFilters } from './archive-filters.js';
+import { initArchivePagination } from './archive-pagination.js';
 import { initBlogMobileContent } from './blog-mobile-content.js';
 import { initCategoryStack } from './category-stack.js';
 import { initFaqAccordion } from './faq-accordion.js';
@@ -31,6 +32,7 @@ const initTheme = () => {
   initVideoOptimization();
   initVideoAboutControls();
   initArchiveFilters();
+  initArchivePagination();
   initBlogMobileContent();
   initFaqAccordion();
   initAboutSlider();
