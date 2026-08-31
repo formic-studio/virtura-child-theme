@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const VIRTURA_ARCHIVE_POSTS_PER_PAGE = 14;
+const VIRTURA_ARCHIVE_POSTS_PER_PAGE = 10;
 
 /**
  * Check whether an element uses a given Bricks CSS class.
@@ -91,7 +91,7 @@ function virtura_child_theme_get_archive_page( array $query_vars = array() ): in
 }
 
 /**
- * Limit archive-grid queries to fourteen posts and retain pagination totals.
+ * Limit archive-grid queries to ten posts and retain pagination totals.
  *
  * @param array  $query_vars  WP_Query arguments prepared by Bricks.
  * @param array  $settings    Bricks element settings.
