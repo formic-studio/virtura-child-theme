@@ -2243,6 +2243,10 @@ body {
   pointer-events: none;
 }
 
+.about-slider .slider-paggination[hidden] {
+  display: none !important;
+}
+
 .testimonials-slider.virtura-testimonials-slider-ready .svg-arrow-block {
   cursor: pointer;
   transition:

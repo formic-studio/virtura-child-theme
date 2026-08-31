@@ -4,6 +4,7 @@ const SLIDER_SELECTOR = ".about-slider";
 const IMAGE_SELECTOR = ".slider-img-item";
 const TEXT_SELECTOR = ".slider-text-block";
 const TEXT_WRAPPER_SELECTOR = ".slider-text-block-wrapper";
+const PAGINATION_SELECTOR = ".slider-paggination";
 const CONTROLS_SELECTOR = ".slider-paggination .svg-arrow-block";
 const ACTIVE_CLASS = "is-active";
 const DISABLED_CLASS = "is-disabled";
@@ -395,15 +396,30 @@ const initSlider = (slider) => {
   const images = Array.from(slider.querySelectorAll(IMAGE_SELECTOR));
   const textBlocks = Array.from(slider.querySelectorAll(TEXT_SELECTOR));
   const textWrapper = slider.querySelector(TEXT_WRAPPER_SELECTOR);
+  const pagination = slider.querySelector(PAGINATION_SELECTOR);
   const controls = Array.from(slider.querySelectorAll(CONTROLS_SELECTOR));
   const slideCount = Math.min(images.length, textBlocks.length);
 
-  if (slideCount < 2 || controls.length < 2) {
+  if (slideCount < 1 || (slideCount > 1 && controls.length < 2)) {
     return;
   }
 
   const imageSlides = images.slice(0, slideCount);
   const textSlides = textBlocks.slice(0, slideCount);
+
+  slider.classList.add(READY_CLASS);
+  slider.dataset.slideCount = String(slideCount);
+
+  if (slideCount === 1) {
+    pagination?.setAttribute("hidden", "");
+    slider.dataset.activeSlide = "1";
+    setImageState(imageSlides, 0, 0, { animate: false });
+    setTextState(textSlides, 0, 0, { animate: false });
+
+    return;
+  }
+
+  pagination?.removeAttribute("hidden");
   let activeIndex = 0;
   let touchStartX = null;
 
@@ -532,7 +548,6 @@ const initSlider = (slider) => {
     }
   });
 
-  slider.classList.add(READY_CLASS);
   slider.setAttribute("aria-roledescription", "carousel");
   const initialHashIndex = getSlideIndexFromHash(window.location.hash);
 
