@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Stabilized the homepage in Safari and Firefox. Category-stack and GSAP
+  measurements now start only after the intro, fonts and two complete layout
+  frames are ready. The intro failsafe always removes the scroll lock, clears
+  temporary inline styles and resolves initialization even if media or its
+  timeline stalls. Hero motion is protected against duplicate placeholders;
+  WebKit and Gecko use the stable in-flow hero fallback while retaining all
+  other scroll reveals and sticky category cards.
 - Added a `Proporcja 1:1` help note below every image field in the realization
   slider editor.
 - Added a lazy Google Calendar appointment modal for the Contact page. The

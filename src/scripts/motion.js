@@ -4,7 +4,7 @@ import { addSmoothScrollListener } from './smooth-scroll.js';
 const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
 const activeAnimations = [];
 
-const HERO_MEDIA_SELECTOR = '.section_hero .hero-video';
+const HERO_MEDIA_SELECTOR = '.section_hero .hero-video:not(.virtura-hero-video-placeholder)';
 const HERO_SECTION_SELECTOR = '.section_hero';
 const HERO_PLACEHOLDER_CLASS = 'virtura-hero-video-placeholder';
 const HERO_FLOATING_CLASS = 'virtura-hero-video-floating';
@@ -51,10 +51,16 @@ const OPTION_MEDIA_PARALLAX_DISTANCE = 8.5;
 const OPTION_MEDIA_SCALE = 1.18;
 
 let motionInitialized = false;
+let motionInitializing = false;
 let heroMediaScrollTrigger;
 let removeSmoothScrollListener;
 
 const mobileLMedia = window.matchMedia(MOBILE_L_MEDIA_QUERY);
+const userAgent = window.navigator.userAgent || '';
+const isFirefox = /Firefox|FxiOS/i.test(userAgent);
+const isSafari = /Safari/i.test(userAgent)
+  && !/Chrome|Chromium|CriOS|Edg|OPR/i.test(userAgent);
+const supportsReliableFixedHeroPin = !isFirefox && !isSafari;
 
 export const getHeroMediaScrollTrigger = () => heroMediaScrollTrigger;
 
@@ -68,7 +74,13 @@ const getHeroMedia = () => document.querySelector(HERO_MEDIA_SELECTOR);
 
 const getHeroSection = (media) => media?.closest(HERO_SECTION_SELECTOR);
 
-const shouldInitHeroMediaScale = () => !mobileLMedia.matches;
+// This effect reparents the video to <body> while ScrollTrigger pins the hero.
+// WebKit and Gecko can retain a stale fixed-pin offset after the intro removes
+// its scroll lock. In those engines keep the hero media in normal document
+// flow; all remaining scroll reveals are still initialized.
+const shouldInitHeroMediaScale = () => (
+  !mobileLMedia.matches && supportsReliableFixedHeroPin
+);
 
 const getCssLengthInPixels = (value) => {
   if (!value) {
@@ -427,12 +439,27 @@ const initHeroMediaScale = (gsap, ScrollTrigger) => {
     return;
   }
 
+  if (
+    section.dataset.virturaHeroMotionInitialized === 'true'
+    || section.querySelector(`.${HERO_PLACEHOLDER_CLASS}`)
+  ) {
+    return;
+  }
+
+  section.dataset.virturaHeroMotionInitialized = 'true';
+
   const placeholder = document.createElement('div');
   const nativeVideo = media instanceof HTMLVideoElement
     ? media
     : media.querySelector('video');
 
-  placeholder.className = `${media.className} ${HERO_PLACEHOLDER_CLASS}`;
+  placeholder.className = [
+    ...Array.from(media.classList).filter((className) => (
+      className !== HERO_PLACEHOLDER_CLASS
+      && className !== HERO_FLOATING_CLASS
+    )),
+    HERO_PLACEHOLDER_CLASS,
+  ].join(' ');
   placeholder.setAttribute('aria-hidden', 'true');
   media.before(placeholder);
   media.classList.add(HERO_FLOATING_CLASS);
@@ -592,6 +619,7 @@ const initHeroMediaScale = (gsap, ScrollTrigger) => {
       timeline.kill();
       section.classList.remove(HERO_ACTIVE_CLASS);
       section.classList.remove(HERO_DOCKED_CLASS);
+      delete section.dataset.virturaHeroMotionInitialized;
       media.classList.remove(HERO_FLOATING_CLASS);
       placeholder.replaceWith(media);
       gsap.set(media, {
@@ -766,39 +794,49 @@ export const initMotion = async () => {
     return;
   }
 
-  const { gsap, ScrollTrigger } = await loadGsap();
-
-  if (!removeSmoothScrollListener) {
-    removeSmoothScrollListener = addSmoothScrollListener(ScrollTrigger.update);
-  }
-
-  if (reducedMotionMedia.matches) {
-    document.documentElement.classList.remove('virtura-motion-ready');
-    clearAnimations();
-    resetMotionElements();
-    resetCategoryRevealElements();
-    resetOptionMotionElements();
+  if (motionInitializing) {
     return;
   }
 
-  initHeroMediaScale(gsap, ScrollTrigger);
-  initScrollReveal(gsap, motionElements);
-  initCategoryBlockReveal(gsap, categoryBlocks);
-  initOptionBlockMotion(gsap, ScrollTrigger, optionBlocks);
+  motionInitializing = true;
 
-  if (reducedMotionMedia.matches) {
-    document.documentElement.classList.remove('virtura-motion-ready');
-    clearAnimations();
-    resetMotionElements();
-    resetCategoryRevealElements();
-    resetOptionMotionElements();
-    return;
+  try {
+    const { gsap, ScrollTrigger } = await loadGsap();
+
+    if (!removeSmoothScrollListener) {
+      removeSmoothScrollListener = addSmoothScrollListener(ScrollTrigger.update);
+    }
+
+    if (reducedMotionMedia.matches) {
+      document.documentElement.classList.remove('virtura-motion-ready');
+      clearAnimations();
+      resetMotionElements();
+      resetCategoryRevealElements();
+      resetOptionMotionElements();
+      return;
+    }
+
+    initHeroMediaScale(gsap, ScrollTrigger);
+    initScrollReveal(gsap, motionElements);
+    initCategoryBlockReveal(gsap, categoryBlocks);
+    initOptionBlockMotion(gsap, ScrollTrigger, optionBlocks);
+
+    if (reducedMotionMedia.matches) {
+      document.documentElement.classList.remove('virtura-motion-ready');
+      clearAnimations();
+      resetMotionElements();
+      resetCategoryRevealElements();
+      resetOptionMotionElements();
+      return;
+    }
+
+    ScrollTrigger.sort();
+    ScrollTrigger.refresh();
+    document.documentElement.classList.add('virtura-motion-ready');
+    motionInitialized = true;
+  } finally {
+    motionInitializing = false;
   }
-
-  ScrollTrigger.sort();
-  ScrollTrigger.refresh();
-  document.documentElement.classList.add('virtura-motion-ready');
-  motionInitialized = true;
 };
 
 if ('addEventListener' in reducedMotionMedia) {

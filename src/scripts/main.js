@@ -11,6 +11,24 @@ const MOTION_SELECTOR = [
 ].join(', ');
 let videoOptimizationInitialized = false;
 
+const nextAnimationFrame = () => new Promise((resolve) => {
+  window.requestAnimationFrame(resolve);
+});
+
+const waitForStableLayout = async () => {
+  if (document.fonts?.ready) {
+    await Promise.race([
+      document.fonts.ready.catch(() => {}),
+      new Promise((resolve) => window.setTimeout(resolve, 2500)),
+    ]);
+  }
+
+  // Safari and Firefox can keep recalculating viewport/font metrics for one
+  // frame after the intro overlay and its scroll lock are removed.
+  await nextAnimationFrame();
+  await nextAnimationFrame();
+};
+
 const getNormalizedPath = () => {
   const path = window.location.pathname || '/';
 
@@ -87,11 +105,6 @@ const initPageFeatures = () => Promise.allSettled([
     'initBookingCalendar',
   ),
   loadFeature(
-    '.section_category .category-wrapper',
-    () => import('./category-stack.js'),
-    'initCategoryStack',
-  ),
-  loadFeature(
     '.faq-block',
     () => import('./faq-accordion.js'),
     'initFaqAccordion',
@@ -123,22 +136,34 @@ const initPageFeatures = () => Promise.allSettled([
   ),
 ]);
 
-const initScrollFeatures = () => {
-  const smoothScrollReady = import('./smooth-scroll.js')
-    .then(({ initSmoothScroll }) => initSmoothScroll());
-  const motionReady = loadFeature(
+const initScrollFeatures = async () => {
+  await import('./smooth-scroll.js')
+    .then(({ initSmoothScroll }) => initSmoothScroll())
+    .catch(() => {});
+
+  await waitForStableLayout();
+
+  // The category stack changes document geometry. Initialize it before GSAP
+  // measures ScrollTrigger start/end positions, never while intro is hidden.
+  await loadFeature(
+    '.section_category .category-wrapper',
+    () => import('./category-stack.js'),
+    'initCategoryStack',
+  ).catch(() => {});
+
+  await waitForStableLayout();
+
+  await loadFeature(
     MOTION_SELECTOR,
     () => import('./motion.js'),
     'initMotion',
-  );
+  ).catch(() => {});
 
-  void Promise.allSettled([smoothScrollReady, motionReady]).then(() => {
-    void loadFeature(
-      '.section_hero .skip',
-      () => import('./hero-skip.js'),
-      'initHeroSkip',
-    );
-  });
+  await loadFeature(
+    '.section_hero .skip',
+    () => import('./hero-skip.js'),
+    'initHeroSkip',
+  ).catch(() => {});
 };
 
 const initTheme = () => {
@@ -147,7 +172,9 @@ const initTheme = () => {
   const introReady = startIntro();
 
   void initPageFeatures();
-  void introReady.finally(initScrollFeatures);
+  void introReady.finally(() => {
+    void initScrollFeatures();
+  });
 };
 
 if (document.readyState === 'loading') {

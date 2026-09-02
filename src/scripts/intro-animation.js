@@ -362,6 +362,14 @@ export const initIntroAnimation = async () => {
   const mediaReadyPromise = waitForVideo(heroNativeVideo);
   const unlockIntroScroll = createIntroScrollLock();
   let introStateCleanedUp = false;
+  let introCompleteResolved = false;
+  let introFailsafeTimer;
+  let timeline;
+  let gsap;
+  let resolveIntroComplete = () => {};
+  const introComplete = new Promise((resolve) => {
+    resolveIntroComplete = resolve;
+  });
   const cleanupIntroState = () => {
     if (introStateCleanedUp) {
       return;
@@ -375,28 +383,84 @@ export const initIntroAnimation = async () => {
     releaseHeroVideoPlayback(heroNativeVideo);
     overlay.remove();
   };
-  const introFailsafeTimer = window.setTimeout(
-    cleanupIntroState,
+  const clearIntroElementStyles = () => {
+    if (!gsap) {
+      [headerSurface, heroHeading, heroMedia, heroArrow].forEach((element) => {
+        if (!element) {
+          return;
+        }
+
+        [
+          'clip-path',
+          '-webkit-clip-path',
+          'filter',
+          'opacity',
+          'transform',
+          'visibility',
+        ].forEach((property) => element.style.removeProperty(property));
+      });
+      return;
+    }
+
+    if (headerSurface) {
+      gsap.set(headerSurface, {
+        clearProps: 'clipPath,webkitClipPath,opacity,visibility,transform',
+      });
+    }
+
+    if (heroHeading) {
+      gsap.set(heroHeading, {
+        clearProps: 'clipPath,filter,opacity,visibility,webkitClipPath',
+      });
+    }
+
+    if (heroMedia) {
+      gsap.set(heroMedia, {
+        clearProps: 'clipPath,filter,opacity,scale,transform,visibility,webkitClipPath',
+      });
+    }
+
+    if (heroArrow) {
+      gsap.set(heroArrow, {
+        clearProps: 'opacity,scale,transform,visibility',
+      });
+    }
+  };
+  const finishIntro = (completed) => {
+    if (introCompleteResolved) {
+      return;
+    }
+
+    introCompleteResolved = true;
+    window.clearTimeout(introFailsafeTimer);
+
+    if (!completed) {
+      timeline?.kill();
+    }
+
+    cleanupIntroState();
+    clearIntroElementStyles();
+    resolveIntroComplete(completed);
+  };
+
+  introFailsafeTimer = window.setTimeout(
+    () => finishIntro(false),
     INTRO_FAILSAFE_TIMEOUT,
   );
 
   root.classList.add('virtura-intro-running');
   root.classList.remove(INTRO_PRIME_CLASS);
 
-  let gsap;
-
   try {
     ({ gsap } = await loadGsap());
   } catch (error) {
-    window.clearTimeout(introFailsafeTimer);
-    cleanupIntroState();
-    return;
+    finishIntro(false);
+    return introComplete;
   }
 
   if (reducedMotionMedia.matches) {
-    window.clearTimeout(introFailsafeTimer);
-    cleanupIntroState();
-    return;
+    finishIntro(false);
+    return introComplete;
   }
 
   const logo = overlay.querySelector('[data-intro-logo]');
@@ -412,7 +476,13 @@ export const initIntroAnimation = async () => {
   let arrowRevealed = false;
 
   const revealArrowWhenReady = () => {
-    if (!heroArrow || !mediaReady || !mediaRevealed || arrowRevealed) {
+    if (
+      introCompleteResolved
+      || !heroArrow
+      || !mediaReady
+      || !mediaRevealed
+      || arrowRevealed
+    ) {
       return;
     }
 
@@ -489,45 +559,17 @@ export const initIntroAnimation = async () => {
     });
   }
 
-  let resolveIntroComplete = () => {};
-  const introComplete = new Promise((resolve) => {
-    resolveIntroComplete = resolve;
-  });
-
-  const timeline = gsap.timeline({
+  timeline = gsap.timeline({
     defaults: {
       ease: 'power3.out',
     },
     onComplete: () => {
-      window.clearTimeout(introFailsafeTimer);
-      cleanupIntroState();
-
-      if (headerSurface) {
-        gsap.set(headerSurface, {
-          clearProps:
-            'clipPath,webkitClipPath,opacity,visibility,transform',
-        });
-      }
-
-      if (heroHeading) {
-        gsap.set(heroHeading, {
-          clearProps: 'clipPath,filter,opacity,visibility,webkitClipPath',
-        });
-      }
-
-      if (heroMedia) {
-        gsap.set(heroMedia, {
-          clearProps:
-            'clipPath,filter,opacity,scale,transform,visibility,webkitClipPath',
-        });
-      }
-
-      resolveIntroComplete(true);
+      finishIntro(true);
     },
   });
 
   const releaseMediaGate = () => {
-    if (mediaGateReleased) {
+    if (introCompleteResolved || mediaGateReleased) {
       return;
     }
 
