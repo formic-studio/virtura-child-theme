@@ -1,5 +1,5 @@
-const FILTERS_SCOPE_SELECTOR = '.brxe-fjvljt';
-const SELECT_SELECTOR = `${FILTERS_SCOPE_SELECTOR} > select.brxe-filter-select.dropdown`;
+const FILTERS_SCOPE_SELECTOR = '.brxe-fjvljt, #brxe-ccwslj';
+const SELECT_SELECTOR = `:is(${FILTERS_SCOPE_SELECTOR}) > select.brxe-filter-select.dropdown`;
 const READY_CLASS = 'virtura-filter-select-ready';
 const NATIVE_CLASS = 'virtura-filter-select-native';
 const OPEN_CLASS = 'is-open';

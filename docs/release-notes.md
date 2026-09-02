@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Extended the mobile archive filter scroller through the `padding-global`
+  gutters while keeping its first and last controls aligned with page content.
+  The same full-bleed behavior and native mobile selects now cover both the
+  Realization and Blog archive filter bars.
 - Added touch-friendly horizontal scrolling to the Realization archive filter
   bar below 768px. Mobile uses the accessible native selects so their option
   lists are not clipped by the horizontal scroller, while the custom desktop

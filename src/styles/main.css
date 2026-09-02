@@ -372,24 +372,33 @@ body {
 }
 
 @media (max-width: 767px) {
-  .brxe-fjvljt.brxe-block {
+  :is(.brxe-fjvljt, #brxe-ccwslj).brxe-block {
+    --archive-filter-mobile-gutter: var(--space-16, 1.6rem);
     align-items: center;
+    box-sizing: border-box;
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
+    margin-inline: calc(0px - var(--archive-filter-mobile-gutter));
+    max-width: none !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
     overscroll-behavior-inline: contain;
+    padding-inline: var(--archive-filter-mobile-gutter);
+    scroll-padding-inline: var(--archive-filter-mobile-gutter);
     scrollbar-width: none;
-    width: 100%;
+    width: calc(
+      100% + var(--archive-filter-mobile-gutter) +
+        var(--archive-filter-mobile-gutter)
+    ) !important;
     -webkit-overflow-scrolling: touch;
   }
 
-  .brxe-fjvljt.brxe-block::-webkit-scrollbar {
+  :is(.brxe-fjvljt, #brxe-ccwslj).brxe-block::-webkit-scrollbar {
     display: none;
   }
 
-  .brxe-fjvljt.brxe-block > :is(
+  :is(.brxe-fjvljt, #brxe-ccwslj).brxe-block > :is(
       .brxe-filter-select,
       .virtura-filter-select,
       .brxe-filter-submit
