@@ -1,5 +1,5 @@
 const DEFAULT_BOOKING_URL =
-  'https://calendar.google.com/calendar/appointments/schedules/AcZssZ1m4dzOi1CydW-8YJNPmqf1QpU89tasfXWppfhibAF-MXbvZWaKY-fQ743JqP7-KfjcKxFyJWsK?gv=true';
+  'https://calendar.google.com/calendar/appointments/schedules/AcZssZ3J9Lu_9JXgh8buuWMcm6fziY0Oh-tZx6xYMKO2oRM0hINZf70xy599wrP_j97R2WKkf-pGNwh_?gv=true';
 const EXPLICIT_TRIGGER_SELECTOR =
   '[data-booking-calendar-trigger], .booking-calendar-trigger';
 const FALLBACK_TRIGGER_SELECTOR = '#brx-content .btn-big';
