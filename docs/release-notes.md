@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added a `Proporcja 1:1` help note below every image field in the realization
+  slider editor.
 - Added a lazy Google Calendar appointment modal for the Contact page. The
   existing `.btn-big` whose text refers to a meeting, reservation or calendar
   opens the supplied test schedule without rendering Google's own button. For

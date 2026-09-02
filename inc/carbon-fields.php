@@ -109,7 +109,10 @@ function virtura_child_theme_register_realization_carbon_fields(): void {
 								'slide_image',
 								__( 'Zdjęcie', 'virtura-child-theme' )
 							)
-								->set_value_type( 'id' ),
+								->set_value_type( 'id' )
+								->set_help_text(
+									__( 'Proporcja 1:1', 'virtura-child-theme' )
+								),
 							\Carbon_Fields\Field::make(
 								'text',
 								'slide_title',
