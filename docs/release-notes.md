@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Added a lazy Google Calendar appointment modal for the Contact page. The
+  existing `.btn-big` whose text refers to a meeting, reservation or calendar
+  opens the supplied test schedule without rendering Google's own button. For
+  an unambiguous Bricks setup, add `booking-calendar-trigger` to the intended
+  button. Additional employee buttons can set their own Google Appointment
+  Schedule URL through `data-booking-calendar-url` and an optional modal title
+  through `data-booking-calendar-title`. The iframe connects to Google only
+  after the visitor opens the modal; keyboard activation, Escape/backdrop
+  closing, focus restoration, mobile viewport sizing and reduced motion are
+  supported.
 - Added exclusive playback for the three sound-enabled team videos inside
   `.team-wrapper`. Starting one video pauses the other two while preserving
   their playback positions. Muted autoplay videos elsewhere on the About page

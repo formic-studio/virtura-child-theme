@@ -82,6 +82,11 @@ const initPageFeatures = () => Promise.allSettled([
     'initBlogMobileContent',
   ),
   loadFeature(
+    '[data-booking-calendar-trigger], .booking-calendar-trigger, .btn-big',
+    () => import('./booking-calendar.js'),
+    'initBookingCalendar',
+  ),
+  loadFeature(
     '.section_category .category-wrapper',
     () => import('./category-stack.js'),
     'initCategoryStack',

@@ -817,6 +817,151 @@ body:has(.brxe-pagination) .virtura-archive-pagination {
   transition: color 0.2s ease;
 }
 
+body.virtura-booking-dialog-open {
+  overflow: hidden;
+}
+
+.virtura-booking-dialog {
+  background: var(--color-white, #fff);
+  border: 0;
+  border-radius: var(--space-24, 2.4rem);
+  box-sizing: border-box;
+  color: var(--color-black, #000);
+  height: min(82rem, calc(100dvh - 4.8rem));
+  margin: auto;
+  max-height: none;
+  max-width: none;
+  overflow: hidden;
+  padding: 0;
+  width: min(112rem, calc(100vw - 4.8rem));
+}
+
+.virtura-booking-dialog:not([open]) {
+  display: none;
+}
+
+.virtura-booking-dialog::backdrop {
+  backdrop-filter: blur(0.6rem);
+  background: rgb(0 0 0 / 72%);
+}
+
+.virtura-booking-dialog__surface {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.virtura-booking-dialog__header {
+  align-items: center;
+  border-bottom: 1px solid var(--color-light-grey, #ececec);
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--space-16, 1.6rem);
+  justify-content: space-between;
+  padding: var(--space-16, 1.6rem) var(--space-24, 2.4rem);
+}
+
+.virtura-booking-dialog__title {
+  color: inherit;
+  font-size: clamp(2rem, 2vw, 3.2rem);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.virtura-booking-dialog__close {
+  align-items: center;
+  background: var(--color-light-grey, #ececec);
+  border: 0;
+  border-radius: 50%;
+  color: var(--color-black, #000);
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 4.8rem;
+  justify-content: center;
+  padding: 0;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+  width: 4.8rem;
+}
+
+.virtura-booking-dialog__close:is(:hover, :focus-visible) {
+  background: var(--color-black, #000);
+  color: var(--color-white, #fff);
+}
+
+.virtura-booking-dialog__close:focus-visible {
+  outline: 2px solid var(--color-black, #000);
+  outline-offset: 0.3rem;
+}
+
+.virtura-booking-dialog__close svg {
+  fill: none;
+  height: 2.4rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 2;
+  width: 2.4rem;
+}
+
+.virtura-booking-dialog__frame-wrapper {
+  background: var(--color-white, #fff);
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+}
+
+.virtura-booking-dialog__loading {
+  left: 50%;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.virtura-booking-dialog__frame {
+  background: var(--color-white, #fff);
+  border: 0;
+  display: block;
+  height: 100%;
+  opacity: 0;
+  position: relative;
+  transition: opacity 0.2s ease;
+  width: 100%;
+}
+
+.virtura-booking-dialog__frame-wrapper.is-loaded
+  .virtura-booking-dialog__frame {
+  opacity: 1;
+}
+
+@media (max-width: 767px) {
+  .virtura-booking-dialog {
+    border-radius: 0;
+    height: 100dvh;
+    margin: 0;
+    width: 100vw;
+  }
+
+  .virtura-booking-dialog__header {
+    padding:
+      max(var(--space-12, 1.2rem), env(safe-area-inset-top))
+      max(var(--space-16, 1.6rem), env(safe-area-inset-right))
+      var(--space-12, 1.2rem)
+      max(var(--space-16, 1.6rem), env(safe-area-inset-left));
+  }
+
+  .virtura-booking-dialog__title {
+    font-size: 2rem;
+  }
+
+  .virtura-booking-dialog__close {
+    height: 4.4rem;
+    width: 4.4rem;
+  }
+}
+
 #brx-content
   :is(a.btn-big[href], .btn-big:has(a[href])):not(
     :has(.svg-arrow-block)
@@ -2918,6 +3063,11 @@ body:has(.brxe-pagination) .virtura-archive-pagination {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .virtura-booking-dialog__close,
+  .virtura-booking-dialog__frame {
+    transition: none;
+  }
+
   .tab-options.brxe-block::before {
     transition: none;
   }

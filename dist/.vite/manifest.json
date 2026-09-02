@@ -1,6 +1,6 @@
 {
-  "_animation-runtime-BsnrUghM.js": {
-    "file": "assets/animation-runtime-BsnrUghM.js",
+  "_animation-runtime-Bu7dy3aP.js": {
+    "file": "assets/animation-runtime-Bu7dy3aP.js",
     "name": "animation-runtime",
     "imports": [
       "src/scripts/main.js"
@@ -30,12 +30,12 @@
     "isDynamicEntry": true
   },
   "src/scripts/about-slider.js": {
-    "file": "assets/about-slider-CofOigz5.js",
+    "file": "assets/about-slider-B41pEH4F.js",
     "name": "about-slider",
     "src": "src/scripts/about-slider.js",
     "isDynamicEntry": true,
     "imports": [
-      "_animation-runtime-BsnrUghM.js",
+      "_animation-runtime-Bu7dy3aP.js",
       "src/scripts/main.js"
     ]
   },
@@ -66,6 +66,12 @@
     "src": "src/scripts/blog-mobile-content.js",
     "isDynamicEntry": true
   },
+  "src/scripts/booking-calendar.js": {
+    "file": "assets/booking-calendar-BQDspaLk.js",
+    "name": "booking-calendar",
+    "src": "src/scripts/booking-calendar.js",
+    "isDynamicEntry": true
+  },
   "src/scripts/category-stack.js": {
     "file": "assets/category-stack-H0ZtWJ9W.js",
     "name": "category-stack",
@@ -73,12 +79,12 @@
     "isDynamicEntry": true
   },
   "src/scripts/faq-accordion.js": {
-    "file": "assets/faq-accordion-Db0YJ11I.js",
+    "file": "assets/faq-accordion-wpUrzUDX.js",
     "name": "faq-accordion",
     "src": "src/scripts/faq-accordion.js",
     "isDynamicEntry": true,
     "imports": [
-      "_animation-runtime-BsnrUghM.js",
+      "_animation-runtime-Bu7dy3aP.js",
       "src/scripts/main.js"
     ]
   },
@@ -89,29 +95,29 @@
     "isDynamicEntry": true
   },
   "src/scripts/hero-skip.js": {
-    "file": "assets/hero-skip-B-N3TSdf.js",
+    "file": "assets/hero-skip-krRq4dXx.js",
     "name": "hero-skip",
     "src": "src/scripts/hero-skip.js",
     "isDynamicEntry": true,
     "imports": [
       "src/scripts/motion.js",
       "src/scripts/smooth-scroll.js",
-      "_animation-runtime-BsnrUghM.js",
+      "_animation-runtime-Bu7dy3aP.js",
       "src/scripts/main.js"
     ]
   },
   "src/scripts/intro-animation.js": {
-    "file": "assets/intro-animation-Ds3R0TNP.js",
+    "file": "assets/intro-animation--aPR9IvM.js",
     "name": "intro-animation",
     "src": "src/scripts/intro-animation.js",
     "isDynamicEntry": true,
     "imports": [
-      "_animation-runtime-BsnrUghM.js",
+      "_animation-runtime-Bu7dy3aP.js",
       "src/scripts/main.js"
     ]
   },
   "src/scripts/main.js": {
-    "file": "assets/main-DglaFcsP.js",
+    "file": "assets/main-23_NbqC8.js",
     "name": "main",
     "src": "src/scripts/main.js",
     "isEntry": true,
@@ -121,6 +127,7 @@
       "src/scripts/archive-filters.js",
       "src/scripts/archive-pagination.js",
       "src/scripts/blog-mobile-content.js",
+      "src/scripts/booking-calendar.js",
       "src/scripts/category-stack.js",
       "src/scripts/faq-accordion.js",
       "src/scripts/fit-text.js",
@@ -133,16 +140,16 @@
       "src/scripts/hero-skip.js"
     ],
     "css": [
-      "assets/main-BAojB4we.css"
+      "assets/main-YBxgIgit.css"
     ]
   },
   "src/scripts/motion.js": {
-    "file": "assets/motion-BOLzvB_X.js",
+    "file": "assets/motion-BuoTskL7.js",
     "name": "motion",
     "src": "src/scripts/motion.js",
     "isDynamicEntry": true,
     "imports": [
-      "_animation-runtime-BsnrUghM.js",
+      "_animation-runtime-Bu7dy3aP.js",
       "src/scripts/smooth-scroll.js",
       "src/scripts/main.js"
     ]
@@ -157,22 +164,22 @@
     ]
   },
   "src/scripts/specs-slider.js": {
-    "file": "assets/specs-slider-tBg5oJMb.js",
+    "file": "assets/specs-slider-BsJs4SoH.js",
     "name": "specs-slider",
     "src": "src/scripts/specs-slider.js",
     "isDynamicEntry": true,
     "imports": [
-      "_animation-runtime-BsnrUghM.js",
+      "_animation-runtime-Bu7dy3aP.js",
       "src/scripts/main.js"
     ]
   },
   "src/scripts/testimonials-slider.js": {
-    "file": "assets/testimonials-slider-BwlNFzeN.js",
+    "file": "assets/testimonials-slider-BM_2fghm.js",
     "name": "testimonials-slider",
     "src": "src/scripts/testimonials-slider.js",
     "isDynamicEntry": true,
     "imports": [
-      "_animation-runtime-BsnrUghM.js",
+      "_animation-runtime-Bu7dy3aP.js",
       "src/scripts/main.js"
     ]
   },
