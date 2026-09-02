@@ -789,6 +789,21 @@ body:has(.brxe-pagination) .virtura-archive-pagination {
   color: var(--color-white, #fff);
 }
 
+#brx-content .brxe-form .message {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+#brx-content .brxe-form .message.success {
+  color: var(--color-white, #fff);
+}
+
+#brx-content .brxe-form .message.error {
+  color: var(--color-error, #ff5364);
+}
+
 #brx-content .btn-big {
   background-image: none;
   transition:
