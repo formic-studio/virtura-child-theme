@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Fixed realization detail layouts overflowing horizontally on mobile. The
+  `.grid-case-img` gallery and `.grid-overview` content now form a true
+  single-column stack below 768px; stale desktop grid placement, wrapping and
+  height constraints can no longer create off-screen flex columns.
 - Stabilized the homepage in Safari and Firefox. Category-stack and GSAP
   measurements now start only after the intro, fonts and two complete layout
   frames are ready. The intro failsafe always removes the scroll lock, clears

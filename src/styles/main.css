@@ -3062,6 +3062,62 @@ body.virtura-booking-dialog-open {
   .tabs-wrapper.brxe-block .tab-content.brxe-block > .dot {
     margin-top: 0.75em;
   }
+
+  /*
+   * Bricks keeps `flex-wrap: wrap` and the desktop height constraints when
+   * these realization grids switch from CSS Grid to flex. In a column flex
+   * container that creates additional columns to the right of the viewport.
+   */
+  .grid-overview.brxe-block,
+  .grid-case-img.brxe-block {
+    align-items: stretch !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    height: auto !important;
+    max-height: none !important;
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .grid-overview.brxe-block > .overview-item,
+  .grid-case-img.brxe-block > * {
+    align-self: stretch !important;
+    flex: 0 0 auto !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .grid-overview.brxe-block > .overview-item,
+  .overview-block-info.brxe-block {
+    flex-wrap: nowrap !important;
+    height: auto !important;
+    max-height: none !important;
+    min-width: 0 !important;
+  }
+
+  .overview-block-info.brxe-block,
+  .overview-block-info.brxe-block > *,
+  .grid-case-img.brxe-block > .brxe-image {
+    box-sizing: border-box;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .overview-block-info.brxe-block > * {
+    flex-wrap: nowrap !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+  }
+
+  .grid-case-img.brxe-block > .brxe-image {
+    display: block;
+    height: auto !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
