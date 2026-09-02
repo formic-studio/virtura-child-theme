@@ -1466,6 +1466,8 @@ body.virtura-booking-dialog-open {
   background-position: left center !important;
   background-repeat: no-repeat !important;
   background-size: 0% 100% !important;
+  color: var(--header-cta-fg) !important;
+  text-decoration: none;
   transition: var(--btn-hover-transition) !important;
 }
 
