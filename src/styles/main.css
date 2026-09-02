@@ -371,6 +371,34 @@ body {
   }
 }
 
+@media (max-width: 767px) {
+  .brxe-fjvljt.brxe-block {
+    align-items: center;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: none;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .brxe-fjvljt.brxe-block::-webkit-scrollbar {
+    display: none;
+  }
+
+  .brxe-fjvljt.brxe-block > :is(
+      .brxe-filter-select,
+      .virtura-filter-select,
+      .brxe-filter-submit
+    ) {
+    flex: 0 0 auto !important;
+    max-width: none !important;
+  }
+}
+
 .archive-grid {
   --archive-grid-gap: var(--space-24, 2.4rem);
   display: grid;

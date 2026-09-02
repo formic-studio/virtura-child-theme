@@ -3,6 +3,7 @@ const SELECT_SELECTOR = `${FILTERS_SCOPE_SELECTOR} > select.brxe-filter-select.d
 const READY_CLASS = 'virtura-filter-select-ready';
 const NATIVE_CLASS = 'virtura-filter-select-native';
 const OPEN_CLASS = 'is-open';
+const mobileFiltersMediaQuery = window.matchMedia('(max-width: 767px)');
 
 let activeDropdown = null;
 let documentListenersReady = false;
@@ -249,6 +250,13 @@ const hideNativeSelect = (select) => {
   select.tabIndex = -1;
 };
 
+const showNativeSelect = (select) => {
+  getExistingDropdown(select)?.remove();
+  select.classList.remove(READY_CLASS, NATIVE_CLASS);
+  select.removeAttribute('aria-hidden');
+  select.removeAttribute('tabindex');
+};
+
 const removeAdjacentDuplicateDropdowns = (dropdown) => {
   let nextElement = dropdown.nextElementSibling;
 
@@ -313,6 +321,16 @@ const initSelect = (select, seenFilterKeys) => {
 };
 
 const syncFilterControls = () => {
+  if (mobileFiltersMediaQuery.matches) {
+    document.querySelectorAll(FILTERS_SCOPE_SELECTOR).forEach((scope) => {
+      scope.querySelectorAll('.virtura-filter-select').forEach((dropdown) => dropdown.remove());
+    });
+
+    document.querySelectorAll(SELECT_SELECTOR).forEach(showNativeSelect);
+    activeDropdown = null;
+    return;
+  }
+
   const seenFilterKeys = new Set();
 
   document.querySelectorAll(FILTERS_SCOPE_SELECTOR).forEach((scope) => {
@@ -345,6 +363,12 @@ const initDocumentListeners = () => {
 
   document.addEventListener('bricks/ajax/query_result/displayed', syncFilterControls);
   document.addEventListener('bricks/ajax/end', syncFilterControls);
+
+  if (typeof mobileFiltersMediaQuery.addEventListener === 'function') {
+    mobileFiltersMediaQuery.addEventListener('change', syncFilterControls);
+  } else {
+    mobileFiltersMediaQuery.addListener(syncFilterControls);
+  }
 
   documentListenersReady = true;
 };

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added touch-friendly horizontal scrolling to the Realization archive filter
+  bar below 768px. Mobile uses the accessible native selects so their option
+  lists are not clipped by the horizontal scroller, while the custom desktop
+  dropdowns remain unchanged.
 - Fixed realization detail layouts overflowing horizontally on mobile. The
   `.grid-case-img` gallery and `.grid-overview` content now form a true
   single-column stack below 768px; stale desktop grid placement, wrapping and
