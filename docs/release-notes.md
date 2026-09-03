@@ -5,6 +5,9 @@
 - Added a permanently visible, centred play icon to the team videos on tablet
   and touch devices. The icon disappears during playback, while the existing
   custom hover cursor remains unchanged on desktop.
+- Extended the mobile team slider through both `padding-global` gutters. Its
+  first and last cards remain aligned with the page content at their snap
+  positions, while cards being swiped can use the full viewport width.
 - Extended the mobile archive filter scroller through the `padding-global`
   gutters while keeping its first and last controls aligned with page content.
   The same full-bleed behavior and native mobile selects now cover both the
