@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added a permanently visible, centred play icon to the team videos on tablet
+  and touch devices. The icon disappears during playback, while the existing
+  custom hover cursor remains unchanged on desktop.
 - Extended the mobile archive filter scroller through the `padding-global`
   gutters while keeping its first and last controls aligned with page content.
   The same full-bleed behavior and native mobile selects now cover both the

@@ -2387,6 +2387,39 @@ body.virtura-booking-dialog-open {
   outline-offset: var(--space-4, 0.4rem);
 }
 
+/*
+ * Desktop communicates the video action through the custom cursor above.
+ * Touch devices have no hover state or visible cursor, so expose the same
+ * play affordance in the centre of each team portrait until playback starts.
+ */
+@media (max-width: 991px), (hover: none), (pointer: coarse) {
+  .team-wrapper .video-about {
+    position: relative;
+  }
+
+  .team-wrapper .video-about::after {
+    aspect-ratio: 1;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M30%2060C46.5685%2060%2060%2046.5685%2060%2030C60%2013.4315%2046.5685%200%2030%200C13.4315%200%200%2013.4315%200%2030C0%2046.5685%2013.4315%2060%2030%2060Z%22%20fill%3D%22white%22%20fill-opacity%3D%220.7%22%2F%3E%3Cpath%20d%3D%22M24%2017L43%2030L24%2043V17Z%22%20fill%3D%22%23848484%22%2F%3E%3C%2Fsvg%3E");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    content: "";
+    left: 50%;
+    opacity: 1;
+    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.2s ease;
+    width: clamp(4.8rem, 12vw, 6rem);
+    z-index: 2;
+  }
+
+  .team-wrapper .video-about.is-video-playing::after {
+    opacity: 0;
+  }
+}
+
 .text-overview,
 .fit-text-to-box {
   display: block;
