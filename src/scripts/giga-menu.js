@@ -31,7 +31,6 @@ const MOBILE_SURFACE_OPEN_HEIGHT_PROPERTY =
   '--virtura-mobile-menu-surface-open-height';
 const MOBILE_MENU_MIN_HEIGHT = 160;
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
-const MOBILE_CATEGORY_ORDER = ['detailing', 'design', 'selection', 'tuning'];
 
 let mobileMenuInstanceCount = 0;
 
@@ -123,30 +122,6 @@ const getDirectLink = (item) =>
   item.querySelector(':scope > a, :scope > .brx-submenu-toggle > a');
 
 const normalizeText = (value = '') => value.replace(/\s+/g, ' ').trim();
-
-const getMobileCategoryLabel = (sourceLink) =>
-  normalizeText(sourceLink?.textContent || '').replace(/^VC\s+/i, '');
-
-const getMobileCategorySortIndex = (item) => {
-  const link = getDirectLink(item);
-  const label = getMobileCategoryLabel(link).toLowerCase();
-  const index = MOBILE_CATEGORY_ORDER.indexOf(label);
-
-  return index === -1 ? MOBILE_CATEGORY_ORDER.length : index;
-};
-
-const getMobileServiceItems = (trigger) =>
-  getDirectSubmenuItems(trigger)
-    .map((item, index) => ({ index, item }))
-    .sort((first, second) => {
-      const firstOrder = getMobileCategorySortIndex(first.item);
-      const secondOrder = getMobileCategorySortIndex(second.item);
-
-      return firstOrder === secondOrder
-        ? first.index - second.index
-        : firstOrder - secondOrder;
-    })
-    .map(({ item }) => item);
 
 const getMobileTopLevelItems = (root, trigger) =>
   Array.from(root.querySelectorAll('.bricks-nav-menu > .menu-item')).filter(
@@ -254,7 +229,7 @@ const createMobileAccordionItem = (sourceItem, index, instanceId) => {
 
   const childItems = getDirectSubmenuItems(sourceItem);
   const element = document.createElement('div');
-  const categoryLabel = getMobileCategoryLabel(sourceLink);
+  const categoryLabel = normalizeText(sourceLink.textContent);
 
   element.className = 'virtura-mobile-giga-menu__item';
 
@@ -519,7 +494,7 @@ const initMobileGigaMenu = (root, header, panel, trigger) => {
     return;
   }
 
-  const serviceItems = getMobileServiceItems(trigger);
+  const serviceItems = getDirectSubmenuItems(trigger);
   const topLevelItems = getMobileTopLevelItems(root, trigger);
 
   if (!serviceItems.length && !topLevelItems.length) {

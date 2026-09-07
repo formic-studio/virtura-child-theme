@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Fixed the mobile header menu to preserve the WordPress services order and
+  full category labels, including `VC Design` and `VC Selection`, just like
+  the desktop giga menu.
 - Added a permanently visible, centred play icon to the team videos on tablet
   and touch devices. The icon disappears during playback, while the existing
   custom hover cursor remains unchanged on desktop.
