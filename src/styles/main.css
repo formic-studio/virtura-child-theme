@@ -2545,7 +2545,17 @@ body.virtura-booking-dialog-open {
 
   .specs-slider.virtura-specs-slider-ready .specs-wrapper {
     box-sizing: border-box;
-    padding-inline: var(--virtura-spec-mobile-gutter, var(--space-16, 1.6rem));
+    padding-inline-start: var(
+      --virtura-spec-mobile-gutter,
+      var(--space-16, 1.6rem)
+    );
+    padding-inline-end: max(
+      var(--virtura-spec-mobile-gutter, var(--space-16, 1.6rem)),
+      calc(
+        100% + var(--virtura-spec-mobile-gutter, var(--space-16, 1.6rem)) -
+          var(--virtura-spec-item-width, 100%)
+      )
+    );
   }
 
   .specs-slider .specs-wrapper .spec-top {

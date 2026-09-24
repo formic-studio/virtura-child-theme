@@ -81,8 +81,10 @@ const setItemWidth = (track, items) => {
   const paddingRight = Number.parseFloat(styles.paddingRight) || 0;
   const availableWidth = Math.max(0, trackWidth - paddingLeft - paddingRight);
   const isMobile = window.matchMedia('(max-width: 767px)').matches;
-  const itemWidth = isMobile && items.length > 1
-    ? Math.min(availableWidth, trackWidth * MOBILE_ITEM_WIDTH_RATIO)
+  const itemWidth = isMobile
+    ? items.length > 1
+      ? trackWidth * MOBILE_ITEM_WIDTH_RATIO
+      : Math.max(0, trackWidth - paddingLeft * 2)
     : Math.max(
         0,
         (availableWidth - gap * Math.max(0, visibleItems - 1)) / visibleItems,
