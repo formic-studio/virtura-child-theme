@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Made the closed tablet/mobile navigation white with a subtle shadow from the
+  first render. Its logo, links and menu toggle now stay black on that solid
+  surface instead of waiting for the scrolled header state.
 - Fixed the mobile header menu to preserve the WordPress services order and
   full category labels, including `VC Design` and `VC Selection`, just like
   the desktop giga menu.

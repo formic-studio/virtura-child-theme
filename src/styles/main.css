@@ -1708,15 +1708,8 @@ body.virtura-booking-dialog-open {
     z-index: 999 !important;
   }
 
-  #brx-header.header-theme-light.header-nav-active:not(
-      .mobile-giga-menu-open
-    ):not(.header-scroll-solid) {
-    --header-fg: var(--color-white, #fff);
-    --header-cta-bg: var(--color-white, #fff);
-    --header-cta-fg: var(--color-black, #000);
-  }
-
-  #brx-header.header-theme-dark.header-nav-active:not(.mobile-giga-menu-open) {
+  #brx-header.header-theme-light:not(.mobile-giga-menu-open),
+  #brx-header.header-theme-dark:not(.mobile-giga-menu-open) {
     --header-fg: var(--color-black, #000);
     --header-cta-bg: var(--color-black, #000);
     --header-cta-fg: var(--color-white, #fff);
@@ -1746,7 +1739,10 @@ body.virtura-booking-dialog-open {
   #brx-header:not(.mobile-giga-menu-open) .nav-wrapper:focus,
   #brx-header:not(.mobile-giga-menu-open) .nav-wrapper:focus-within,
   #brx-header.header-nav-active:not(.mobile-giga-menu-open) .nav-wrapper {
-    background-color: transparent !important;
+    background-color: var(--color-white, #fff) !important;
+    box-shadow:
+      0 0 0 1px rgb(0 0 0 / 3%),
+      0 0.6rem 2.4rem rgb(0 0 0 / 8%);
   }
 
   #brx-header.mobile-giga-menu-open .nav-wrapper,
