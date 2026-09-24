@@ -2,8 +2,8 @@
 
 ## Unreleased
 
-- Removed the visible light border from `.btn-glass` buttons while preserving
-  its width as a transparent border and retaining borders on glass cards.
+- Removed the visible border from arrow blocks nested in `.btn-glass` buttons
+  while retaining the intended glass border around the complete button.
 - Reduced the mobile `.tabs-wrapper` spacing from 4.8rem to the shared 2.4rem
   token, keeping the gaps between its image and content cards consistent.
 - Made the closed tablet/mobile navigation white with a subtle shadow from the

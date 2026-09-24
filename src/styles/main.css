@@ -1106,6 +1106,10 @@ body.virtura-booking-dialog-open {
   position: relative;
 }
 
+.btn-glass .svg-arrow-block {
+  border-color: transparent !important;
+}
+
 .svg-arrow-block.virtura-arrow-motion-ready {
   --virtura-arrow-shift: 100vw;
   --virtura-arrow-enter-x: calc(0px - var(--virtura-arrow-shift));
@@ -2333,7 +2337,6 @@ body.virtura-booking-dialog-open {
 
 .btn-glass {
   background-image: none;
-  border-color: transparent;
   box-shadow: none;
 }
 
