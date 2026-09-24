@@ -2551,6 +2551,16 @@ body.virtura-booking-dialog-open {
   will-change: clip-path;
 }
 
+@media (max-width: 767px) {
+  .offer-block .option-block ~ .btn,
+  .offer-block .virtura-option-button {
+    align-self: stretch !important;
+    box-sizing: border-box;
+    max-width: none !important;
+    width: 100% !important;
+  }
+}
+
 .virtura-option-media-frame {
   overflow: hidden;
 }

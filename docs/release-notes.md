@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Expanded offer buttons following `.option-block` to the full available width
+  below 768px, including when reduced motion prevents the animation helper
+  class from being applied.
 - Removed the visible border from arrow blocks nested in `.btn-glass` buttons
   while retaining the intended glass border around the complete button.
 - Reduced the mobile `.tabs-wrapper` spacing from 4.8rem to the shared 2.4rem
