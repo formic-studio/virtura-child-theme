@@ -2333,6 +2333,7 @@ body.virtura-booking-dialog-open {
 
 .btn-glass {
   background-image: none;
+  border-color: transparent;
   box-shadow: none;
 }
 
