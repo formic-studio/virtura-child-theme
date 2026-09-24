@@ -2532,6 +2532,22 @@ body.virtura-booking-dialog-open {
 }
 
 @media (max-width: 767px) {
+  #brx-content .padding-global .specs-slider.slider.brxe-block {
+    --virtura-spec-mobile-gutter: var(--space-16, 1.6rem);
+
+    margin-inline: calc(0px - var(--virtura-spec-mobile-gutter));
+    max-width: none !important;
+    width: calc(
+      100% + var(--virtura-spec-mobile-gutter) +
+        var(--virtura-spec-mobile-gutter)
+    ) !important;
+  }
+
+  .specs-slider.virtura-specs-slider-ready .specs-wrapper {
+    box-sizing: border-box;
+    padding-inline: var(--virtura-spec-mobile-gutter, var(--space-16, 1.6rem));
+  }
+
   .specs-slider .specs-wrapper .spec-top {
     --virtura-spec-padding-top: clamp(2.8rem, 9vw, 3.6rem);
 

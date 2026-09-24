@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Extended the mobile SPEC slider through the `padding-global` gutters and
+  reduced each option to 84% of the available track width. The first option
+  remains aligned with page content while a visible slice of the next option
+  communicates that the comparison can be swiped.
 - Expanded offer buttons following `.option-block` to the full available width
   below 768px, including when reduced motion prevents the animation helper
   class from being applied.

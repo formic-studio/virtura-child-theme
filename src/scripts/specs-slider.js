@@ -23,6 +23,7 @@ const WHEEL_REARM_DELAY = ANIMATION_DURATION * 1000;
 const WHEEL_REARM_MIN_DELTA = 6;
 const WHEEL_REARM_MIN_INCREASE = 3;
 const WHEEL_REARM_RATIO = 1.65;
+const MOBILE_ITEM_WIDTH_RATIO = 0.84;
 
 const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -75,10 +76,17 @@ const setItemWidth = (track, items) => {
 
   const visibleItems = Math.min(items.length, getItemsPerView());
   const gap = getTrackGap(track);
-  const itemWidth = Math.max(
-    0,
-    (trackWidth - gap * Math.max(0, visibleItems - 1)) / visibleItems,
-  );
+  const styles = getComputedStyle(track);
+  const paddingLeft = Number.parseFloat(styles.paddingLeft) || 0;
+  const paddingRight = Number.parseFloat(styles.paddingRight) || 0;
+  const availableWidth = Math.max(0, trackWidth - paddingLeft - paddingRight);
+  const isMobile = window.matchMedia('(max-width: 767px)').matches;
+  const itemWidth = isMobile && items.length > 1
+    ? Math.min(availableWidth, trackWidth * MOBILE_ITEM_WIDTH_RATIO)
+    : Math.max(
+        0,
+        (availableWidth - gap * Math.max(0, visibleItems - 1)) / visibleItems,
+      );
   const nextValue = `${itemWidth.toFixed(3)}px`;
 
   if (track.style.getPropertyValue('--virtura-spec-item-width') !== nextValue) {
@@ -100,8 +108,13 @@ const getItemOffset = (track, item) => {
 
 const getTrackPositions = (track, items) => {
   const maxOffset = getMaxOffset(track);
-  const positions = items
-    .map((item) => Math.min(getItemOffset(track, item), maxOffset))
+  const itemOffsets = items.map((item) => getItemOffset(track, item));
+  const firstItemOffset = itemOffsets[0] || 0;
+  const positions = itemOffsets
+    .map((position) => Math.min(
+      Math.max(0, position - firstItemOffset),
+      maxOffset,
+    ))
     .filter(
       (position, index, allPositions) =>
         index === 0 ||
