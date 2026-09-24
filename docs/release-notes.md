@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Reduced the mobile `.tabs-wrapper` spacing from 4.8rem to the shared 2.4rem
+  token, keeping the gaps between its image and content cards consistent.
 - Made the closed tablet/mobile navigation white with a subtle shadow from the
   first render. Its logo, links and menu toggle now stay black on that solid
   surface instead of waiting for the scrolled header state.
