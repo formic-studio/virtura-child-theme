@@ -2558,6 +2558,16 @@ body.virtura-booking-dialog-open {
     );
   }
 
+  .specs-slider .slider-paggination {
+    align-self: stretch !important;
+    box-sizing: border-box;
+    padding-inline: var(
+      --virtura-spec-mobile-gutter,
+      var(--space-16, 1.6rem)
+    ) !important;
+    width: 100% !important;
+  }
+
   .specs-slider .specs-wrapper .spec-top {
     --virtura-spec-padding-top: clamp(2.8rem, 9vw, 3.6rem);
 

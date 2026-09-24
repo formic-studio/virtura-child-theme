@@ -112,11 +112,15 @@ const getTrackPositions = (track, items) => {
   const maxOffset = getMaxOffset(track);
   const itemOffsets = items.map((item) => getItemOffset(track, item));
   const firstItemOffset = itemOffsets[0] || 0;
+  const isMobile = window.matchMedia('(max-width: 767px)').matches;
   const positions = itemOffsets
-    .map((position) => Math.min(
-      Math.max(0, position - firstItemOffset),
-      maxOffset,
-    ))
+    .map((position) => {
+      const normalizedPosition = Math.max(0, position - firstItemOffset);
+
+      return isMobile
+        ? normalizedPosition
+        : Math.min(normalizedPosition, maxOffset);
+    })
     .filter(
       (position, index, allPositions) =>
         index === 0 ||
