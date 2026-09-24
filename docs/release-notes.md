@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Generalized archive-filter detection beyond the legacy Bricks element IDs.
+  On mobile, current Realization filters now stay in one swipeable horizontal
+  row and size to their content instead of inheriting full-width controls.
 - Extended the mobile SPEC slider through the `padding-global` gutters and
   reduced each option to 84% of the available track width. The first option
   remains aligned with page content while a visible slice of the next option

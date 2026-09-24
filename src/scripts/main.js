@@ -85,7 +85,7 @@ const initPageFeatures = () => Promise.allSettled([
     'initAboutSlider',
   ),
   loadFeature(
-    '.brxe-fjvljt, #brxe-ccwslj',
+    '.brxe-fjvljt, #brxe-ccwslj, .brxe-block:has(> select.brxe-filter-select.dropdown)',
     () => import('./archive-filters.js'),
     'initArchiveFilters',
   ),
