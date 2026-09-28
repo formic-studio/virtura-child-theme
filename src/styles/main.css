@@ -737,7 +737,8 @@ body:has(.brxe-pagination) .virtura-archive-pagination {
   .archive-grid > .bricks-layout-wrapper > .bricks-layout-item,
   .archive-grid > .bricks-layout-wrapper > .bricks-layout-item:nth-child(5) {
     aspect-ratio: 1 / 1.15;
-    grid-column: auto;
+    grid-column: auto !important;
+    grid-row: auto !important;
   }
 }
 
