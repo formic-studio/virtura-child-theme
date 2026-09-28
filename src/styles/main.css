@@ -665,6 +665,32 @@ body:has(.brxe-pagination) .virtura-archive-pagination {
   }
 }
 
+/*
+ * Blog cards include their date and title below the image, unlike realization
+ * cards whose content overlays a fixed-ratio media tile. Keep the shared
+ * archive grid, but let blog cards grow with their text and clip only the
+ * image wrapper so its rounded corners remain visible at every breakpoint.
+ */
+.archive-grid > .archive-block.blog {
+  aspect-ratio: auto;
+  overflow: visible;
+}
+
+.archive-block.blog > * {
+  height: auto;
+}
+
+.archive-block.blog .blog-wrapper {
+  border-radius: var(--space-24, 2.4rem);
+  overflow: hidden;
+}
+
+.archive-block.blog :where(.archive-img, .archive-img img) {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
 .grid-2-item.archive-grid,
 .grid-2-item .archive-grid,
 .grid-2-item.archive-grid > .bricks-layout-wrapper,
