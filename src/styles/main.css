@@ -484,6 +484,21 @@ body {
   pointer-events: none;
 }
 
+/*
+ * Number badges in realization technology cards are inline SVGs inside a
+ * flex row. Without a fixed flex basis, longer labels shrink the badge and
+ * make each number appear at a different size.
+ */
+#brx-content
+  .contact-info.brxe-block
+  > .brxe-svg[viewBox="0 0 32 26"] {
+  flex: 0 0 3.2rem;
+  height: 2.6rem;
+  max-width: 3.2rem;
+  min-width: 3.2rem;
+  width: 3.2rem;
+}
+
 .archive-grid.is-ajax-updating {
   opacity: 0.55;
   pointer-events: none;
