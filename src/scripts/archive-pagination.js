@@ -3,9 +3,11 @@ const ARCHIVE_GRID_SELECTOR = '.archive-grid';
 const QUERY_TRAIL_SELECTOR = '.brx-query-trail[data-query-element-id][data-query-vars]';
 const ARCHIVE_POST_TYPES = new Set(['post', 'realizacja']);
 const FILTER_CLICK_TYPES = new Set(['active-filters', 'apply', 'reset']);
+const INFINITE_ARCHIVE_MEDIA = window.matchMedia('(max-width: 767px)');
 const pendingPaginationQueries = new Set();
 const revealTimers = new Map();
 const archiveRequests = new Map();
+const infiniteArchiveObservers = new Map();
 
 const PREVIOUS_LABEL = 'Poprzednia strona';
 const NEXT_LABEL = 'Następna strona';
@@ -195,7 +197,60 @@ const replaceArchiveGrid = (queryId, responseContext) => {
   return true;
 };
 
-const loadArchivePage = async (queryId, urlValue, { pushHistory = true } = {}) => {
+const appendArchiveGrid = (queryId, responseContext) => {
+  const archiveGrid = getArchiveGridForQuery(queryId);
+
+  if (!archiveGrid || !(responseContext?.archiveGrid instanceof HTMLElement)) {
+    return null;
+  }
+
+  const responseGrid = responseContext.archiveGrid.cloneNode(true);
+  const responseQueryTrail = Array.from(
+    responseGrid.querySelectorAll(QUERY_TRAIL_SELECTOR),
+  ).find((trail) => trail.dataset.queryElementId === queryId);
+
+  if (!responseQueryTrail) {
+    return null;
+  }
+
+  updateQueryInstanceFromTrail(queryId, responseQueryTrail);
+  responseGrid.querySelectorAll(QUERY_TRAIL_SELECTOR).forEach((queryTrail) => {
+    if (queryTrail.dataset.queryElementId === queryId) {
+      queryTrail.remove();
+    }
+  });
+
+  const targetItemsContainer =
+    archiveGrid.querySelector(':scope > .bricks-layout-wrapper') || archiveGrid;
+  const responseItemsContainer =
+    responseGrid.querySelector(':scope > .bricks-layout-wrapper') || responseGrid;
+  const addedItems = Array.from(responseItemsContainer.children).filter((element) =>
+    element.matches('.archive-block, .bricks-layout-item'),
+  );
+
+  if (!addedItems.length) {
+    return null;
+  }
+
+  addedItems.forEach((item) => {
+    item.removeAttribute('data-brx-loop-start');
+    targetItemsContainer.append(item);
+  });
+
+  document.dispatchEvent(
+    new CustomEvent('bricks/ajax/nodes_added', {
+      detail: { addedNodes: addedItems, queryId },
+    }),
+  );
+
+  return addedItems;
+};
+
+const loadArchivePage = async (
+  queryId,
+  urlValue,
+  { append = false, pushHistory = true } = {},
+) => {
   const queryInstance = window.bricksData?.queryLoopInstances?.[queryId];
 
   if (!queryInstance) {
@@ -209,7 +264,9 @@ const loadArchivePage = async (queryId, urlValue, { pushHistory = true } = {}) =
 
   archiveRequests.set(queryId, controller);
   queryInstance.isLoading = 1;
-  document.dispatchEvent(new CustomEvent('bricks/ajax/start', { detail: { queryId } }));
+  document.dispatchEvent(
+    new CustomEvent('bricks/ajax/start', { detail: { append, queryId } }),
+  );
 
   try {
     const response = await window.fetch(urlValue, {
@@ -224,12 +281,18 @@ const loadArchivePage = async (queryId, urlValue, { pushHistory = true } = {}) =
 
     const responseDocument = new DOMParser().parseFromString(await response.text(), 'text/html');
     const responseContext = getResponseArchiveContext(responseDocument, queryId);
+    const addedItems = append
+      ? appendArchiveGrid(queryId, responseContext || {})
+      : null;
 
-    if (!responseContext || !replaceArchiveGrid(queryId, responseContext)) {
+    if (
+      !responseContext ||
+      (append ? !addedItems : !replaceArchiveGrid(queryId, responseContext))
+    ) {
       throw new Error('Archive query was not found in the response');
     }
 
-    if (pushHistory) {
+    if (pushHistory && !append) {
       window.history.pushState(
         { isVirturaArchivePagination: true, queryId },
         '',
@@ -238,12 +301,34 @@ const loadArchivePage = async (queryId, urlValue, { pushHistory = true } = {}) =
     }
 
     document.dispatchEvent(
-      new CustomEvent('bricks/ajax/query_result/displayed', { detail: { queryId } }),
+      new CustomEvent('bricks/ajax/query_result/displayed', {
+        detail: { addedItems: addedItems || [], append, queryId },
+      }),
     );
-    document.dispatchEvent(new CustomEvent('bricks/ajax/end', { detail: { queryId } }));
+    document.dispatchEvent(
+      new CustomEvent('bricks/ajax/end', { detail: { append, queryId } }),
+    );
   } catch (error) {
     if (error.name !== 'AbortError') {
-      window.location.assign(urlValue);
+      if (append) {
+        const pagination = findPagination(queryId);
+        const loadMoreButton = pagination?.querySelector('.virtura-archive-load-more');
+
+        pagination?.classList.add('has-infinite-error');
+
+        if (loadMoreButton instanceof HTMLButtonElement) {
+          loadMoreButton.disabled = false;
+          loadMoreButton.textContent = 'Spróbuj ponownie';
+        }
+
+        document.dispatchEvent(
+          new CustomEvent('bricks/ajax/end', {
+            detail: { append, error: true, queryId },
+          }),
+        );
+      } else {
+        window.location.assign(urlValue);
+      }
     }
   } finally {
     if (archiveRequests.get(queryId) === controller) {
@@ -264,20 +349,61 @@ const resetQueryToFirstPage = (queryId) => {
   window.history.replaceState(window.history.state, '', getArchivePageUrl(1));
 };
 
-const startArchiveUpdate = (queryId) => {
+const startArchiveUpdate = (queryId, { append = false } = {}) => {
   const archiveGrid = getArchiveGridForQuery(queryId);
   const pagination = findPagination(queryId);
+
+  if (append) {
+    const loadMoreButton = pagination?.querySelector('.virtura-archive-load-more');
+
+    pagination?.classList.remove('has-infinite-error');
+    pagination?.classList.add('is-infinite-loading');
+    pagination?.setAttribute('aria-busy', 'true');
+
+    if (loadMoreButton instanceof HTMLButtonElement) {
+      loadMoreButton.disabled = true;
+      loadMoreButton.textContent = 'Ładowanie…';
+    }
+
+    return;
+  }
 
   archiveGrid?.classList.remove('is-ajax-revealing');
   archiveGrid?.classList.add('is-ajax-updating');
   pagination?.setAttribute('aria-busy', 'true');
 };
 
-const revealArchiveItems = (queryId) => {
+const revealArchiveItems = (queryId, { addedItems = [], append = false } = {}) => {
   const archiveGrid = getArchiveGridForQuery(queryId);
   const pagination = findPagination(queryId);
 
   if (!archiveGrid) {
+    return;
+  }
+
+  if (append) {
+    const shouldReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    pagination?.classList.remove('is-infinite-loading');
+    pagination?.removeAttribute('aria-busy');
+
+    if (!shouldReduceMotion) {
+      addedItems.forEach((item, index) => {
+        item.style.setProperty('--virtura-archive-item-index', String(Math.min(index, 10)));
+        item.classList.add('is-infinite-revealing');
+      });
+
+      window.clearTimeout(revealTimers.get(queryId));
+      revealTimers.set(
+        queryId,
+        window.setTimeout(() => {
+          addedItems.forEach((item) => item.classList.remove('is-infinite-revealing'));
+          revealTimers.delete(queryId);
+        },
+        850),
+      );
+    }
+
     return;
   }
 
@@ -404,7 +530,111 @@ const appendListItem = (list, content) => {
   list.append(item);
 };
 
+const disconnectInfiniteArchiveObserver = (queryId) => {
+  infiniteArchiveObservers.get(queryId)?.disconnect();
+  infiniteArchiveObservers.delete(queryId);
+};
+
+const loadNextArchivePage = (pagination) => {
+  if (!(pagination instanceof HTMLElement) || !INFINITE_ARCHIVE_MEDIA.matches) {
+    return;
+  }
+
+  const queryId = pagination.dataset.queryElementId;
+  const queryInstance = window.bricksData?.queryLoopInstances?.[queryId];
+  const loadMoreButton = pagination.querySelector('.virtura-archive-load-more');
+  const nextPage = Number.parseInt(loadMoreButton?.dataset.nextPage, 10) || 0;
+  const totalPages = Number.parseInt(queryInstance?.maxPages, 10) || 0;
+
+  if (
+    !queryId ||
+    !queryInstance ||
+    queryInstance.isLoading ||
+    nextPage < 2 ||
+    nextPage > totalPages
+  ) {
+    return;
+  }
+
+  disconnectInfiniteArchiveObserver(queryId);
+  void loadArchivePage(queryId, getPageUrl(nextPage), {
+    append: true,
+    pushHistory: false,
+  });
+};
+
+const observeInfiniteArchivePagination = (pagination) => {
+  const queryId = pagination.dataset.queryElementId;
+
+  if (!queryId || infiniteArchiveObservers.has(queryId)) {
+    return;
+  }
+
+  if (!('IntersectionObserver' in window)) {
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        loadNextArchivePage(pagination);
+      }
+    },
+    {
+      rootMargin: '600px 0px',
+      threshold: 0,
+    },
+  );
+
+  observer.observe(pagination);
+  infiniteArchiveObservers.set(queryId, observer);
+};
+
+const renderInfinitePagination = (pagination, currentPage, totalPages) => {
+  const queryId = pagination.dataset.queryElementId;
+
+  pagination.classList.add('is-infinite');
+  pagination.classList.remove('has-infinite-error', 'is-infinite-loading');
+  pagination.removeAttribute('aria-busy');
+  pagination.setAttribute('aria-label', 'Doładowywanie archiwum');
+
+  if (totalPages < 2 || currentPage >= totalPages) {
+    pagination.hidden = true;
+    disconnectInfiniteArchiveObserver(queryId);
+    return;
+  }
+
+  let loadMoreButton = pagination.querySelector('.virtura-archive-load-more');
+
+  if (!(loadMoreButton instanceof HTMLButtonElement)) {
+    loadMoreButton = document.createElement('button');
+    loadMoreButton.className = 'virtura-archive-load-more';
+    loadMoreButton.type = 'button';
+    pagination.replaceChildren(loadMoreButton);
+  }
+
+  pagination.hidden = false;
+  loadMoreButton.dataset.nextPage = String(currentPage + 1);
+  loadMoreButton.disabled = false;
+  loadMoreButton.textContent = 'Załaduj więcej';
+  observeInfiniteArchivePagination(pagination);
+};
+
 const renderPagination = (pagination, currentPage, totalPages) => {
+  if (INFINITE_ARCHIVE_MEDIA.matches) {
+    renderInfinitePagination(pagination, currentPage, totalPages);
+    return;
+  }
+
+  disconnectInfiniteArchiveObserver(pagination.dataset.queryElementId);
+  pagination.classList.remove(
+    'has-infinite-error',
+    'is-infinite',
+    'is-infinite-loading',
+  );
+  pagination.removeAttribute('aria-busy');
+  pagination.setAttribute('aria-label', 'Paginacja archiwum');
+
   if (totalPages < 2) {
     pagination.hidden = true;
     return;
@@ -510,6 +740,16 @@ const handlePaginationClick = (event) => {
     return;
   }
 
+  const loadMoreButton = event.target.closest('.virtura-archive-load-more');
+
+  if (loadMoreButton instanceof HTMLButtonElement) {
+    const pagination = loadMoreButton.closest(PAGINATION_SELECTOR);
+
+    event.preventDefault();
+    loadNextArchivePage(pagination);
+    return;
+  }
+
   const link = event.target.closest(`${PAGINATION_SELECTOR} a.page-numbers`);
 
   if (!(link instanceof HTMLAnchorElement)) {
@@ -520,7 +760,12 @@ const handlePaginationClick = (event) => {
   const queryId = pagination?.dataset.queryElementId;
   const queryInstance = window.bricksData?.queryLoopInstances?.[queryId];
 
-  if (!queryId || !queryInstance || typeof window.fetch !== 'function') {
+  if (
+    INFINITE_ARCHIVE_MEDIA.matches ||
+    !queryId ||
+    !queryInstance ||
+    typeof window.fetch !== 'function'
+  ) {
     return;
   }
 
@@ -560,7 +805,7 @@ const handleFilterInteraction = (event) => {
 };
 
 const handleBrowserHistory = (event) => {
-  if (!event.state?.isVirturaArchivePagination) {
+  if (INFINITE_ARCHIVE_MEDIA.matches || !event.state?.isVirturaArchivePagination) {
     return;
   }
 
@@ -573,7 +818,11 @@ const handleBrowserHistory = (event) => {
 };
 
 const markInitialArchiveHistory = () => {
-  if (getPageNumberFromUrl() <= 1 || window.history.state?.isVirturaArchivePagination) {
+  if (
+    INFINITE_ARCHIVE_MEDIA.matches ||
+    getPageNumberFromUrl() <= 1 ||
+    window.history.state?.isVirturaArchivePagination
+  ) {
     return;
   }
 
@@ -589,6 +838,25 @@ const markInitialArchiveHistory = () => {
   }
 };
 
+const handleArchiveModeChange = () => {
+  const archiveContexts = Array.from(document.querySelectorAll(ARCHIVE_GRID_SELECTOR))
+    .map((archiveGrid) => getArchiveQueryContext(archiveGrid))
+    .filter(Boolean);
+  const contextToReset = archiveContexts.find(
+    ({ queryInstance }) => Number.parseInt(queryInstance?.page, 10) > 1,
+  );
+
+  if (!contextToReset) {
+    ensureArchivePaginations();
+    return;
+  }
+
+  const firstPageUrl = getArchivePageUrl(1);
+
+  window.history.replaceState(window.history.state, '', firstPageUrl);
+  void loadArchivePage(contextToReset.queryId, firstPageUrl, { pushHistory: false });
+};
+
 export const initArchivePagination = () => {
   window.requestAnimationFrame(() => {
     ensureArchivePaginations();
@@ -599,9 +867,16 @@ export const initArchivePagination = () => {
   document.addEventListener('change', handleFilterInteraction, true);
   document.addEventListener('click', handleFilterInteraction, true);
   window.addEventListener('popstate', handleBrowserHistory);
+  if (typeof INFINITE_ARCHIVE_MEDIA.addEventListener === 'function') {
+    INFINITE_ARCHIVE_MEDIA.addEventListener('change', handleArchiveModeChange);
+  } else {
+    INFINITE_ARCHIVE_MEDIA.addListener(handleArchiveModeChange);
+  }
 
   document.addEventListener('bricks/ajax/start', (event) => {
-    startArchiveUpdate(event.detail?.queryId);
+    startArchiveUpdate(event.detail?.queryId, {
+      append: Boolean(event.detail?.append),
+    });
   });
 
   document.addEventListener('bricks/ajax/query_result/displayed', (event) => {
@@ -609,7 +884,10 @@ export const initArchivePagination = () => {
 
     window.requestAnimationFrame(() => {
       ensureArchivePaginations(queryId);
-      revealArchiveItems(queryId);
+      revealArchiveItems(queryId, {
+        addedItems: event.detail?.addedItems || [],
+        append: Boolean(event.detail?.append),
+      });
     });
   });
 };
