@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Disabled the staggered word reveal in shared About-style sliders below
+  768px. Mobile slides now show their complete text immediately while keeping
+  the existing slide and image transitions.
 - Pointed blog post tag links to the designed Blog listing with the matching
   Bricks filter active, instead of opening the unstyled native tag archive.
 - Generalized archive-filter detection beyond the legacy Bricks element IDs.

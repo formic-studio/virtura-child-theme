@@ -31,10 +31,12 @@ const TEXT_WORD_EASE = "sine.out";
 const TEXT_WORD_STAGGER = 0.035;
 const TEXT_FADE_OUT_DURATION = 0.22;
 const SWIPE_THRESHOLD = 40;
+const MOBILE_QUERY = "(max-width: 767px)";
 const HASH_ALIASES = new Map([
   ["ubezpieczenie", "ubezpieczenia"],
 ]);
 
+const mobileMedia = window.matchMedia(MOBILE_QUERY);
 const reducedMotionMedia = window.matchMedia(
   "(prefers-reduced-motion: reduce)",
 );
@@ -304,7 +306,12 @@ const setTextState = (items, index, previousIndex, { animate = true } = {}) => {
     }
   });
 
-  void loadSliderAnimation()
+  const animateWords = !mobileMedia.matches;
+  const animationPromise = animateWords
+    ? loadSliderAnimation()
+    : loadGsap().then(({ gsap }) => ({ gsap, SplitText: null }));
+
+  void animationPromise
     .then(({ gsap, SplitText }) => {
       if (slider && textTransitionTokens.get(slider) !== transitionToken) {
         return;
@@ -315,6 +322,10 @@ const setTextState = (items, index, previousIndex, { animate = true } = {}) => {
 
       slider?.classList.add(GSAP_CLASS);
       gsap.killTweensOf(items);
+
+      if (!animateWords) {
+        items.forEach(revertTextSplit);
+      }
 
       gsap.to(items, {
         duration: ANIMATION_DURATION,
@@ -334,6 +345,11 @@ const setTextState = (items, index, previousIndex, { animate = true } = {}) => {
       }
 
       if (incoming) {
+        if (!animateWords) {
+          gsap.set(incoming, { opacity: 1 });
+          return;
+        }
+
         const split = splitTextWords(SplitText, incoming);
 
         gsap.set(incoming, { opacity: 1 });

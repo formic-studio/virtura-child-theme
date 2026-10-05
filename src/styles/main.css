@@ -2800,6 +2800,12 @@ body.virtura-booking-dialog-open {
   transition: none;
 }
 
+@media (max-width: 767px) {
+  .about-slider .virtura-slider-word {
+    opacity: 1 !important;
+  }
+}
+
 .about-slider.virtura-about-slider-ready .svg-arrow-block {
   cursor: pointer;
   transition:
