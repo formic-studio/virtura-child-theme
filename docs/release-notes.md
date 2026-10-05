@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Pointed blog post tag links to the designed Blog listing with the matching
+  Bricks filter active, instead of opening the unstyled native tag archive.
 - Generalized archive-filter detection beyond the legacy Bricks element IDs.
   On mobile, current Realization filters now stay in one swipeable horizontal
   row and size to their content instead of inheriting full-width controls.

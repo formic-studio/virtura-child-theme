@@ -19,3 +19,4 @@ require_once VIRTURA_CHILD_THEME_PATH . '/inc/media-optimization.php';
 require_once VIRTURA_CHILD_THEME_PATH . '/inc/video-optimization.php';
 require_once VIRTURA_CHILD_THEME_PATH . '/inc/accessibility-images.php';
 require_once VIRTURA_CHILD_THEME_PATH . '/inc/archive-pagination.php';
+require_once VIRTURA_CHILD_THEME_PATH . '/inc/blog-tags.php';
