@@ -6,6 +6,8 @@ const HERO_SECTION_SELECTOR = '.section_hero';
 const CONTENT_SECTION_SELECTOR = '#brx-content .brxe-section';
 const READY_ATTRIBUTE = 'data-virtura-hero-skip';
 const SKIP_DURATION = 0.8;
+const HEADER_HIDE_EVENT = 'virtura:hero-skip-start';
+const HEADER_RELEASE_EVENT = 'virtura:hero-skip-complete';
 
 const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -73,6 +75,7 @@ const setupSkipControl = (control) => {
 
     isSkipping = true;
     control.classList.add('is-skipping');
+    window.dispatchEvent(new CustomEvent(HEADER_HIDE_EVENT));
 
     scrollToPosition(target, {
       duration: SKIP_DURATION,
@@ -80,6 +83,7 @@ const setupSkipControl = (control) => {
       onComplete: () => {
         isSkipping = false;
         control.classList.remove('is-skipping');
+        window.dispatchEvent(new CustomEvent(HEADER_RELEASE_EVENT));
       },
     });
   };

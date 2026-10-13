@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Hid the fixed header with its existing upward transition when the homepage
+  hero skip arrow is activated. The header stays hidden throughout the
+  programmatic scroll and returns to the normal direction-aware behavior after
+  the destination section is reached.
 - Disabled the staggered word reveal in shared About-style sliders below
   768px. Mobile slides now show their complete text immediately while keeping
   the existing slide and image transitions.

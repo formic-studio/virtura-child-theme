@@ -7,6 +7,8 @@ const HIDE_DISTANCE = 24;
 const HERO_MEDIA_SELECTOR = '.hero-video';
 const HERO_MOTION_QUERY = '(min-width: 768px)';
 const HERO_SECTION_SELECTOR = '.section_hero';
+const HERO_SKIP_START_EVENT = 'virtura:hero-skip-start';
+const HERO_SKIP_COMPLETE_EVENT = 'virtura:hero-skip-complete';
 const INTENT_TTL = 2000;
 const SHOW_DISTANCE = 28;
 const STICKY_CONFLICT_SELECTOR = '.specs-slider .spec-top';
@@ -106,6 +108,7 @@ export const initHeaderScroll = () => {
   let isHidden = header.classList.contains('header-scroll-hidden');
   let lastIntent = null;
   let lastIntentAt = 0;
+  let isProgrammaticHideActive = false;
   let touchY = null;
 
   header.classList.add('header-scroll-ready');
@@ -150,6 +153,16 @@ export const initHeaderScroll = () => {
 
     const currentY = Math.max(0, window.scrollY);
     const hideOffset = getHideOffset(configuredHideOffset, heroExitTarget);
+
+    if (isProgrammaticHideActive) {
+      if (!isHidden || revealFrame !== null) {
+        hideHeader();
+      }
+
+      previousY = currentY;
+      peakY = currentY;
+      return;
+    }
 
     if (currentY <= HIDE_DISTANCE) {
       header.classList.remove(HEADER_SOLID_CLASS);
@@ -229,6 +242,17 @@ export const initHeaderScroll = () => {
   window.addEventListener('scroll', scheduleUpdate, { passive: true });
   window.addEventListener('resize', scheduleUpdate, { passive: true });
   window.addEventListener('orientationchange', scheduleUpdate, { passive: true });
+  window.addEventListener(HERO_SKIP_START_EVENT, () => {
+    isProgrammaticHideActive = true;
+    setIntent('down');
+    hideHeader();
+  });
+  window.addEventListener(HERO_SKIP_COMPLETE_EVENT, () => {
+    isProgrammaticHideActive = false;
+    previousY = Math.max(0, window.scrollY);
+    peakY = previousY;
+    scheduleUpdate();
+  });
   window.addEventListener(
     'wheel',
     (event) => {
