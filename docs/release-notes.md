@@ -3,11 +3,13 @@
 ## Unreleased
 
 - Made the homepage category card stack height-aware between 768px and 1440px.
-  Shorter viewports now use compact white service buttons and adaptive sticky
-  offsets while retaining the original image size and stack-exit behavior.
+  Shorter viewports now use adaptive sticky offsets while retaining the
+  original service-button and image sizes.
   The wrapper gap adds more scroll distance before the next card joins the
   stack. Category entrance motion is now limited to the image; headings and
-  all card buttons remain static.
+  all card buttons remain static. The final category card remains anchored in
+  the document flow so scrolling the stack does not change the visual spacing
+  before the following section.
 - Hid the fixed header with its existing upward transition when the homepage
   hero skip arrow is activated. The header stays hidden throughout the
   programmatic scroll and returns to the normal direction-aware behavior after

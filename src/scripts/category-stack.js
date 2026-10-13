@@ -141,6 +141,15 @@ const getStackLiftProgress = (stack, stackLifts) => {
 };
 
 const getCardStackLift = (stack, cardIndex, stackLift) => {
+  const lastIndex = stack.cards.length - 1;
+
+  // The final card is the visual anchor for the following section. Moving it
+  // with a transform changes the apparent gap below the stack even though its
+  // layout position stays unchanged.
+  if (cardIndex === lastIndex) {
+    return 0;
+  }
+
   if (Math.abs(stackLift) <= EXIT_THRESHOLD) {
     return 0;
   }
@@ -183,12 +192,14 @@ const applyStackLift = (stack, stackLift) => {
     card.style.setProperty('--virtura-category-stack-lift-y', `${cardLift}px`);
   });
 
-  if (Math.abs(stackLift) <= EXIT_THRESHOLD) {
+  const layoutLift = stack.appliedStackLifts[stack.appliedStackLifts.length - 1] ?? 0;
+
+  if (Math.abs(layoutLift) <= EXIT_THRESHOLD) {
     stack.wrapper.style.removeProperty('--virtura-category-stack-layout-y');
     return;
   }
 
-  stack.wrapper.style.setProperty('--virtura-category-stack-layout-y', `${stackLift}px`);
+  stack.wrapper.style.setProperty('--virtura-category-stack-layout-y', `${layoutLift}px`);
 };
 
 const updateStack = (stack) => {

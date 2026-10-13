@@ -2964,20 +2964,13 @@ body.virtura-booking-dialog-open {
 
   .section_category .subcategory-block {
     flex: 1 1 0;
-    max-width: 44rem;
+    max-width: 50rem;
     min-width: 0;
     row-gap: clamp(0.8rem, 1.5vh, 1.6rem) !important;
   }
 
   .section_category .subcategory-block .btn {
-    font-size: clamp(1.4rem, 1.6vw, 1.8rem) !important;
-    padding: clamp(0.8rem, 1.5vh, 1.6rem) clamp(1.2rem, 2vw, 2rem) !important;
     width: 100% !important;
-  }
-
-  .section_category .subcategory-block .btn .svg-arrow-block {
-    border-radius: 0.6rem;
-    padding: 0.6rem 0.9rem;
   }
 
   .section_category .category-img {
