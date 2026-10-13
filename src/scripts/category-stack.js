@@ -21,12 +21,6 @@ const desktopMedia = window.matchMedia(DESKTOP_MEDIA_QUERY);
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
-const getStackLiftEntryDistance = () => clamp(
-  window.innerHeight * STACK_LIFT_ENTRY_VIEWPORT_RATIO,
-  STACK_LIFT_ENTRY_MIN,
-  STACK_LIFT_ENTRY_MAX,
-);
-
 const getCards = (wrapper) => Array.from(wrapper.children)
   .filter((child) => child.classList.contains(CARD_CLASS));
 
@@ -112,8 +106,8 @@ const getCardTopWithoutTransforms = (stack, cardIndex, stackLifts) => (
 const getStackLiftProgress = (stack, stackLifts) => {
   const startIndex = 1;
   const start = stack.stickyScrolls[startIndex];
-  const lastStickyScroll = stack.stickyScrolls[stack.stickyScrolls.length - 1];
-  const end = lastStickyScroll - getStackLiftEntryDistance();
+  const end = stack.stickyScrolls[stack.stickyScrolls.length - 1];
+  const plannedDistance = end - start;
 
   if (!stack.cards[startIndex] || !Number.isFinite(start) || !Number.isFinite(end)) {
     return 0;
@@ -131,10 +125,10 @@ const getStackLiftProgress = (stack, stackLifts) => {
     stack.liftStartScroll = window.scrollY;
   }
 
-  const distance = end - stack.liftStartScroll;
+  const distance = plannedDistance > 0 ? plannedDistance : window.innerHeight * 0.5;
 
   if (distance <= 0) {
-    return 1;
+    return 0;
   }
 
   const progress = clamp((window.scrollY - stack.liftStartScroll) / distance, 0, 1);
@@ -161,10 +155,13 @@ const getCardStackLift = (stack, cardIndex, stackLift) => {
     return 0;
   }
 
-  const entryDistance = getStackLiftEntryDistance();
-  const entryStart = stickyScroll - entryDistance;
+  const entryDistance = clamp(
+    window.innerHeight * STACK_LIFT_ENTRY_VIEWPORT_RATIO,
+    STACK_LIFT_ENTRY_MIN,
+    STACK_LIFT_ENTRY_MAX,
+  );
   const entryProgress = clamp(
-    (window.scrollY - entryStart) / entryDistance,
+    (window.scrollY - stickyScroll) / entryDistance,
     0,
     1,
   );
