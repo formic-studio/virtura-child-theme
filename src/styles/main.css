@@ -2897,7 +2897,6 @@ body.virtura-booking-dialog-open {
 
 .section_category .category-wrapper.virtura-category-stack-ready {
   isolation: isolate;
-  margin-bottom: var(--virtura-category-stack-layout-y, 0px);
 }
 
 .section_category .category-block {
@@ -3180,14 +3179,7 @@ body.virtura-booking-dialog-open {
 .section_category
   .category-wrapper.virtura-category-stack-ready
   > .category-block {
-  transform: translate3d(
-    0,
-    calc(
-      var(--virtura-category-stack-lift-y, 0px) +
-        var(--virtura-category-stack-exit-y, 0px)
-    ),
-    0
-  );
+  transform: translate3d(0, var(--virtura-category-stack-exit-y, 0px), 0);
   will-change: transform;
   z-index: var(--virtura-category-stack-index, 1);
 }
