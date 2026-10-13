@@ -7,7 +7,9 @@
   image sizes.
   The wrapper gap adds more scroll distance before the next card joins the
   stack. Category entrance motion is now limited to the image; headings and
-  all card buttons remain static.
+  all card buttons remain static. The progressive stack lift still begins
+  after the second card stacks, but now reaches its final position before the
+  last card enters its sticky stop, preventing late movement of the final card.
 - Hid the fixed header with its existing upward transition when the homepage
   hero skip arrow is activated. The header stays hidden throughout the
   programmatic scroll and returns to the normal direction-aware behavior after
