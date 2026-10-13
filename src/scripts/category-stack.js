@@ -13,15 +13,11 @@ const STACK_LIFT_BASE_MAX = 72;
 const STACK_LIFT_BASE_MIN = 40;
 const STACK_LIFT_BASE_VIEWPORT_RATIO = 0.045;
 const STACK_LIFT_MAX_VIEWPORT_RATIO = 0.22;
-const COMPACT_STACK_LIFT_AMOUNT_RATIO = 1;
-const COMPACT_STACK_LIFT_MAX_VIEWPORT_RATIO = 0.42;
-const COMPACT_STACK_QUERY = '(min-width: 768px) and (max-width: 1440px)';
 const STACK_LIFT_PROGRESS_BOOST = 0.35;
 
 let categoryStackInitialized = false;
 
 const desktopMedia = window.matchMedia(DESKTOP_MEDIA_QUERY);
-const compactStackMedia = window.matchMedia(COMPACT_STACK_QUERY);
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
@@ -79,18 +75,12 @@ const createStack = (wrapper) => {
 
 const getStackLiftLimit = (stack) => {
   const viewportHeight = window.innerHeight;
-  const liftAmountRatio = compactStackMedia.matches
-    ? COMPACT_STACK_LIFT_AMOUNT_RATIO
-    : STACK_LIFT_AMOUNT_RATIO;
-  const maxLiftViewportRatio = compactStackMedia.matches
-    ? COMPACT_STACK_LIFT_MAX_VIEWPORT_RATIO
-    : STACK_LIFT_MAX_VIEWPORT_RATIO;
   const baseLift = clamp(
     viewportHeight * STACK_LIFT_BASE_VIEWPORT_RATIO,
     STACK_LIFT_BASE_MIN,
     STACK_LIFT_BASE_MAX,
   );
-  const maxLift = viewportHeight * maxLiftViewportRatio;
+  const maxLift = viewportHeight * STACK_LIFT_MAX_VIEWPORT_RATIO;
   const requiredLift = stack.cardHeights.reduce((lift, cardHeight, index) => {
     const visibleOverflow = stack.stickyTops[index]
       + cardHeight
@@ -101,7 +91,7 @@ const getStackLiftLimit = (stack) => {
   }, 0);
 
   return clamp(
-    Math.max(requiredLift * liftAmountRatio, baseLift),
+    Math.max(requiredLift * STACK_LIFT_AMOUNT_RATIO, baseLift),
     0,
     maxLift,
   );
@@ -299,10 +289,8 @@ export const initCategoryStack = () => {
 
   if ('addEventListener' in desktopMedia) {
     desktopMedia.addEventListener('change', refresh);
-    compactStackMedia.addEventListener('change', refresh);
   } else {
     desktopMedia.addListener(refresh);
-    compactStackMedia.addListener(refresh);
   }
 
   if ('ResizeObserver' in window) {
