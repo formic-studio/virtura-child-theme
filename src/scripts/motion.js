@@ -13,20 +13,10 @@ const HERO_DOCKED_CLASS = 'virtura-hero-video-motion-docked';
 const HERO_TARGET_OVERSCAN = '6rem';
 const MOBILE_L_MEDIA_QUERY = '(max-width: 767px)';
 const CATEGORY_BLOCK_SELECTOR = '.section_category .category-block';
-const CATEGORY_HEADER_SELECTOR = '.category-heading-block';
-const CATEGORY_HEADING_SELECTOR = ':is(h1, h2, h3, h4, h5, h6, .brxe-heading)';
-const CATEGORY_BUTTON_SELECTOR = '.btn';
-const CATEGORY_BUTTON_REVEAL_DURATION = 1.25;
 const CATEGORY_BUTTON_START_BUFFER = 48;
 const CATEGORY_IMAGE_REVEAL_DURATION = 1.4;
 const CATEGORY_IMAGE_REVEAL_START = 'top 94%';
 const CATEGORY_IMAGE_SELECTOR = '.category-img';
-const CATEGORY_REVEAL_END = 'top 65%';
-const CATEGORY_REVEAL_SCRUB = 0.85;
-const CATEGORY_REVEAL_START = 'top 95%';
-const CATEGORY_SUBCATEGORY_BUTTON_REVEAL_DURATION = 1.1;
-const CATEGORY_SUBCATEGORY_BUTTON_REVEAL_START = 'top 92%';
-const CATEGORY_SUBCATEGORY_BUTTON_SELECTOR = '.subcategory-block .btn';
 const OPTION_BLOCK_SELECTOR = '.option-block';
 const OPTION_CARD_SELECTOR = '.offer-block';
 const OPTION_BUTTON_SELECTOR = '.btn';
@@ -165,16 +155,7 @@ const resetMotionElements = () => {
 };
 
 const getCategoryRevealElements = () => getCategoryBlocks()
-  .flatMap((block) => {
-    const header = block.querySelector(CATEGORY_HEADER_SELECTOR);
-
-    return [
-      header?.querySelector(CATEGORY_HEADING_SELECTOR),
-      header?.querySelector(CATEGORY_BUTTON_SELECTOR),
-      block.querySelector(CATEGORY_IMAGE_SELECTOR),
-      ...block.querySelectorAll(CATEGORY_SUBCATEGORY_BUTTON_SELECTOR),
-    ];
-  })
+  .map((block) => block.querySelector(CATEGORY_IMAGE_SELECTOR))
   .filter(Boolean);
 
 const resetCategoryRevealElements = () => {
@@ -421,7 +402,7 @@ const initOptionBlockMotion = (gsap, ScrollTrigger, optionBlocks) => {
   });
 };
 
-const getCategoryElementStartX = (element, block) => {
+const getCategoryImageStartX = (element, block) => {
   const elementRect = element.getBoundingClientRect();
   const blockRect = block.getBoundingClientRect();
   const distanceToBlockEdge = blockRect.right - elementRect.left;
@@ -658,113 +639,31 @@ const initScrollReveal = (gsap, motionElements) => {
 
 const initCategoryBlockReveal = (gsap, categoryBlocks) => {
   categoryBlocks.forEach((block) => {
-    const header = block.querySelector(CATEGORY_HEADER_SELECTOR);
-    const heading = header?.querySelector(CATEGORY_HEADING_SELECTOR);
-    const button = header?.querySelector(CATEGORY_BUTTON_SELECTOR);
     const image = block.querySelector(CATEGORY_IMAGE_SELECTOR);
-    const subcategoryButtons = Array.from(
-      block.querySelectorAll(CATEGORY_SUBCATEGORY_BUTTON_SELECTOR),
-    );
 
-    if (!header || (!heading && !button && !image && !subcategoryButtons.length)) {
+    if (!image) {
       return;
     }
 
-    if (heading) {
-      storeAnimation(
-        gsap.fromTo(
-          heading,
-          {
-            autoAlpha: 0,
-            filter: 'blur(5px)',
-            y: '1rem',
+    storeAnimation(
+      gsap.fromTo(
+        image,
+        {
+          x: () => getCategoryImageStartX(image, block),
+        },
+        {
+          duration: CATEGORY_IMAGE_REVEAL_DURATION,
+          ease: 'power3.out',
+          scrollTrigger: {
+            invalidateOnRefresh: true,
+            start: CATEGORY_IMAGE_REVEAL_START,
+            toggleActions: 'play none none reverse',
+            trigger: image,
           },
-          {
-            autoAlpha: 1,
-            ease: 'power3.out',
-            filter: 'blur(0px)',
-            scrollTrigger: {
-              end: CATEGORY_REVEAL_END,
-              invalidateOnRefresh: true,
-              scrub: CATEGORY_REVEAL_SCRUB,
-              start: CATEGORY_REVEAL_START,
-              trigger: header,
-            },
-            y: 0,
-          },
-        ),
-      );
-    }
-
-    if (button) {
-      storeAnimation(
-        gsap.fromTo(
-          button,
-          {
-            x: () => getCategoryElementStartX(button, block),
-          },
-          {
-            duration: CATEGORY_BUTTON_REVEAL_DURATION,
-            ease: 'power3.out',
-            scrollTrigger: {
-              invalidateOnRefresh: true,
-              start: CATEGORY_REVEAL_START,
-              toggleActions: 'play none none reverse',
-              trigger: header,
-            },
-            x: 0,
-          },
-        ),
-      );
-    }
-
-    if (image) {
-      storeAnimation(
-        gsap.fromTo(
-          image,
-          {
-            x: () => getCategoryElementStartX(image, block),
-          },
-          {
-            duration: CATEGORY_IMAGE_REVEAL_DURATION,
-            ease: 'power3.out',
-            scrollTrigger: {
-              invalidateOnRefresh: true,
-              start: CATEGORY_IMAGE_REVEAL_START,
-              toggleActions: 'play none none reverse',
-              trigger: image,
-            },
-            x: 0,
-          },
-        ),
-      );
-    }
-
-    subcategoryButtons.forEach((subcategoryButton) => {
-      storeAnimation(
-        gsap.fromTo(
-          subcategoryButton,
-          {
-            autoAlpha: 1,
-            clipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)',
-            webkitClipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)',
-          },
-          {
-            autoAlpha: 1,
-            clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
-            duration: CATEGORY_SUBCATEGORY_BUTTON_REVEAL_DURATION,
-            ease: 'power3.out',
-            scrollTrigger: {
-              invalidateOnRefresh: true,
-              start: CATEGORY_SUBCATEGORY_BUTTON_REVEAL_START,
-              toggleActions: 'play none none reverse',
-              trigger: subcategoryButton,
-            },
-            webkitClipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
-          },
-        ),
-      );
-    });
+          x: 0,
+        },
+      ),
+    );
   });
 };
 

@@ -2904,6 +2904,53 @@ body.virtura-booking-dialog-open {
   overflow: hidden;
 }
 
+/*
+ * Compact category stack for smaller desktop/tablet viewports.
+ * Keep this override isolated so the live change can be rolled back without
+ * editing the Bricks layout. Height-aware values keep every active card inside
+ * short 16:9 laptop/tablet viewports while a larger wrapper gap slows the
+ * moment at which the following card reaches the sticky stack.
+ */
+@media (min-width: 768px) and (max-width: 1440px) {
+  .section_category .category-wrapper {
+    row-gap: clamp(7.2rem, 18vh, 12rem) !important;
+  }
+
+  .section_category .category-block {
+    padding: clamp(1.6rem, 3vh, 2.4rem) !important;
+    row-gap: clamp(1.6rem, 4.5vh, 3.2rem) !important;
+  }
+
+  .section_category
+    .category-heading-block
+    > :is(h1, h2, h3, h4, h5, h6, .brxe-heading) {
+    font-size: clamp(4.8rem, min(8vh, 5vw), 7.2rem) !important;
+    line-height: 0.92;
+  }
+
+  .section_category .subcategory-wrapper {
+    column-gap: clamp(1.6rem, 3vw, 4rem) !important;
+  }
+
+  .section_category .subcategory-block {
+    flex: 1 1 0;
+    max-width: 50rem;
+    min-width: 0;
+    row-gap: clamp(0.8rem, 1.5vh, 1.6rem) !important;
+  }
+
+  .section_category .subcategory-block .btn {
+    width: 100% !important;
+  }
+
+  .section_category .category-img {
+    flex: 1 1 0;
+    max-height: clamp(18rem, 38vh, 32rem) !important;
+    min-width: 0;
+    width: auto;
+  }
+}
+
 @media (max-width: 767px) {
   .section_category .category-block {
     display: flex;
