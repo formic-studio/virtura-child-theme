@@ -2905,11 +2905,8 @@ body.virtura-booking-dialog-open {
 }
 
 /*
- * Compact category stack for smaller desktop/tablet viewports.
- * Keep this override isolated so the live change can be rolled back without
- * editing the Bricks layout. A larger wrapper gap slows the moment at which
- * the following card reaches the sticky stack without changing the original
- * sticky stop positions defined in Bricks.
+ * Keep the current compact desktop layout through 1280px. Sticky offsets stay
+ * owned by Bricks so these size changes cannot alter the stacking sequence.
  */
 @media (min-width: 768px) and (max-width: 1440px) {
   .section_category .category-wrapper {
@@ -2947,6 +2944,77 @@ body.virtura-booking-dialog-open {
     flex: 1 1 0;
     min-width: 0;
     width: auto;
+  }
+}
+
+/*
+ * Below 1280px scale every visible card token from the same curve. At 1024px
+ * and down the content stops at 70% of the 1280px reference size. Explicit
+ * dimensions replace transform/zoom so layout and sticky geometry stay equal.
+ */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .section_category .category-block {
+    border-radius: clamp(10.267px, calc(1.7188vw - 7.333px), 14.667px) !important;
+    padding: clamp(15.4px, calc(2.5781vw - 11px), 22px) !important;
+    row-gap: clamp(20.533px, calc(3.4375vw - 14.667px), 29.333px) !important;
+  }
+
+  .section_category
+    .category-heading-block
+    > :is(h1, h2, h3, h4, h5, h6, .brxe-heading) {
+    font-size: clamp(40.6px, calc(6.7969vw - 29px), 58px) !important;
+    line-height: 0.92;
+  }
+
+  .section_category .category-heading-block > .btn {
+    border-radius: clamp(5.133px, calc(0.8594vw - 3.667px), 7.333px) !important;
+    column-gap: clamp(10.267px, calc(1.7188vw - 7.333px), 14.667px) !important;
+    font-size: clamp(10.267px, calc(1.7188vw - 7.333px), 14.667px) !important;
+    padding:
+      clamp(3.85px, calc(0.6445vw - 2.75px), 5.5px)
+      clamp(3.85px, calc(0.6445vw - 2.75px), 5.5px)
+      clamp(3.85px, calc(0.6445vw - 2.75px), 5.5px)
+      clamp(10.267px, calc(1.7188vw - 7.333px), 14.667px) !important;
+  }
+
+  .section_category .subcategory-wrapper {
+    column-gap: clamp(25.667px, calc(4.2969vw - 18.333px), 36.667px) !important;
+  }
+
+  .section_category .subcategory-block {
+    max-width: clamp(320.833px, calc(53.7109vw - 229.167px), 458.333px);
+    row-gap: clamp(10.267px, calc(1.7188vw - 7.333px), 14.667px) !important;
+  }
+
+  .section_category .subcategory-block .btn {
+    border-radius: clamp(5.133px, calc(0.8594vw - 3.667px), 7.333px) !important;
+    column-gap: clamp(10.267px, calc(1.7188vw - 7.333px), 14.667px) !important;
+    font-size: clamp(12.833px, calc(2.1484vw - 9.167px), 18.333px) !important;
+    padding:
+      clamp(12.833px, calc(2.1484vw - 9.167px), 18.333px)
+      clamp(15.4px, calc(2.5781vw - 11px), 22px) !important;
+  }
+
+  .section_category .category-block .svg-arrow-block {
+    border-radius: clamp(5.133px, calc(0.8594vw - 3.667px), 7.333px) !important;
+    padding:
+      clamp(5.6px, calc(0.9375vw - 4px), 8px)
+      clamp(8.4px, calc(1.4063vw - 6px), 12px)
+      clamp(5.6px, calc(0.9375vw - 4px), 8px)
+      clamp(9.1px, calc(1.5234vw - 6.5px), 13px) !important;
+  }
+
+  .section_category .category-block .svg-arrow-block > svg {
+    height: clamp(16.1px, calc(2.6953vw - 11.5px), 23px);
+    width: clamp(8.4px, calc(1.4063vw - 6px), 12px);
+  }
+
+  .section_category .category-img {
+    border-radius: clamp(10.267px, calc(1.7188vw - 7.333px), 14.667px) !important;
+    flex: 0 1 clamp(320.833px, calc(53.7109vw - 229.167px), 458.333px);
+    max-height: clamp(256.667px, calc(42.9688vw - 183.333px), 366.667px) !important;
+    max-width: clamp(320.833px, calc(53.7109vw - 229.167px), 458.333px) !important;
+    width: clamp(320.833px, calc(53.7109vw - 229.167px), 458.333px);
   }
 }
 
