@@ -458,33 +458,6 @@ body {
   grid-column: span 2;
 }
 
-/*
- * Realizations archive only. Bricks gives every block width: 100%, so each
- * flex basis must use broadly supported calc() syntax. With Bricks' 2rem
- * column gap, the fourth card takes 36% of the available row and the fifth
- * takes 64%. Their 1:1 and 16:9 ratios therefore produce the same height.
- */
-body.page-id-451 #brxe-akgvqh.archive-grid {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-body.page-id-451 #brxe-akgvqh.archive-grid > .archive-block {
-  flex: 0 0 calc(33.333333% - 1.333333rem);
-}
-
-body.page-id-451
-  #brxe-akgvqh.archive-grid
-  > .archive-block:nth-child(4) {
-  flex-basis: calc(36% - 0.72rem);
-}
-
-body.page-id-451
-  #brxe-akgvqh.archive-grid
-  > .archive-block:nth-child(5) {
-  flex-basis: calc(64% - 1.28rem);
-}
-
 .archive-block > *,
 .archive-grid
   > .bricks-layout-wrapper
@@ -752,16 +725,6 @@ body:has(.brxe-pagination) .virtura-archive-pagination {
     grid-column: span 2;
   }
 
-  body.page-id-451 #brxe-akgvqh.archive-grid > .archive-block {
-    flex-basis: calc(50% - 1rem);
-  }
-
-  body.page-id-451
-    #brxe-akgvqh.archive-grid
-    > .archive-block:nth-child(5) {
-    flex-basis: 100%;
-  }
-
 }
 
 @media (max-width: 767px) {
@@ -777,13 +740,6 @@ body:has(.brxe-pagination) .virtura-archive-pagination {
     aspect-ratio: 1 / 1;
     grid-column: auto !important;
     grid-row: auto !important;
-  }
-
-  body.page-id-451 #brxe-akgvqh.archive-grid > .archive-block,
-  body.page-id-451
-    #brxe-akgvqh.archive-grid
-    > .archive-block:nth-child(5) {
-    flex-basis: 100%;
   }
 
 }
