@@ -101,6 +101,25 @@ function virtura_child_theme_is_archive_listing_request(): bool {
 }
 
 /**
+ * Add a stable frontend scope for the realizations listing layout.
+ *
+ * The page uses the same Bricks archive classes as the Blog listing, so a
+ * dedicated body class prevents realization-specific card proportions from
+ * affecting other archive grids.
+ *
+ * @param string[] $classes Existing body classes.
+ * @return string[]
+ */
+function virtura_child_theme_realization_archive_body_class( array $classes ): array {
+	if ( is_post_type_archive( 'realizacja' ) || is_page( 'realizacje' ) ) {
+		$classes[] = 'virtura-realization-archive';
+	}
+
+	return $classes;
+}
+add_filter( 'body_class', 'virtura_child_theme_realization_archive_body_class' );
+
+/**
  * Return the current archive page for regular and Bricks AJAX requests.
  *
  * @param array $query_vars WP_Query arguments prepared by Bricks.

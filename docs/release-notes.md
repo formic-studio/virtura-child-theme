@@ -4,7 +4,9 @@
 
 - Standardized realization archive card proportions: regular cards now render
   at a true 1:1 ratio, while the fifth card renders at 16:9 on desktop and
-  tablet. Mobile keeps every card, including the fifth, at 1:1.
+  tablet. The fourth and fifth desktop cards now use matching 9:16 column
+  widths, keeping their 1:1 and 16:9 media tiles at the same height without
+  stretching. Mobile keeps every card, including the fifth, at 1:1.
 - Added a native Gutenberg sidebar panel for `realizacja` posts to select an
   additional 16:9 image from Media Library. The attachment ID is stored as
   registered post meta, can be changed or removed without affecting the
