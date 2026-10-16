@@ -445,7 +445,7 @@ body {
 
 .archive-block,
 .archive-grid > .bricks-layout-wrapper > .bricks-layout-item {
-  aspect-ratio: 1 / 1.12;
+  aspect-ratio: 1 / 1;
   cursor: pointer;
   min-width: 0;
   overflow: hidden;
@@ -454,7 +454,7 @@ body {
 .archive-grid > .archive-block:nth-child(5),
 .archive-grid > .bricks-layout-wrapper > .bricks-layout-item:nth-child(5) {
   align-self: stretch;
-  aspect-ratio: 1.84 / 1;
+  aspect-ratio: 16 / 9;
   grid-column: span 2;
 }
 
@@ -736,9 +736,14 @@ body:has(.brxe-pagination) .virtura-archive-pagination {
   .archive-grid > .archive-block:nth-child(5),
   .archive-grid > .bricks-layout-wrapper > .bricks-layout-item,
   .archive-grid > .bricks-layout-wrapper > .bricks-layout-item:nth-child(5) {
-    aspect-ratio: 1 / 1.15;
+    aspect-ratio: 1 / 1;
     grid-column: auto !important;
     grid-row: auto !important;
+  }
+
+  .archive-grid > .archive-block:nth-child(5),
+  .archive-grid > .bricks-layout-wrapper > .bricks-layout-item:nth-child(5) {
+    aspect-ratio: 16 / 9;
   }
 }
 

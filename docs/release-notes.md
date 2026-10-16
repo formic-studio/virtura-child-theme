@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Standardized realization archive card proportions: regular cards now render
+  at a true 1:1 ratio and the fifth card in each grid renders at 16:9 across
+  desktop, tablet and mobile layouts.
 - Added a native Gutenberg sidebar panel for `realizacja` posts to select an
   additional 16:9 image from Media Library. The attachment ID is stored as
   registered post meta, can be changed or removed without affecting the
