@@ -741,10 +741,6 @@ body:has(.brxe-pagination) .virtura-archive-pagination {
     grid-row: auto !important;
   }
 
-  .archive-grid > .archive-block:nth-child(5),
-  .archive-grid > .bricks-layout-wrapper > .bricks-layout-item:nth-child(5) {
-    aspect-ratio: 16 / 9;
-  }
 }
 
 /*
