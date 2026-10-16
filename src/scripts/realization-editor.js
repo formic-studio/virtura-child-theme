@@ -79,7 +79,10 @@ const RealizationLandscapeImagePanel = () => {
     createElement(
       'p',
       { className: 'virtura-realization-image-panel__description' },
-      getLabel('description', 'Poziome zdjęcie realizacji używane w układach 16:9.'),
+      getLabel(
+        'description',
+        'Poziome zdjęcie realizacji używane w układach 16:9, w rozmiarze 2560 × 1440 px.',
+      ),
     ),
     editorState.imageId && !editorState.media
       ? createElement(

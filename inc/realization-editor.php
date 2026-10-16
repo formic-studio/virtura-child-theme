@@ -83,7 +83,7 @@ function virtura_child_theme_enqueue_realization_editor_assets(): void {
 			'postType' => 'realizacja',
 			'labels'   => array(
 				'panelTitle'   => __( 'Zdjęcie 16:9', 'virtura-child-theme' ),
-				'description'  => __( 'Poziome zdjęcie realizacji używane w układach 16:9.', 'virtura-child-theme' ),
+				'description'  => __( 'Poziome zdjęcie realizacji używane w układach 16:9, w rozmiarze 2560 × 1440 px.', 'virtura-child-theme' ),
 				'empty'        => __( 'Nie wybrano zdjęcia 16:9.', 'virtura-child-theme' ),
 				'choose'       => __( 'Wybierz zdjęcie', 'virtura-child-theme' ),
 				'replace'      => __( 'Zmień zdjęcie', 'virtura-child-theme' ),
