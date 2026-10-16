@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Kept Blog archive cards in the regular three-column desktop flow by
+  preventing the realization-specific fifth-card span from affecting `.blog`
+  cards.
 - Standardized realization archive card proportions: regular cards now render
   at a true 1:1 ratio, while the fifth card renders at approximately 2.03:1 on
   desktop and tablet so its height matches the adjacent square card. Mobile

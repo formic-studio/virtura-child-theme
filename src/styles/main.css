@@ -752,6 +752,7 @@ body:has(.brxe-pagination) .virtura-archive-pagination {
  */
 .archive-grid > .archive-block.blog {
   aspect-ratio: auto;
+  grid-column: auto;
   overflow: visible;
 }
 
