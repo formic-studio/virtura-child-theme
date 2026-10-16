@@ -13,6 +13,7 @@ const VIRTURA_CHILD_THEME_REALIZATION_LANDSCAPE_IMAGE_META = '_virtura_realizati
 
 add_action( 'init', 'virtura_child_theme_register_realization_landscape_image_meta', 20 );
 add_action( 'enqueue_block_editor_assets', 'virtura_child_theme_enqueue_realization_editor_assets', 1 );
+add_filter( 'bricks/frontend/render_element', 'virtura_child_theme_use_landscape_image_on_fifth_realization', 15, 2 );
 
 /**
  * Register the 2.03:1 image attachment ID for REST-backed Gutenberg editing.
@@ -137,4 +138,99 @@ function virtura_get_realization_landscape_image_url( $post_id = 0 ): string {
 	$image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'full' ) : '';
 
 	return is_string( $image_url ) ? $image_url : '';
+}
+
+/**
+ * Use the dedicated landscape image in the fifth realization archive card.
+ *
+ * Bricks renders the query loop server-side, including AJAX filter responses,
+ * so replacing the existing image tag here avoids duplicate media elements
+ * and keeps the card's current classes and media-switch behavior intact.
+ *
+ * @param string          $html    Rendered Bricks element markup.
+ * @param \Bricks\Element $element Bricks element instance.
+ */
+function virtura_child_theme_use_landscape_image_on_fifth_realization( $html, $element ): string {
+	if (
+		! is_string( $html ) ||
+		'' === $html ||
+		! class_exists( '\\Bricks\\Query' ) ||
+		! method_exists( '\\Bricks\\Query', 'get_loop_index' ) ||
+		! function_exists( 'virtura_child_theme_is_archive_listing_request' ) ||
+		! virtura_child_theme_is_archive_listing_request() ||
+		( function_exists( 'virtura_child_theme_is_bricks_builder' ) && virtura_child_theme_is_bricks_builder() )
+	) {
+		return is_string( $html ) ? $html : '';
+	}
+
+	$settings = function_exists( 'virtura_child_theme_get_bricks_element_settings' )
+		? virtura_child_theme_get_bricks_element_settings( $element )
+		: array();
+
+	if (
+		! function_exists( 'virtura_child_theme_bricks_element_has_class' ) ||
+		! virtura_child_theme_bricks_element_has_class( $settings, 'archive-block' ) ||
+		virtura_child_theme_bricks_element_has_class( $settings, 'blog' ) ||
+		virtura_child_theme_bricks_element_has_class( $settings, 'grid-2-item' ) ||
+		4 !== (int) \Bricks\Query::get_loop_index()
+	) {
+		return $html;
+	}
+
+	$post_id = method_exists( '\\Bricks\\Query', 'get_loop_object_id' )
+		? absint( \Bricks\Query::get_loop_object_id() )
+		: get_the_ID();
+
+	if ( ! $post_id || 'realizacja' !== get_post_type( $post_id ) ) {
+		return $html;
+	}
+
+	$image_id = virtura_get_realization_landscape_image_id( $post_id );
+
+	if ( ! $image_id ) {
+		return $html;
+	}
+
+	$replaced = false;
+	$updated  = preg_replace_callback(
+		'/<img\b[^>]*>/i',
+		static function ( $matches ) use ( $image_id, &$replaced ) {
+			$image_tag = $matches[0];
+
+			if (
+				$replaced ||
+				! preg_match( '/\sclass\s*=\s*(["\'])([^"\']*)\1/i', $image_tag, $class_matches )
+			) {
+				return $image_tag;
+			}
+
+			$classes = preg_split( '/\s+/', trim( $class_matches[2] ) );
+
+			if ( ! is_array( $classes ) || ! in_array( 'archive-img', $classes, true ) ) {
+				return $image_tag;
+			}
+
+			$classes[] = 'archive-img-wide';
+			$classes   = array_values( array_unique( array_filter( $classes ) ) );
+			$new_image = wp_get_attachment_image(
+				$image_id,
+				'full',
+				false,
+				array(
+					'class' => implode( ' ', $classes ),
+				)
+			);
+
+			if ( ! is_string( $new_image ) || '' === $new_image ) {
+				return $image_tag;
+			}
+
+			$replaced = true;
+
+			return $new_image;
+		},
+		$html
+	);
+
+	return $replaced && is_string( $updated ) ? $updated : $html;
 }

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added a server-side Bricks archive image switch for realization cards. The
+  fifth query-loop item now uses its dedicated 2.03:1 attachment when present,
+  falls back to the featured image when empty, and receives responsive image
+  sizing for its two-column desktop width.
 - Kept Blog archive cards in the regular three-column desktop flow by
   preventing the realization-specific fifth-card span from affecting `.blog`
   cards.
