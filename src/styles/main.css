@@ -458,59 +458,6 @@ body {
   grid-column: span 2;
 }
 
-/*
- * In the realizations listing, cards four and five share a row. Their widths
- * use the matching 9:16 ratio, so the square card and the 16:9 card end up at
- * exactly the same height without CSS Grid stretching either card.
- */
-body.virtura-realization-archive .archive-grid:not(.grid-2-item),
-body.virtura-realization-archive
-  .archive-grid:not(.grid-2-item)
-  > .bricks-layout-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-body.virtura-realization-archive
-  .archive-grid:not(.grid-2-item)
-  > .bricks-layout-wrapper {
-  flex: 0 0 100%;
-  width: 100%;
-}
-
-body.virtura-realization-archive
-  .archive-grid:not(.grid-2-item)
-  > .archive-block,
-body.virtura-realization-archive
-  .archive-grid:not(.grid-2-item)
-  > .bricks-layout-wrapper
-  > .bricks-layout-item {
-  flex: 0 0
-    calc(
-      (100% - var(--archive-grid-gap) - var(--archive-grid-gap)) / 3
-    );
-}
-
-body.virtura-realization-archive
-  .archive-grid:not(.grid-2-item)
-  > .archive-block:nth-child(4),
-body.virtura-realization-archive
-  .archive-grid:not(.grid-2-item)
-  > .bricks-layout-wrapper
-  > .bricks-layout-item:nth-child(4) {
-  flex-basis: calc((100% - var(--archive-grid-gap)) / 25 * 9);
-}
-
-body.virtura-realization-archive
-  .archive-grid:not(.grid-2-item)
-  > .archive-block:nth-child(5),
-body.virtura-realization-archive
-  .archive-grid:not(.grid-2-item)
-  > .bricks-layout-wrapper
-  > .bricks-layout-item:nth-child(5) {
-  flex-basis: calc((100% - var(--archive-grid-gap)) / 25 * 16);
-}
-
 .archive-block > *,
 .archive-grid
   > .bricks-layout-wrapper
@@ -778,25 +725,6 @@ body:has(.brxe-pagination) .virtura-archive-pagination {
     grid-column: span 2;
   }
 
-  body.virtura-realization-archive
-    .archive-grid:not(.grid-2-item)
-    > .archive-block,
-  body.virtura-realization-archive
-    .archive-grid:not(.grid-2-item)
-    > .bricks-layout-wrapper
-    > .bricks-layout-item {
-    flex-basis: calc((100% - var(--archive-grid-gap)) / 2);
-  }
-
-  body.virtura-realization-archive
-    .archive-grid:not(.grid-2-item)
-    > .archive-block:nth-child(5),
-  body.virtura-realization-archive
-    .archive-grid:not(.grid-2-item)
-    > .bricks-layout-wrapper
-    > .bricks-layout-item:nth-child(5) {
-    flex-basis: 100%;
-  }
 }
 
 @media (max-width: 767px) {
@@ -812,23 +740,6 @@ body:has(.brxe-pagination) .virtura-archive-pagination {
     aspect-ratio: 1 / 1;
     grid-column: auto !important;
     grid-row: auto !important;
-  }
-
-  body.virtura-realization-archive
-    .archive-grid:not(.grid-2-item)
-    > .archive-block,
-  body.virtura-realization-archive
-    .archive-grid:not(.grid-2-item)
-    > .bricks-layout-wrapper
-    > .bricks-layout-item,
-  body.virtura-realization-archive
-    .archive-grid:not(.grid-2-item)
-    > .archive-block:nth-child(5),
-  body.virtura-realization-archive
-    .archive-grid:not(.grid-2-item)
-    > .bricks-layout-wrapper
-    > .bricks-layout-item:nth-child(5) {
-    flex-basis: 100%;
   }
 
 }
