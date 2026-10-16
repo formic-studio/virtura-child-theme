@@ -213,6 +213,7 @@ add_action( 'wp_head', 'virtura_child_theme_print_intro_prime', 0 );
 function virtura_child_theme_add_module_type_to_script( string $tag, string $handle, string $src ): string {
 	$module_handles = array(
 		'virtura-child-theme',
+		'virtura-realization-editor',
 		'virtura-video-poster-admin',
 	);
 

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Added a native Gutenberg sidebar panel for `realizacja` posts to select an
+  additional 16:9 image from Media Library. The attachment ID is stored as
+  registered post meta, can be changed or removed without affecting the
+  existing featured image, and is exposed to Bricks through dedicated ID and
+  URL helper functions.
 - Made the homepage category card stack height-aware between 768px and 1440px.
   Shorter viewports retain the original sticky stops, service-button sizes and
   image sizes.

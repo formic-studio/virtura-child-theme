@@ -12,6 +12,7 @@ export default defineConfig({
       input: {
         adminVideoPoster: resolve(__dirname, 'src/scripts/admin-video-poster.js'),
         main: resolve(__dirname, 'src/scripts/main.js'),
+        realizationEditor: resolve(__dirname, 'src/scripts/realization-editor.js'),
       },
     },
   },

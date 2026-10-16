@@ -154,6 +154,15 @@
       "src/scripts/main.js"
     ]
   },
+  "src/scripts/realization-editor.js": {
+    "file": "assets/realizationEditor-CTrSmzmb.js",
+    "name": "realizationEditor",
+    "src": "src/scripts/realization-editor.js",
+    "isEntry": true,
+    "css": [
+      "assets/realizationEditor-B69RBIG2.css"
+    ]
+  },
   "src/scripts/smooth-scroll.js": {
     "file": "assets/smooth-scroll-DZrpD-hL.js",
     "name": "smooth-scroll",

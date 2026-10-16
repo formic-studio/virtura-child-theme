@@ -530,6 +530,8 @@ function virtura_child_theme_allow_bricks_echo_functions( $function_names ): arr
 	$function_names[] = 'virtura_get_realization_google_reviews';
 	$function_names[] = 'virtura_get_realization_google_reviews_json';
 	$function_names[] = 'virtura_get_realization_google_review_hidden';
+	$function_names[] = 'virtura_get_realization_landscape_image_id';
+	$function_names[] = 'virtura_get_realization_landscape_image_url';
 	$function_names[] = 'virtura_get_post_date_month_year';
 
 	return array_values( array_unique( $function_names ) );
