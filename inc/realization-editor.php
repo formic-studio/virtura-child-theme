@@ -143,9 +143,10 @@ function virtura_get_realization_landscape_image_url( $post_id = 0 ): string {
 /**
  * Use the dedicated landscape image in the fifth realization archive card.
  *
- * Bricks renders the query loop server-side, including AJAX filter responses,
- * so replacing the existing image tag here avoids duplicate media elements
- * and keeps the card's current classes and media-switch behavior intact.
+ * Bricks renders the query loop server-side, including AJAX filter responses.
+ * A picture source switches to the dedicated attachment from 768px upwards,
+ * while the existing featured image remains the mobile and empty-field
+ * fallback without introducing a second visible media element.
  *
  * @param string          $html    Rendered Bricks element markup.
  * @param \Bricks\Element $element Bricks element instance.
@@ -191,10 +192,20 @@ function virtura_child_theme_use_landscape_image_on_fifth_realization( $html, $e
 		return $html;
 	}
 
-	$replaced = false;
-	$updated  = preg_replace_callback(
+	$landscape_url    = wp_get_attachment_image_url( $image_id, 'full' );
+	$landscape_srcset = wp_get_attachment_image_srcset( $image_id, 'full' );
+
+	if ( ! is_string( $landscape_url ) || '' === $landscape_url ) {
+		return $html;
+	}
+
+	$landscape_srcset = is_string( $landscape_srcset ) && '' !== $landscape_srcset
+		? $landscape_srcset
+		: $landscape_url;
+	$replaced          = false;
+	$updated           = preg_replace_callback(
 		'/<img\b[^>]*>/i',
-		static function ( $matches ) use ( $image_id, &$replaced ) {
+		static function ( $matches ) use ( $landscape_srcset, &$replaced ) {
 			$image_tag = $matches[0];
 
 			if (
@@ -210,24 +221,13 @@ function virtura_child_theme_use_landscape_image_on_fifth_realization( $html, $e
 				return $image_tag;
 			}
 
-			$classes[] = 'archive-img-wide';
-			$classes   = array_values( array_unique( array_filter( $classes ) ) );
-			$new_image = wp_get_attachment_image(
-				$image_id,
-				'full',
-				false,
-				array(
-					'class' => implode( ' ', $classes ),
-				)
-			);
-
-			if ( ! is_string( $new_image ) || '' === $new_image ) {
-				return $image_tag;
-			}
-
 			$replaced = true;
 
-			return $new_image;
+			return sprintf(
+				'<picture class="archive-img virtura-realization-card-picture" data-media-switch-image><source media="(min-width: 768px)" srcset="%1$s" sizes="(max-width: 991px) calc(100vw - 80px), (max-width: 1919px) calc(66.667vw - 56px), 1208px">%2$s</picture>',
+				esc_attr( $landscape_srcset ),
+				$image_tag
+			);
 		},
 		$html
 	);

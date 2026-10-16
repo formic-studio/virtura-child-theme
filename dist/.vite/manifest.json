@@ -1,6 +1,6 @@
 {
-  "_animation-runtime-D-1HIrOM.js": {
-    "file": "assets/animation-runtime-D-1HIrOM.js",
+  "_animation-runtime-H-1MozTU.js": {
+    "file": "assets/animation-runtime-H-1MozTU.js",
     "name": "animation-runtime",
     "imports": [
       "src/scripts/main.js"
@@ -30,12 +30,12 @@
     "isDynamicEntry": true
   },
   "src/scripts/about-slider.js": {
-    "file": "assets/about-slider-E-fjAdKg.js",
+    "file": "assets/about-slider-Dn7KTcyC.js",
     "name": "about-slider",
     "src": "src/scripts/about-slider.js",
     "isDynamicEntry": true,
     "imports": [
-      "_animation-runtime-D-1HIrOM.js",
+      "_animation-runtime-H-1MozTU.js",
       "src/scripts/main.js"
     ]
   },
@@ -79,12 +79,12 @@
     "isDynamicEntry": true
   },
   "src/scripts/faq-accordion.js": {
-    "file": "assets/faq-accordion-uNjcnuvr.js",
+    "file": "assets/faq-accordion-DQscaBYl.js",
     "name": "faq-accordion",
     "src": "src/scripts/faq-accordion.js",
     "isDynamicEntry": true,
     "imports": [
-      "_animation-runtime-D-1HIrOM.js",
+      "_animation-runtime-H-1MozTU.js",
       "src/scripts/main.js"
     ]
   },
@@ -95,29 +95,29 @@
     "isDynamicEntry": true
   },
   "src/scripts/hero-skip.js": {
-    "file": "assets/hero-skip-DZtHIj7G.js",
+    "file": "assets/hero-skip-DFcDJD8e.js",
     "name": "hero-skip",
     "src": "src/scripts/hero-skip.js",
     "isDynamicEntry": true,
     "imports": [
       "src/scripts/motion.js",
       "src/scripts/smooth-scroll.js",
-      "_animation-runtime-D-1HIrOM.js",
+      "_animation-runtime-H-1MozTU.js",
       "src/scripts/main.js"
     ]
   },
   "src/scripts/intro-animation.js": {
-    "file": "assets/intro-animation-Dm5y1Xju.js",
+    "file": "assets/intro-animation-BHhjBQ2t.js",
     "name": "intro-animation",
     "src": "src/scripts/intro-animation.js",
     "isDynamicEntry": true,
     "imports": [
-      "_animation-runtime-D-1HIrOM.js",
+      "_animation-runtime-H-1MozTU.js",
       "src/scripts/main.js"
     ]
   },
   "src/scripts/main.js": {
-    "file": "assets/main--3tfROvG.js",
+    "file": "assets/main-Baqlgb9T.js",
     "name": "main",
     "src": "src/scripts/main.js",
     "isEntry": true,
@@ -140,16 +140,16 @@
       "src/scripts/hero-skip.js"
     ],
     "css": [
-      "assets/main-CxD1xT_u.css"
+      "assets/main-DEo9YJa1.css"
     ]
   },
   "src/scripts/motion.js": {
-    "file": "assets/motion-DlUYcPlO.js",
+    "file": "assets/motion-6oiH0kJd.js",
     "name": "motion",
     "src": "src/scripts/motion.js",
     "isDynamicEntry": true,
     "imports": [
-      "_animation-runtime-D-1HIrOM.js",
+      "_animation-runtime-H-1MozTU.js",
       "src/scripts/smooth-scroll.js",
       "src/scripts/main.js"
     ]
@@ -173,22 +173,22 @@
     ]
   },
   "src/scripts/specs-slider.js": {
-    "file": "assets/specs-slider-B_DInmyx.js",
+    "file": "assets/specs-slider-D5EXHhjj.js",
     "name": "specs-slider",
     "src": "src/scripts/specs-slider.js",
     "isDynamicEntry": true,
     "imports": [
-      "_animation-runtime-D-1HIrOM.js",
+      "_animation-runtime-H-1MozTU.js",
       "src/scripts/main.js"
     ]
   },
   "src/scripts/testimonials-slider.js": {
-    "file": "assets/testimonials-slider-BcDBLIMb.js",
+    "file": "assets/testimonials-slider-BlO7onai.js",
     "name": "testimonials-slider",
     "src": "src/scripts/testimonials-slider.js",
     "isDynamicEntry": true,
     "imports": [
-      "_animation-runtime-D-1HIrOM.js",
+      "_animation-runtime-H-1MozTU.js",
       "src/scripts/main.js"
     ]
   },

@@ -135,10 +135,9 @@ function virtura_child_theme_set_responsive_image_attributes( $attr, $attachment
 	}
 
 	$sizes_by_class = array(
-		'archive-img-wide' => '(max-width: 767px) calc(100vw - 32px), (max-width: 991px) calc(100vw - 80px), (max-width: 1919px) calc(66.667vw - 56px), 1208px',
-		'archive-img'      => '(max-width: 767px) calc(100vw - 32px), (max-width: 991px) calc(50vw - 60px), (max-width: 1919px) calc(33.333vw - 48px), 592px',
-		'category-img'     => '(max-width: 767px) calc(100vw - 72px), (max-width: 1919px) calc(50vw - 72px), 888px',
-		'team-img'         => '(max-width: 511px) 86vw, (max-width: 767px) 440px, (max-width: 1919px) calc(33.333vw - 45px), 596px',
+		'archive-img'  => '(max-width: 767px) calc(100vw - 32px), (max-width: 991px) calc(50vw - 60px), (max-width: 1919px) calc(33.333vw - 48px), 592px',
+		'category-img' => '(max-width: 767px) calc(100vw - 72px), (max-width: 1919px) calc(50vw - 72px), 888px',
+		'team-img'     => '(max-width: 511px) 86vw, (max-width: 767px) 440px, (max-width: 1919px) calc(33.333vw - 45px), 596px',
 	);
 
 	foreach ( $sizes_by_class as $class_name => $sizes_value ) {

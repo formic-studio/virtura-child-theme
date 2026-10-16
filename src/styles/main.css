@@ -475,6 +475,10 @@ body {
   width: 100%;
 }
 
+.virtura-realization-card-picture {
+  display: block;
+}
+
 .archive-block img,
 .archive-grid > .bricks-layout-wrapper > .bricks-layout-item img {
   object-fit: cover;
