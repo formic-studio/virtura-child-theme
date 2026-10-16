@@ -15,7 +15,7 @@ add_action( 'init', 'virtura_child_theme_register_realization_landscape_image_me
 add_action( 'enqueue_block_editor_assets', 'virtura_child_theme_enqueue_realization_editor_assets', 1 );
 
 /**
- * Register the 16:9 image attachment ID for REST-backed Gutenberg editing.
+ * Register the 2.03:1 image attachment ID for REST-backed Gutenberg editing.
  */
 function virtura_child_theme_register_realization_landscape_image_meta(): void {
 	if ( ! post_type_exists( 'realizacja' ) ) {
@@ -82,22 +82,22 @@ function virtura_child_theme_enqueue_realization_editor_assets(): void {
 			'metaKey'  => VIRTURA_CHILD_THEME_REALIZATION_LANDSCAPE_IMAGE_META,
 			'postType' => 'realizacja',
 			'labels'   => array(
-				'panelTitle'   => __( 'Zdjęcie 16:9', 'virtura-child-theme' ),
-				'description'  => __( 'Poziome zdjęcie realizacji używane w układach 16:9, w rozmiarze 2560 × 1440 px.', 'virtura-child-theme' ),
-				'empty'        => __( 'Nie wybrano zdjęcia 16:9.', 'virtura-child-theme' ),
+				'panelTitle'   => __( 'Zdjęcie 2.03 : 1 – prostokąt', 'virtura-child-theme' ),
+				'description'  => __( 'Poziome zdjęcie realizacji używane w układach 2.03:1, w rozmiarze 2560 × 1261 px.', 'virtura-child-theme' ),
+				'empty'        => __( 'Nie wybrano zdjęcia prostokątnego 2.03:1.', 'virtura-child-theme' ),
 				'choose'       => __( 'Wybierz zdjęcie', 'virtura-child-theme' ),
 				'replace'      => __( 'Zmień zdjęcie', 'virtura-child-theme' ),
 				'remove'       => __( 'Usuń', 'virtura-child-theme' ),
-				'mediaTitle'   => __( 'Wybierz zdjęcie 16:9', 'virtura-child-theme' ),
+				'mediaTitle'   => __( 'Wybierz zdjęcie 2.03:1', 'virtura-child-theme' ),
 				'loading'      => __( 'Ładowanie podglądu zdjęcia…', 'virtura-child-theme' ),
-				'previewAlt'   => __( 'Podgląd zdjęcia 16:9', 'virtura-child-theme' ),
+				'previewAlt'   => __( 'Podgląd zdjęcia 2.03:1', 'virtura-child-theme' ),
 			),
 		)
 	);
 }
 
 /**
- * Return the valid 16:9 realization image attachment ID.
+ * Return the valid 2.03:1 realization image attachment ID.
  *
  * @param int|string $post_id Optional realization ID.
  */
@@ -128,7 +128,7 @@ function virtura_get_realization_landscape_image_id( $post_id = 0 ): int {
 }
 
 /**
- * Return the full URL of the 16:9 realization image for Bricks dynamic data.
+ * Return the full URL of the 2.03:1 realization image for Bricks dynamic data.
  *
  * @param int|string $post_id Optional realization ID.
  */

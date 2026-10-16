@@ -7,7 +7,7 @@
   desktop and tablet so its height matches the adjacent square card. Mobile
   keeps every card, including the fifth, at 1:1.
 - Added a native Gutenberg sidebar panel for `realizacja` posts to select an
-  additional 16:9 image from Media Library. The attachment ID is stored as
+  additional 2.03:1 image from Media Library. The attachment ID is stored as
   registered post meta, can be changed or removed without affecting the
   existing featured image, and is exposed to Bricks through dedicated ID and
   URL helper functions.

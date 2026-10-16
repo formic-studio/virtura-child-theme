@@ -64,7 +64,7 @@ const RealizationLandscapeImagePanel = () => {
           ? getLabel('replace', 'Zmień zdjęcie')
           : getLabel('choose', 'Wybierz zdjęcie'),
       ),
-      title: getLabel('mediaTitle', 'Wybierz zdjęcie 16:9'),
+      title: getLabel('mediaTitle', 'Wybierz zdjęcie 2.03:1'),
       value: editorState.imageId || undefined,
     }),
   );
@@ -74,14 +74,14 @@ const RealizationLandscapeImagePanel = () => {
     {
       className: 'virtura-realization-image-panel',
       name: 'virtura-realization-landscape-image',
-      title: getLabel('panelTitle', 'Zdjęcie 16:9'),
+      title: getLabel('panelTitle', 'Zdjęcie 2.03 : 1 – prostokąt'),
     },
     createElement(
       'p',
       { className: 'virtura-realization-image-panel__description' },
       getLabel(
         'description',
-        'Poziome zdjęcie realizacji używane w układach 16:9, w rozmiarze 2560 × 1440 px.',
+        'Poziome zdjęcie realizacji używane w układach 2.03:1, w rozmiarze 2560 × 1261 px.',
       ),
     ),
     editorState.imageId && !editorState.media
@@ -100,7 +100,7 @@ const RealizationLandscapeImagePanel = () => {
         'div',
         { className: 'virtura-realization-image-panel__preview' },
         createElement('img', {
-          alt: editorState.media?.alt_text || getLabel('previewAlt', 'Podgląd zdjęcia 16:9'),
+          alt: editorState.media?.alt_text || getLabel('previewAlt', 'Podgląd zdjęcia 2.03:1'),
           src: previewUrl,
         }),
       )
@@ -109,7 +109,7 @@ const RealizationLandscapeImagePanel = () => {
       ? createElement(
         'p',
         { className: 'virtura-realization-image-panel__empty' },
-        getLabel('empty', 'Nie wybrano zdjęcia 16:9.'),
+        getLabel('empty', 'Nie wybrano zdjęcia prostokątnego 2.03:1.'),
       )
       : null,
     createElement(
