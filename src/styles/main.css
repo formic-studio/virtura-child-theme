@@ -454,7 +454,7 @@ body {
 .archive-grid > .archive-block:nth-child(5),
 .archive-grid > .bricks-layout-wrapper > .bricks-layout-item:nth-child(5) {
   align-self: stretch;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 2.03 / 1;
   grid-column: span 2;
 }
 
