@@ -61,6 +61,26 @@ function virtura_child_theme_is_bricks_builder(): bool {
 }
 
 /**
+ * Disable WordPress speculative document prefetching on the frontend.
+ *
+ * On this hosting stack Chrome prefetch requests can time out and leave the
+ * subsequent document navigation pending. Regular link navigation remains
+ * unchanged when the speculative loading configuration is disabled.
+ *
+ * @param array<string, string>|null $config Speculative loading configuration.
+ * @return null
+ */
+function virtura_child_theme_disable_speculative_loading( $config ) {
+	unset( $config );
+
+	return null;
+}
+add_filter(
+	'wp_speculation_rules_configuration',
+	'virtura_child_theme_disable_speculative_loading'
+);
+
+/**
  * Enqueue the built Vite entrypoint and associated CSS.
  */
 function virtura_child_theme_enqueue_vite_entry(
