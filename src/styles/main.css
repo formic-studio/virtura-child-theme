@@ -804,7 +804,7 @@ body:has(.brxe-pagination) .virtura-archive-pagination {
 .grid-2-item.archive-grid > .bricks-layout-wrapper > .bricks-layout-item,
 .grid-2-item .archive-grid > .bricks-layout-wrapper > .bricks-layout-item {
   align-self: auto;
-  aspect-ratio: 1 / 1.12 !important;
+  aspect-ratio: 1 / 1 !important;
   grid-column: auto !important;
 }
 
@@ -839,7 +839,7 @@ body:has(.brxe-pagination) .virtura-archive-pagination {
     .archive-grid
     > .bricks-layout-wrapper
     > .bricks-layout-item:nth-child(2) {
-    aspect-ratio: 1 / 1.15 !important;
+    aspect-ratio: 1 / 1 !important;
     grid-column: auto !important;
   }
 }

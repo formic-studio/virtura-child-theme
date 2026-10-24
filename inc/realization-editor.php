@@ -13,7 +13,7 @@ const VIRTURA_CHILD_THEME_REALIZATION_LANDSCAPE_IMAGE_META = '_virtura_realizati
 
 add_action( 'init', 'virtura_child_theme_register_realization_landscape_image_meta', 20 );
 add_action( 'enqueue_block_editor_assets', 'virtura_child_theme_enqueue_realization_editor_assets', 1 );
-add_filter( 'bricks/frontend/render_element', 'virtura_child_theme_use_landscape_image_on_fifth_realization', 15, 2 );
+add_filter( 'bricks/frontend/render_element', 'virtura_child_theme_use_landscape_image_for_wide_realization_card', 15, 2 );
 
 /**
  * Register the 2.03:1 image attachment ID for REST-backed Gutenberg editing.
@@ -141,24 +141,23 @@ function virtura_get_realization_landscape_image_url( $post_id = 0 ): string {
 }
 
 /**
- * Use the dedicated landscape image in the fifth realization archive card.
+ * Use the dedicated landscape image in wide realization cards.
  *
  * Bricks renders the query loop server-side, including AJAX filter responses.
- * A picture source switches to the dedicated attachment from 768px upwards,
- * while the existing featured image remains the mobile and empty-field
- * fallback without introducing a second visible media element.
+ * The fifth archive card and the second two-item featured card switch to the
+ * dedicated attachment from 768px upwards. The existing featured image stays
+ * as the mobile and empty-field fallback without adding a second visible
+ * media element.
  *
  * @param string          $html    Rendered Bricks element markup.
  * @param \Bricks\Element $element Bricks element instance.
  */
-function virtura_child_theme_use_landscape_image_on_fifth_realization( $html, $element ): string {
+function virtura_child_theme_use_landscape_image_for_wide_realization_card( $html, $element ): string {
 	if (
 		! is_string( $html ) ||
 		'' === $html ||
 		! class_exists( '\\Bricks\\Query' ) ||
 		! method_exists( '\\Bricks\\Query', 'get_loop_index' ) ||
-		! function_exists( 'virtura_child_theme_is_archive_listing_request' ) ||
-		! virtura_child_theme_is_archive_listing_request() ||
 		( function_exists( 'virtura_child_theme_is_bricks_builder' ) && virtura_child_theme_is_bricks_builder() )
 	) {
 		return is_string( $html ) ? $html : '';
@@ -168,12 +167,25 @@ function virtura_child_theme_use_landscape_image_on_fifth_realization( $html, $e
 		? virtura_child_theme_get_bricks_element_settings( $element )
 		: array();
 
+	if ( ! function_exists( 'virtura_child_theme_bricks_element_has_class' ) ) {
+		return $html;
+	}
+
+	$is_archive_card = virtura_child_theme_bricks_element_has_class( $settings, 'archive-block' );
+	$is_blog_card    = virtura_child_theme_bricks_element_has_class( $settings, 'blog' );
+	$is_grid_two     = virtura_child_theme_bricks_element_has_class( $settings, 'grid-2-item' );
+	$loop_index      = (int) \Bricks\Query::get_loop_index();
+	$is_wide_archive_card =
+		! $is_grid_two &&
+		4 === $loop_index &&
+		function_exists( 'virtura_child_theme_is_archive_listing_request' ) &&
+		virtura_child_theme_is_archive_listing_request();
+	$is_wide_featured_card = $is_grid_two && 1 === $loop_index;
+
 	if (
-		! function_exists( 'virtura_child_theme_bricks_element_has_class' ) ||
-		! virtura_child_theme_bricks_element_has_class( $settings, 'archive-block' ) ||
-		virtura_child_theme_bricks_element_has_class( $settings, 'blog' ) ||
-		virtura_child_theme_bricks_element_has_class( $settings, 'grid-2-item' ) ||
-		4 !== (int) \Bricks\Query::get_loop_index()
+		! $is_archive_card ||
+		$is_blog_card ||
+		( ! $is_wide_archive_card && ! $is_wide_featured_card )
 	) {
 		return $html;
 	}
@@ -202,10 +214,13 @@ function virtura_child_theme_use_landscape_image_on_fifth_realization( $html, $e
 	$landscape_srcset = is_string( $landscape_srcset ) && '' !== $landscape_srcset
 		? $landscape_srcset
 		: $landscape_url;
+	$responsive_sizes = $is_wide_featured_card
+		? '(max-width: 1919px) calc(66.667vw - 56px), 1208px'
+		: '(max-width: 991px) calc(100vw - 80px), (max-width: 1919px) calc(66.667vw - 56px), 1208px';
 	$replaced          = false;
 	$updated           = preg_replace_callback(
 		'/<img\b[^>]*>/i',
-		static function ( $matches ) use ( $landscape_srcset, &$replaced ) {
+		static function ( $matches ) use ( $landscape_srcset, $responsive_sizes, &$replaced ) {
 			$image_tag = $matches[0];
 
 			if (
@@ -224,8 +239,9 @@ function virtura_child_theme_use_landscape_image_on_fifth_realization( $html, $e
 			$replaced = true;
 
 			return sprintf(
-				'<picture class="archive-img virtura-realization-card-picture" data-media-switch-image><source media="(min-width: 768px)" srcset="%1$s" sizes="(max-width: 991px) calc(100vw - 80px), (max-width: 1919px) calc(66.667vw - 56px), 1208px">%2$s</picture>',
+				'<picture class="archive-img virtura-realization-card-picture" data-media-switch-image><source media="(min-width: 768px)" srcset="%1$s" sizes="%2$s">%3$s</picture>',
 				esc_attr( $landscape_srcset ),
+				esc_attr( $responsive_sizes ),
 				$image_tag
 			);
 		},

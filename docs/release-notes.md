@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Updated the two-item featured realization grid so its first card uses the
+  square featured image and its second card uses the dedicated landscape image
+  from 768px upwards. Mobile keeps both cards square and uses their featured
+  images; an empty landscape field also falls back to the featured image.
 - Added a server-side Bricks archive image switch for realization cards. The
   fifth query-loop item now uses its dedicated 2.03:1 attachment when present,
   from 768px upwards, while mobile and empty fields fall back to the square
