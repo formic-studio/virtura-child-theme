@@ -114,6 +114,23 @@ body {
   display: none !important;
 }
 
+/*
+ * Complianz blocks the Google Maps script until marketing/external-services
+ * consent is granted. Remove the entire Bricks map wrapper from the layout in
+ * the meantime so the fixed 60rem map height does not leave an empty section.
+ */
+html:not(.bricks-is-builder)
+  body:not(.bricks-is-builder)
+  #brxe-eatfgi {
+  display: none;
+}
+
+html:not(.bricks-is-builder)
+  body.cmplz-marketing:not(.bricks-is-builder)
+  #brxe-eatfgi {
+  display: flex;
+}
+
 .spec-level[data-rating] > .level-dot {
   background-color: transparent !important;
 }
